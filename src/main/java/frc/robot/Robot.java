@@ -15,7 +15,7 @@ import frc.robot.systems.FSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
+	private Limelight limelight;
 	// Systems
 	private FSMSystem fsmSystem;
 
@@ -23,6 +23,9 @@ public class Robot extends TimedRobot {
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
 	 */
+
+
+
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
@@ -36,11 +39,13 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		fsmSystem.reset();
+		limelight = new Limelight();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		fsmSystem.update(null);
+		limelight.isCentered();
 	}
 
 	@Override
