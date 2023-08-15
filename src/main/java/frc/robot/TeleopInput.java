@@ -14,6 +14,17 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 0;
 	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int ELEVATOR_HIGH = 7;
+	private static final int ELEVATOR_MID = 9;
+	private static final int ELEVATOR_LOW = 11;
+	private static final int ELEVATOR_UP = 3;
+	private static final int ELEVATOR_DOWN = 5;
+	private static final int WRIST_IN = 6;
+	private static final int WRIST_OUT = 4;
+	private static final int INTAKE_BUTTON = 2;
+	private static final int FLIP_BUTTON = 10;
+	private static final int ARM_ZERO_BUTTON = 8;
+	private static final int WRIST_ZERO_BUTTON = 12;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -59,13 +70,6 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
-	/**
-	 * Get the value of the intake button.
-	 * @return True if button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
-	}
 
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
@@ -82,7 +86,102 @@ public class TeleopInput {
 	public double getRightJoystickY() {
 		return rightJoystick.getY();
 	}
+	
+	/**
+	 * Get the value of the high button.
+	 * @return True if button is pressed
+	 */
+	public boolean isHighButtonPressed() {
+		return leftJoystick.getRawButton(ELEVATOR_HIGH);
+	}
 
+	/**
+	 * Get the value of the mid button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMidButtonPressed() {
+		return leftJoystick.getRawButton(ELEVATOR_MID);
+	}
+
+	/**
+	 * Get the value of the low button.
+	 * @return True if button is pressed
+	 */
+	public boolean isLowButtonPressed() {
+		return leftJoystick.getRawButton(ELEVATOR_LOW);
+	}
+
+	/**
+	 * Get the value of the elevator up button.
+	 * @return True if button is pressed
+	 */
+	public boolean isElevatorUpButtonPressed() {
+		return leftJoystick.getRawButton(ELEVATOR_UP);
+	}
+
+	/**
+	 * Get the value of the elevator down button.
+	 * @return True if button is pressed
+	 */
+	public boolean isElevatorDownButtonPressed() {
+		return leftJoystick.getRawButton(ELEVATOR_DOWN);
+	}
+
+	/**
+	 * Get the value of the release button.
+	 * @return True if button is pressed
+	 */
+	public boolean isOuttakeButtonPressed() {
+		return leftJoystick.getTriggerPressed();
+	}
+
+	/**
+	 * Get the value of the wrist down button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristOutButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_OUT);
+	}
+
+	/**
+	 * Get the value of the wrist up button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristInButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_IN);
+	}
+
+	/**
+	 * Get the value of the fine tuning button.
+	 * @return True if button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return leftJoystick.getRawButton(INTAKE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the arm zero button.
+	 * @return True if button is pressed
+	 */
+	public boolean isArmZeroButtonPressed() {
+		return leftJoystick.getRawButton(ARM_ZERO_BUTTON);
+	}
+
+	/**
+	 * Get the value of the wrist zero button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristZeroButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_ZERO_BUTTON);
+	}
+
+	/**
+	 * Get the value of the throttle.
+	 * @return True throttle is forward
+	 */
+	public boolean isThrottleForward() {
+		return leftJoystick.getThrottle() <= 0;
+	}
 	/* ======================== Private methods ======================== */
 
 }
