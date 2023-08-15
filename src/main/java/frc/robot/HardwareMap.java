@@ -18,10 +18,10 @@ public final class HardwareMap {
 	public static final int CAN_ID_BACK_RIGHT_TURN = 8;
 
 	//CANCoder port ID's
-	//public static final int FRONT_LEFT_CANCODER_ID = 0; //TH IS IS A PLACEHOLDER
-	// public static final int FRONT_RIGHT_CANCODER_ID = 1; //THIS IS A PLACEHOLDER
-	// public static final int BACK_LEFT_CANCODER_ID = 2; //THIS IS A PLACEHOLDER
-	// public static final int BACK_RIGHT_CANCODER_ID = 3; //THIS IS A PLACEHOLDER
+	public static final int FRONT_LEFT_CANCODER_ID = 0; //TH IS IS A PLACEHOLDER
+	public static final int FRONT_RIGHT_CANCODER_ID = 1; //THIS IS A PLACEHOLDER
+	public static final int BACK_LEFT_CANCODER_ID = 2; //THIS IS A PLACEHOLDER
+	public static final int BACK_RIGHT_CANCODER_ID = 3; //THIS IS A PLACEHOLDER
 
 	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
 	private static final int DIO_TEST_SETUP_CHANNEL = 9;
