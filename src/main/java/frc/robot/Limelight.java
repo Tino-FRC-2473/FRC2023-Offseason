@@ -14,6 +14,7 @@ public class Limelight {
     //camera height is 20.8 inches
     final double TARGET_HEIGHT_METERS = Units.feetToMeters(1.91);
     final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
+    final double TARGET_TO_CAMERA = TARGET_HEIGHT_METERS - CAMERA_HEIGHT_METERS;
     double TARGET_PITCH_RADIANS =  Units.degreesToRadians(0);
 
     public Limelight() {
@@ -26,7 +27,7 @@ public class Limelight {
         if(result.hasTargets()) { //at target = 0, to the left of target = pos, to the right of target = neg
             TARGET_PITCH_RADIANS = result.getBestTarget().getPitch();
             boolean centered = false;
-            SmartDashboard.putNumber("Distance to Tape", getTapeDistance());
+            SmartDashboard.putNumber("Distance to Tape", getTapeDistance2());
                 //System.out.println(Units.radiansToDegrees(result.getBestTarget().getYaw()) + ", without conversion ->" + result.getBestTarget().getYaw());
                 
             if(result.getBestTarget() != null && result.getBestTarget().getYaw() >= -CAMERA_YAW_DEGREES && result.getBestTarget().getYaw() <= CAMERA_YAW_DEGREES) {
@@ -64,5 +65,10 @@ public class Limelight {
         }
 
     }
+    public double getTapeDistance2() {
 
-}
+        return TARGET_TO_CAMERA/Math.sin(Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
+    }
+
+    }
+
