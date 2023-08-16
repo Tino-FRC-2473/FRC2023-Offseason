@@ -3,37 +3,66 @@ package frc.robot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Limelight {
 
-
-    // Angle between horizontal and the camera.
-    final double CAMERA_YAW_RADIANS = Units.degreesToRadians(3);
-
-
     private PhotonCamera photonCamera;
+    // Angle between horizontal and the camera.
+    final double CAMERA_YAW_DEGREES = 3;
+    final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(20.6);
+    //camera height is 20.8 inches
+    final double TARGET_HEIGHT_METERS = Units.feetToMeters(1.91);
+    final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
+    double TARGET_PITCH_RADIANS =  Units.degreesToRadians(0);
 
     public Limelight() {
         photonCamera = new PhotonCamera("OV5647");
         photonCamera.setDriverMode(false);
     }
-
-    public void isCentered() {
+    public int isCentered() {
+        photonCamera.setPipelineIndex(5);
         var result = photonCamera.getLatestResult();
-        if(result.hasTargets()) {
-            if(result.getBestTarget().getYaw() >= CAMERA_YAW_RADIANS && result.getBestTarget().getYaw() <= -CAMERA_YAW_RADIANS) {
-                System.out.println("centered");
+        if(result.hasTargets()) { //at target = 0, to the left of target = pos, to the right of target = neg
+            TARGET_PITCH_RADIANS = result.getBestTarget().getPitch();
+            boolean centered = false;
+            SmartDashboard.putNumber("Distance to Tape", getTapeDistance());
+                //System.out.println(Units.radiansToDegrees(result.getBestTarget().getYaw()) + ", without conversion ->" + result.getBestTarget().getYaw());
+                
+            if(result.getBestTarget() != null && result.getBestTarget().getYaw() >= -CAMERA_YAW_DEGREES && result.getBestTarget().getYaw() <= CAMERA_YAW_DEGREES) {
+                centered = true;
+                //System.out.println("centered");
+                SmartDashboard.putBoolean("Centered or not", centered);
+                return 0;
             } else {
-                System.out.println("not centered");
+                //System.out.println("not centered");
+                if(result.getBestTarget().getYaw()>0){
+                    return 1;
+                }else{
+                    return -1;
+                }
             }
-        } else if (!result.hasTargets()) {
+        } else{
             System.out.println("no target");
+            return 50;
         }
+        // SmartDashboard.putNumber("Camera Yaw to target (deg)", result.getBestTarget().getYaw());
     }
 
     //write a method that calculates the distance to the reflective tape
     public double getTapeDistance() {
 
-        return 0.0;
+
+        if(photonCamera.getLatestResult()!=null){
+            return PhotonUtils.calculateDistanceToTargetMeters(
+            CAMERA_HEIGHT_METERS,
+            TARGET_HEIGHT_METERS,
+            CAMERA_PITCH_RADIANS,
+            Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
+        }else{
+            return -1;
+        }
+
     }
+
 }
