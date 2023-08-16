@@ -70,7 +70,9 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
-
+    public boolean isFlipButtonPressed(){
+		return leftJoystick.getRawButton(10);
+	}
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
