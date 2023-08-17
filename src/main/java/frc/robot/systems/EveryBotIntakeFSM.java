@@ -27,6 +27,7 @@ public class EveryBotIntakeFSM {
 		CONE,
 		EMPTY
 	}
+	// hello
 	//HAVE TO CHANGE BASED ON TEST
 	private static final double KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.5;
