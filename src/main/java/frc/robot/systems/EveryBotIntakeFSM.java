@@ -18,8 +18,8 @@ public class EveryBotIntakeFSM {
 		INTAKING,
 		IDLE_FLIPCLOCKWISE,
 		IDLE_FLIPCOUNTERCLOCKWISE,
-        IDLE_STOP,
-        OUTTAKING
+		IDLE_STOP,
+		OUTTAKING
 	}
 	// Distance definitions
 	public enum ItemType {
@@ -27,13 +27,13 @@ public class EveryBotIntakeFSM {
 		CONE,
 		EMPTY
 	}
-	//HAVE TO CHANGE BASED ON TEST           
+	//HAVE TO CHANGE BASED ON TEST
 	private static final double KEEP_SPEED = 0.07;
 	private static final double INTAKE_SPEED = 0.5;
 	private static final double RELEASE_SPEED = -1; //DONT FORGET -
 	private static final double RELEASE_SPEED_LOW = -0.3;
 	private static final double CURRENT_THRESHOLD = 20;
-	private static final double BASE_THRESHOLD = 100;             
+	private static final double BASE_THRESHOLD = 100;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	private static final int AVERAGE_SIZE = 10;
@@ -45,7 +45,6 @@ public class EveryBotIntakeFSM {
 	private boolean isMotorAllowed = false;
 	private boolean toggleUpdate = true;
 	private boolean needsReset = true;
-	private boolean isIntakeUP = false;
 	private int tick = 0;
 	private boolean hasTimerStarted = false;
 	private double[] currLogsCone = new double[AVERAGE_SIZE];
@@ -57,7 +56,7 @@ public class EveryBotIntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotorCone;
-    private CANSparkMax spinnerMotorCube;   
+	private CANSparkMax spinnerMotorCube;
 	private CANSparkMax flipMotor;
 	private Timer timer;
 	private ElevatorArmFSM arm;
@@ -78,7 +77,7 @@ public class EveryBotIntakeFSM {
 				CANSparkMax.MotorType.kBrushless);
 		// Reset state machine
 		reset();
-	}                        
+	}
 
 	/* ======================== Public methods ======================== */
 	/**
@@ -124,7 +123,7 @@ public class EveryBotIntakeFSM {
 		} else {
 			itemType = ItemType.CONE;
 		}
-		if (toggleUpdate) { 
+		if (toggleUpdate) {
 			SmartDashboard.putNumber("output current", spinnerMotorCone.getOutputCurrent());
 			SmartDashboard.putNumber("output current", spinnerMotorCube.getOutputCurrent());
 			SmartDashboard.putString("spinning intake state", currentState.toString());
@@ -133,8 +132,6 @@ public class EveryBotIntakeFSM {
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putNumber("spinner power", spinnerMotorCone.get());
 			SmartDashboard.putNumber("spinner power", spinnerMotorCube.get());
-			
-			
 			switch (currentState) {
 				case INTAKING:
 					handleIntakingState();
@@ -180,12 +177,6 @@ public class EveryBotIntakeFSM {
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
 	}
-	
-	public boolean getIntake(){
-		return isIntakeUP;
-	}
-	
-	
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	/**
@@ -210,7 +201,6 @@ public class EveryBotIntakeFSM {
 			return EveryBotIntakeFSMState.IDLE_STOP;
 		}
 		switch (currentState) {
-		
 			case INTAKING:
 				if (needsReset && isMotorAllowed && toggleUpdate) {
 					timer.reset();
@@ -219,7 +209,7 @@ public class EveryBotIntakeFSM {
 				}
 				if (timer.hasElapsed(TIME_RESET_CURRENT)) {
 					currLogsCone[tick % AVERAGE_SIZE] = spinnerMotorCone.getOutputCurrent();
-					currLogsCube[tick% AVERAGE_SIZE] = spinnerMotorCube.getOutputCurrent();
+					currLogsCube[tick % AVERAGE_SIZE] = spinnerMotorCube.getOutputCurrent();
 					tick++;
 
 					double avgcube = 0;
@@ -230,46 +220,43 @@ public class EveryBotIntakeFSM {
 					}
 					avgcone /= AVERAGE_SIZE;
 					avgcube /= AVERAGE_SIZE;
-     
-					if (avgcone > CURRENT_THRESHOLD || !(input.isIntakeButtonPressed()) ) {
+					if (avgcone > CURRENT_THRESHOLD || !(input.isIntakeButtonPressed())) {
 						return EveryBotIntakeFSMState.IDLE_STOP;
 					}
 				}
 				return EveryBotIntakeFSMState.INTAKING;
-			case IDLE_STOP: 
-				if (input.isOuttakeButtonPressed() && flipMotor.getEncoder().getPosition()>FLIP_THRESHOLD) {
+			case IDLE_STOP:
+				if (input.isOuttakeButtonPressed()
+					&& flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
 					return EveryBotIntakeFSMState.OUTTAKING;
-				}
-				else if(input.isIntakeButtonPressed() && !(flipMotor.getEncoder().getPosition()>FLIP_THRESHOLD)){
+				} else if (input.isIntakeButtonPressed()
+					&& !(flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD)) {
 					return EveryBotIntakeFSMState.INTAKING;
-				}
-				else if(input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD){
+				} else if (input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				}
 			case IDLE_FLIPCLOCKWISE:
-				if(flipMotor.getEncoder().getPosition()<FLIP_THRESHOLD){
+				if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
-				}else if(input.isFlipButtonPressed()){
+				} else if (input.isFlipButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
-				}else if(flipMotor.getEncoder().getPosition()>FLIP_THRESHOLD){
+				} else if (flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
-			    if(flipMotor.getEncoder().getPosition() < 0){
+				if (flipMotor.getEncoder().getPosition() < 0) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
-				}else if(input.isFlipButtonPressed()&&arm.getEncoderCount()>BASE_THRESHOLD){
+				} else if (input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
-				}
-				else{
+				} else {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
 				}
 			case OUTTAKING:
-				if(input.isOuttakeButtonPressed()){
-                   return EveryBotIntakeFSMState.OUTTAKING;
-				}else{
+				if (input.isOuttakeButtonPressed()) {
+					return EveryBotIntakeFSMState.OUTTAKING;
+				} else {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
-				
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -279,33 +266,26 @@ public class EveryBotIntakeFSM {
 	/**
 	 * Handle behavior in states.
 	 */
-	private void handleStartState() {
-       
-	}
-	private void handleIntakingState() { 
-		
-			spinnerMotorCone.set(INTAKE_SPEED);
-			spinnerMotorCube.set(INTAKE_SPEED);
-		
+	private void handleIntakingState() {
+		spinnerMotorCone.set(INTAKE_SPEED);
+		spinnerMotorCube.set(INTAKE_SPEED);
 	}
 	private void handleIdleStopState() {
 		spinnerMotorCone.set(KEEP_SPEED);
 		spinnerMotorCube.set(KEEP_SPEED);
 	}
-	private void handleFlipClockWiseState(){
+	private void handleFlipClockWiseState() {
 		flipMotor.set(TURN_SPEED);
-		if(flipMotor.getEncoder().getPosition()>= FLIP_THRESHOLD){
-           flipMotor.set(0);   
-
+		if (flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD) {
+			flipMotor.set(0);
 		}
-	} 
-	private void handleFlipCounterClockWiseState(){
+	}
+	private void handleFlipCounterClockWiseState() {
 		flipMotor.set(-TURN_SPEED);
-		if(flipMotor.getEncoder().getPosition()<= 0){
-           flipMotor.set(0);   
-
+		if (flipMotor.getEncoder().getPosition() <= 0) {
+			flipMotor.set(0);
 		}
-	}                      
+	}
 	private void handleOuttakingState(TeleopInput input) {
 		if (input == null) {
 			if (!hasTimerStarted) {
@@ -325,7 +305,7 @@ public class EveryBotIntakeFSM {
 			} else {
 				spinnerMotorCone.set(RELEASE_SPEED);
 			}
-		} 
+		}
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
 	}
