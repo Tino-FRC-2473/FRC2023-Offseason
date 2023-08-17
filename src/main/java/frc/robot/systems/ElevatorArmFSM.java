@@ -83,8 +83,12 @@ public class ElevatorArmFSM {
 		return currentState;
 	}
 
-	public double getEncoderCount(){
-        return armMotor.getEncoder().getPosition();
+	/**
+	 * Return current arm encoder count.
+	 * @return Current arm encoder count
+	 */
+	public double getEncoderCount() {
+		return armMotor.getEncoder().getPosition();
 	}
 	/**
 	 * Reset this system to its start state. This may be called from mode init

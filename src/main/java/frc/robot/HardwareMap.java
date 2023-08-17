@@ -54,6 +54,4 @@ public final class HardwareMap {
 	public static boolean isWristDisabled() {
 		return !HardwareMap.wristPin.get();
 	}
-	
-	
 }

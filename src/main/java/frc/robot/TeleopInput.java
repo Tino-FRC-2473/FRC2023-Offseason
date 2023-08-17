@@ -70,8 +70,13 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
-    public boolean isFlipButtonPressed(){
-		return leftJoystick.getRawButton(10);
+
+	/**
+	 * Get the value of the flip button.
+	 * @return True if the button is pressed
+	 */
+	public boolean isFlipButtonPressed() {
+		return leftJoystick.getRawButton(FLIP_BUTTON);
 	}
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
@@ -88,7 +93,7 @@ public class TeleopInput {
 	public double getRightJoystickY() {
 		return rightJoystick.getY();
 	}
-	
+
 	/**
 	 * Get the value of the high button.
 	 * @return True if button is pressed
