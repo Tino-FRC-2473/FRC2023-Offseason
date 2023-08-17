@@ -28,8 +28,10 @@ public class Limelight {
             TARGET_PITCH_RADIANS = result.getBestTarget().getPitch();
             boolean centered = false;
             SmartDashboard.putNumber("Distance to Tape", getTapeDistance2());
+            SmartDashboard.putNumber("Target Pitch", photonCamera.getLatestResult().getBestTarget().getPitch());
                 //System.out.println(Units.radiansToDegrees(result.getBestTarget().getYaw()) + ", without conversion ->" + result.getBestTarget().getYaw());
-                
+            SmartDashboard.putNumber("Actual pitch", Math.atan(TARGET_TO_CAMERA / 0.2925));
+            SmartDashboard.putNumber("dist target to camera", TARGET_TO_CAMERA);
             if(result.getBestTarget() != null && result.getBestTarget().getYaw() >= -CAMERA_YAW_DEGREES && result.getBestTarget().getYaw() <= CAMERA_YAW_DEGREES) {
                 centered = true;
                 //System.out.println("centered");
