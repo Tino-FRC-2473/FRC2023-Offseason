@@ -20,7 +20,6 @@ public class EveryBotIntakeFSM {
 		IDLE_FLIPCOUNTERCLOCKWISE,
         IDLE_STOP,
         OUTTAKING
-		
 	}
 	// Distance definitions
 	public enum ItemType {
