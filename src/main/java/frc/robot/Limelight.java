@@ -10,9 +10,9 @@ public class Limelight {
     private PhotonCamera photonCamera;
     // Angle between horizontal and the camera.
     final double CAMERA_YAW_DEGREES = 3;
-    final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(20.6);
+    final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(20.75);
     //camera height is 20.8 inches
-    final double TARGET_HEIGHT_METERS = Units.feetToMeters(1.91);
+    final double TARGET_HEIGHT_METERS = Units.feetToMeters(1.927);
     final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
     final double TARGET_TO_CAMERA = TARGET_HEIGHT_METERS - CAMERA_HEIGHT_METERS;
     double TARGET_PITCH_RADIANS =  Units.degreesToRadians(0);
@@ -44,6 +44,7 @@ public class Limelight {
                 }
             }
         } else{
+            SmartDashboard.putBoolean("Centered or not", false);
             System.out.println("no target");
             return 50;
         }
