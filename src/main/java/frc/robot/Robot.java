@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.FSMSystem;
 
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation.
@@ -19,6 +22,8 @@ public class Robot extends TimedRobot {
 	// Systems
 	private FSMSystem fsmSystem;
 
+	NetworkTable table;
+	DoubleSubscriber xSub;
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -47,11 +52,14 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		fsmSystem.reset();
+		table = NetworkTableInstance.getDefault().getTable("datatable");
+		xSub = table.getDoubleTopic("x").subscribe(-1);
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		fsmSystem.update(input);
+		double x = xSub.get();
 	}
 
 	@Override
