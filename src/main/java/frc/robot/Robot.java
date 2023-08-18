@@ -5,7 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.FSMSystem;
 
@@ -16,6 +16,7 @@ import frc.robot.systems.FSMSystem;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	private Limelight limelight;
+	private AprilTag apriltag;
 	// Systems
 	private FSMSystem fsmSystem;
 
@@ -40,12 +41,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Autonomous Init --------");
 		fsmSystem.reset();
 		limelight = new Limelight();
+		apriltag = new AprilTag();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		fsmSystem.update(null);
-		limelight.isCentered();
+		//limelight.isCentered();
+		apriltag.isCentered();
+		
+		SmartDashboard.putNumber("estimated pose", apriltag.getTagX());
 	}
 
 	@Override
