@@ -35,9 +35,9 @@ public final class SwerveConstants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(22.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final double kWheelBase = Units.inchesToMeters(22.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -46,22 +46,23 @@ public final class SwerveConstants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = 6.63 + Math.PI/2;
-    public static final double kFrontRightChassisAngularOffset = 2.00 + Math.PI/2;
-    public static final double kBackLeftChassisAngularOffset = 2.03 + Math.PI/2;
-    public static final double kBackRightChassisAngularOffset = 1.39 + Math.PI/2;
+    public static final double kFrontLeftChassisAngularOffset = 2.00 - Math.PI/2;
+    public static final double kFrontRightChassisAngularOffset = 6.63 - Math.PI/2;
+    public static final double kBackLeftChassisAngularOffset = 1.39 - Math.PI/2;
+    public static final double kBackRightChassisAngularOffset = 2.03 - Math.PI/2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 1;
-    public static final int kRearLeftDrivingCanId = 5;
-    public static final int kFrontRightDrivingCanId = 3;
-    public static final int kRearRightDrivingCanId = 7;
+    public static final int kFrontLeftDrivingCanId = 3;
+    public static final int kFrontRightDrivingCanId = 1;
+    public static final int kRearLeftDrivingCanId = 7;
+    public static final int kRearRightDrivingCanId = 5;
 
-    public static final int kFrontLeftTurningCanId = 2;
-    public static final int kRearLeftTurningCanId = 6;
-    public static final int kFrontRightTurningCanId = 4;
-    public static final int kRearRightTurningCanId = 8;
+    public static final int kFrontLeftTurningCanId = 4;
+    public static final int kFrontRightTurningCanId = 2;
+    public static final int kRearLeftTurningCanId = 8;
+    public static final int kRearRightTurningCanId = 6;
 
+  
     public static final boolean kGyroReversed = false;
   }
 
@@ -112,7 +113,7 @@ public final class SwerveConstants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 20; // amps //50
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 

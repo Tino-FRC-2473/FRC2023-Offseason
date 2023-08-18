@@ -43,7 +43,8 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private AHRS gyro = new AHRS(SPI.Port.kMXP);
+  //private AHRS gyro = new AHRS(SPI.Port.kMXP);
+  private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -72,10 +73,10 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    System.out.println("front right: " + m_frontRight.getPosition());
-    System.out.println("front left: " + m_frontLeft.getPosition());
-    System.out.println("back right: " + m_rearRight.getPosition());
-    System.out.println("back left: " + m_rearLeft.getPosition());
+    // System.out.println("front right: " + m_frontRight.getPosition());
+    // System.out.println("front left: " + m_frontLeft.getPosition());
+    // System.out.println("back right: " + m_rearRight.getPosition());
+    // System.out.println("back left: " + m_rearLeft.getPosition());
     m_odometry.update(
         Rotation2d.fromDegrees(gyro.getAngle()),
         new SwerveModulePosition[] {
@@ -194,14 +195,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void balence() {
     double power;
-    if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
-      > -2) {
-      power = 0;
-    } else if (gyro.getRoll() > 0) {
-      power = Math.abs(gyro.getRoll()) / 200;
-    } else if (gyro.getRoll() < 0) {
-      power = -Math.abs(gyro.getRoll()) / 200;
-    }
+    // if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
+    //   > -2) {
+    //   power = 0;
+    // } else if (gyro.getRoll() > 0) {
+    //   power = Math.abs(gyro.getRoll()) / 200;
+    // } else if (gyro.getRoll() < 0) {
+    //   power = -Math.abs(gyro.getRoll()) / 200;
+    // }
     // set to power field reletive so facing charge station
   }
 
