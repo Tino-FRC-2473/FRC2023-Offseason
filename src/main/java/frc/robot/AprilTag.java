@@ -60,21 +60,24 @@ public class AprilTag {
     }
 
     // Returns estimated pose of april tag from camera or null if optPose doesn't exist
-    public Pose3d getEstimatedGlobalPose(Pose2d p) {
+    public Pose3d getEstimatedGlobalPose() {
         //System.out.println("here");
         photonCamera.setPipelineIndex(4);
         Optional<EstimatedRobotPose> optPose = poseEstimator.update();
+        System.out.println("has value " + optPose.isPresent());
+        //System.out.println("Value of Pose " + poseEstimator);
+        //SmartDashboard.putData("Value of optPose", optPose);
         if (optPose != null && optPose.get() != null) {
             return optPose.get().estimatedPose;
         } else {
-            return null;
+            return null ;
         }
     }
 
     // Returns x pose of target from camera, else unreasonable number 
     public double getTagX() {
         try {
-            return getEstimatedGlobalPose(new Pose2d()).toPose2d().getX();
+            return getEstimatedGlobalPose().toPose2d().getX();
             
         } catch (NoSuchElementException e) {
             e.printStackTrace();
