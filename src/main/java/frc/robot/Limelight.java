@@ -4,6 +4,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
 
 public class Limelight {
 
@@ -70,7 +71,7 @@ public class Limelight {
     }
     public double getTapeDistance2() {
 
-        return TARGET_TO_CAMERA/Math.sin(Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
+        return TARGET_TO_CAMERA/Math.tan(Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
     }
 
     }
