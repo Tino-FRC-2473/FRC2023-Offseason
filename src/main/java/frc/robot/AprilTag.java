@@ -37,10 +37,12 @@ public class AprilTag {
     final double TARGET_TO_CAMERA = TARGET_HEIGHT_METERS - CAMERA_HEIGHT_METERS;
     double TARGET_PITCH_RADIANS =  Units.degreesToRadians(0);
     private Transform3d robotToCam;
+    private Optional<EstimatedRobotPose> optPose;
 
     public AprilTag() {
         photonCamera = new PhotonCamera("OV5647");
         photonCamera.setDriverMode(false);
+        photonCamera.setPipelineIndex(0);
 
         AprilTagFieldLayout atfl = null;
 		try {
@@ -48,7 +50,7 @@ public class AprilTag {
 				AprilTagFields.k2023ChargedUp.m_resourceFile);
 			System.out.println(atfl);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("error with loading april tag");
 		}
 
         // Transform the robot pose to find the camera's pose
@@ -62,21 +64,23 @@ public class AprilTag {
     // Returns estimated pose of april tag from camera or null if optPose doesn't exist
     public Pose3d getEstimatedGlobalPose() {
         //System.out.println("here");
-        photonCamera.setPipelineIndex(4);
-        Optional<EstimatedRobotPose> optPose = poseEstimator.update();
+        photonCamera.setPipelineIndex(0);
+        optPose = poseEstimator.update();
         System.out.println("has value " + optPose.isPresent());
         //System.out.println("Value of Pose " + poseEstimator);
         //SmartDashboard.putData("Value of optPose", optPose);
         if (optPose != null && optPose.get() != null) {
-            return optPose.get().estimatedPose;
+            return poseEstimator.update().get().estimatedPose;
         } else {
             return null ;
         }
     }
 
     // Returns x pose of target from camera, else unreasonable number 
+    // 
     public double getTagX() {
         try {
+            photonCamera.setPipelineIndex(0);
             return getEstimatedGlobalPose().toPose2d().getX();
             
         } catch (NoSuchElementException e) {
@@ -106,7 +110,7 @@ public class AprilTag {
     // NEED TO MODIFY FUNCTION FOR APRIL TAG
     public int isCentered() {
         SmartDashboard.putNumber("Pipeline index", photonCamera.getPipelineIndex());
-        photonCamera.setPipelineIndex(4);
+        photonCamera.setPipelineIndex(0);
         var result = photonCamera.getLatestResult();
         if(result.hasTargets()) { //at target = 0, to the left of target = pos, to the right of target = neg
             TARGET_PITCH_RADIANS = result.getBestTarget().getPitch();
