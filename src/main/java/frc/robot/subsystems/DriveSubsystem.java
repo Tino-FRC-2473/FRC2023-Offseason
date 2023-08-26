@@ -77,14 +77,14 @@ public class DriveSubsystem extends SubsystemBase {
 	// System.out.println("front left: " + m_frontLeft.getPosition());
 	// System.out.println("back right: " + m_rearRight.getPosition());
 	// System.out.println("back left: " + m_rearLeft.getPosition());
-	mOdometry.update(
-		Rotation2d.fromDegrees(gyro.getAngle()),
-		new SwerveModulePosition[] {
-			mFrontLeft.getPosition(),
-			mFrontRight.getPosition(),
-			mRearLeft.getPosition(),
-			mRearRight.getPosition()
-		});
+		mOdometry.update(
+			Rotation2d.fromDegrees(gyro.getAngle()),
+			new SwerveModulePosition[] {
+				mFrontLeft.getPosition(),
+				mFrontRight.getPosition(),
+				mRearLeft.getPosition(),
+				mRearRight.getPosition()
+			});
 	}
 
 	/**
@@ -137,32 +137,32 @@ public class DriveSubsystem extends SubsystemBase {
 			// Calculate the direction slew rate based on an estimate of the lateral acceleration
 			double directionSlewRate;
 			if (mCurrentTranslationMag != 0.0) {
-				directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
+				directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / mCurrentTranslationMag);
 			} else {
 				directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
 			}
 
 			double currentTime = WPIUtilJNI.now() * 1e-6;
-			double elapsedTime = currentTime - m_prevTime;
-			double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
+			double elapsedTime = currentTime - mPrevTime;
+			double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, mCurrentTranslationDir);
 
 			if (angleDif < 0.45*Math.PI) {
-				mCurrentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-				mCurrentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+				mCurrentTranslationDir = SwerveUtils.StepTowardsCircular(mCurrentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+				mCurrentTranslationMag = mMagLimiter.calculate(inputTranslationMag);
 			} else if (angleDif > 0.85*Math.PI) {
 				if (mCurrentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
-					mCurrentTranslationMag = m_magLimiter.calculate(0.0);
+					mCurrentTranslationMag = mMagLimiter.calculate(0.0);
 				} else {
-					mCurrentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
+					mCurrentTranslationDir = SwerveUtils.WrapAngle(mCurrentTranslationDir + Math.PI);
 					mCurrentTranslationMag = mMagLimiter.calculate(inputTranslationMag);
 				}
 			} else {
-				mCurrentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+				mCurrentTranslationDir = SwerveUtils.StepTowardsCircular(mCurrentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
 				mCurrentTranslationMag = mMagLimiter.calculate(0.0);
 			}
 			mPrevTime = currentTime;
-			
+
 			xSpeedCommanded = mCurrentTranslationMag * Math.cos(mCurrentTranslationDir);
 			ySpeedCommanded = mCurrentTranslationMag * Math.sin(mCurrentTranslationDir);
 			mCurrentRotation = mRotLimiter.calculate(rot);

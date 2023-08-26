@@ -75,7 +75,7 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		new JoystickButton(mDriverController, Button.kR1.value)
 				.whileTrue(new RunCommand(
-						() -> m_robotDrive.setX(),
+						() -> mRobotDrive.setX(),
 						mRobotDrive));
 	}
 
@@ -87,7 +87,7 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// Create config for trajectory
 		TrajectoryConfig config = new TrajectoryConfig(
-				AutoConstants.kMaxSpeedMetersPerSecond,
+				AutoConstants.K_MAX_SPEED_METERS_PER_SECOND,
 				AutoConstants.kMaxAccelerationMetersPerSecondSquared)
 				// Add kinematics to ensure max speed is actually obeyed
 				.setKinematics(DriveConstants.kDriveKinematics);
