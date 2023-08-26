@@ -33,10 +33,11 @@ import java.util.List;
  */
 public class RobotContainer {
 	// The robot's subsystems
-	private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+	private final DriveSubsystem mRobotDrive = new DriveSubsystem();
 
 	// The driver's controller
-	XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+	private XboxController mDriverController =
+		new XboxController(OIConstants.kDriverControllerPort);
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -46,16 +47,20 @@ public class RobotContainer {
 		configureButtonBindings();
 
 		// Configure default commands
-		m_robotDrive.setDefaultCommand(
+		mRobotDrive.setDefaultCommand(
 				// The left stick controls translation of the robot.
 				// Turning is controlled by the X axis of the right stick.
 				new RunCommand(
-						() -> m_robotDrive.drive(
-								-MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-								-MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-								-MathUtil.applyDeadband(-m_driverController.getRightX(), OIConstants.kDriveDeadband),
-								true, true),
-						m_robotDrive));
+						() -> mRobotDrive.drive(
+							-MathUtil.applyDeadband(
+								mDriverController.getLeftY(), OIConstants.kDriveDeadband),
+							-MathUtil.applyDeadband(
+								mDriverController.getLeftX(), OIConstants.kDriveDeadband),
+							-MathUtil.applyDeadband(
+								-mDriverController.getRightX(), OIConstants.kDriveDeadband),
+							true,
+							true),
+						mRobotDrive));
 	}
 
 	/**
@@ -68,10 +73,10 @@ public class RobotContainer {
 	 * {@link JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		new JoystickButton(m_driverController, Button.kR1.value)
+		new JoystickButton(mDriverController, Button.kR1.value)
 				.whileTrue(new RunCommand(
 						() -> m_robotDrive.setX(),
-						m_robotDrive));
+						mRobotDrive));
 	}
 
 	/**
@@ -103,20 +108,20 @@ public class RobotContainer {
 
 		SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
 				exampleTrajectory,
-				m_robotDrive::getPose, // Functional interface to feed supplier
+				mRobotDrive::getPose, // Functional interface to feed supplier
 				DriveConstants.kDriveKinematics,
 
 				// Position controllers
 				new PIDController(AutoConstants.kPXController, 0, 0),
 				new PIDController(AutoConstants.kPYController, 0, 0),
 				thetaController,
-				m_robotDrive::setModuleStates,
-				m_robotDrive);
+				mRobotDrive::setModuleStates,
+				mRobotDrive);
 
 		// Reset odometry to the starting pose of the trajectory.
-		m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+		mRobotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
 		// Run path following command, then stop at the end.
-		return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+		return swerveControllerCommand.andThen(() -> mRobotDrive.drive(0, 0, 0, false, false));
 	}
 }
