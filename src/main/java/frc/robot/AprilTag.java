@@ -66,24 +66,32 @@ public class AprilTag {
         //System.out.println("here");
         photonCamera.setPipelineIndex(0);
         optPose = poseEstimator.update();
-        System.out.println("has value " + optPose.isPresent());
-        //System.out.println("Value of Pose " + poseEstimator);
-        //SmartDashboard.putData("Value of optPose", optPose);
-        if (optPose != null && optPose.get() != null) {
-            return poseEstimator.update().get().estimatedPose;
-        } else {
-            return null ;
+        if (optPose.isEmpty()) {
+            return null;
         }
+        return optPose.get().estimatedPose;
     }
+
+    // public EstimatedRobotPose update() {
+    //     Optional<EstimatedRobotPose> poses = poseEstimator.update();
+    //     if (poses.isPresent()) {
+    //         EstimatedRobotPose estimatedPose = poses.get();
+    //         return estimatedPose;
+    //         //poseEstimator.addVisionMeasurement()
+    //     } else {
+    //         return null;
+    //     }
+       
+    // }
 
     // Returns x pose of target from camera, else unreasonable number 
     // 
     public double getTagX() {
         try {
             photonCamera.setPipelineIndex(0);
-            return getEstimatedGlobalPose().toPose2d().getX();
+            return getEstimatedGlobalPose().getX();
             
-        } catch (NoSuchElementException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
         return 10000;
