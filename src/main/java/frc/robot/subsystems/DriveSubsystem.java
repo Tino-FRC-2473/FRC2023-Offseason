@@ -151,13 +151,13 @@ public class DriveSubsystem extends SubsystemBase {
 			double angleDif = SwerveUtils.AngleDifference(inputTranslationDir,
 				currentTranslationDir);
 
-			if (angleDif < 0.45*Math.PI) {
+			if (angleDif < 0.45 * Math.PI) {
 				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-			} else if (angleDif > 0.85*Math.PI) {
+			} else if (angleDif > 0.85 * Math.PI) {
 				if (currentTranslationMag > 1e-4) {
-					//some small number to avoid floating-point errors with equality checking
+					// some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
 				} else {
@@ -216,10 +216,14 @@ public class DriveSubsystem extends SubsystemBase {
 	 * Sets the wheels into an X formation to prevent movement.
 	 */
 	public void setX() {
-		frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-		frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-		rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-		rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+		frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
+			Math.toDegrees(Math.PI / 2))));
+		frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
+			-Math.toDegrees(Math.PI / 2))));
+		rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
+			-Math.toDegrees(Math.PI / 2))));
+		rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
+			Math.toDegrees(Math.PI / 2))));
 	}
 
 	/**
