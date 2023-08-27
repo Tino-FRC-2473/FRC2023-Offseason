@@ -88,7 +88,7 @@ public class RobotContainer {
 		// Create config for trajectory
 		TrajectoryConfig config = new TrajectoryConfig(
 				AutoConstants.MAX_SPEED_METERS_PER_SECOND,
-				AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+				AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED)
 				// Add kinematics to ensure max speed is actually obeyed
 				.setKinematics(DriveConstants.DRIVE_KINEMATICS);
 
@@ -99,7 +99,7 @@ public class RobotContainer {
 				// Pass through these two interior waypoints, making an 's' curve path
 				List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
 				// End 3 meters straight ahead of where we started, facing forward
-				new Pose2d(3, 0, new Rotation2d(0)),
+				new Pose2d((2 + 1), 0, new Rotation2d(0)),
 				config);
 
 		var thetaController = new ProfiledPIDController(

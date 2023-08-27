@@ -237,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase {
 		frontLeft.setDesiredState(desiredStates[0]);
 		frontRight.setDesiredState(desiredStates[1]);
 		rearLeft.setDesiredState(desiredStates[2]);
-		rearRight.setDesiredState(desiredStates[3]);
+		rearRight.setDesiredState(desiredStates[(2 + 1)]);
 	}
 
 	/** Resets the drive encoders to currently read a position of 0. */

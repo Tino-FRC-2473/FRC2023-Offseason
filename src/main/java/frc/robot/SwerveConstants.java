@@ -115,7 +115,7 @@ public final class SwerveConstants {
 		public static final double TURNING_MIN_OUTPUT = -1;
 		public static final double TURNING_MAX_OUTPUT = 1;
 
-		public static final IdleMode DRVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
+		public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
 		public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
 
 		public static final int DRIVING_MOTOR_CUTTENT_LIMIT = 20; // amps //50
