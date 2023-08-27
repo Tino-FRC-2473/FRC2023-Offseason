@@ -33,11 +33,11 @@ import java.util.List;
  */
 public class RobotContainer {
 	// The robot's subsystems
-	private final DriveSubsystem mRobotDrive = new DriveSubsystem();
+	private final DriveSubsystem robotDrive = new DriveSubsystem();
 
 	// The driver's controller
-	private XboxController mDriverController =
-		new XboxController(OIConstants.kDriverControllerPort);
+	private XboxController driverController =
+		new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -47,20 +47,20 @@ public class RobotContainer {
 		configureButtonBindings();
 
 		// Configure default commands
-		mRobotDrive.setDefaultCommand(
+		robotDrive.setDefaultCommand(
 				// The left stick controls translation of the robot.
 				// Turning is controlled by the X axis of the right stick.
 				new RunCommand(
-						() -> mRobotDrive.drive(
+						() -> robotDrive.drive(
 							-MathUtil.applyDeadband(
-								mDriverController.getLeftY(), OIConstants.kDriveDeadband),
+								driverController.getLeftY(), OIConstants.DRIVE_DEADBAND),
 							-MathUtil.applyDeadband(
-								mDriverController.getLeftX(), OIConstants.kDriveDeadband),
+								driverController.getLeftX(), OIConstants.DRIVE_DEADBAND),
 							-MathUtil.applyDeadband(
-								-mDriverController.getRightX(), OIConstants.kDriveDeadband),
+								-driverController.getRightX(), OIConstants.DRIVE_DEADBAND),
 							true,
 							true),
-						mRobotDrive));
+						robotDrive));
 	}
 
 	/**
@@ -73,10 +73,10 @@ public class RobotContainer {
 	 * {@link JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		new JoystickButton(mDriverController, Button.kR1.value)
+		new JoystickButton(driverController, Button.kR1.value)
 				.whileTrue(new RunCommand(
-						() -> mRobotDrive.setX(),
-						mRobotDrive));
+						() -> robotDrive.setX(),
+						robotDrive));
 	}
 
 	/**
@@ -87,10 +87,10 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// Create config for trajectory
 		TrajectoryConfig config = new TrajectoryConfig(
-				AutoConstants.K_MAX_SPEED_METERS_PER_SECOND,
+				AutoConstants.MAX_SPEED_METERS_PER_SECOND,
 				AutoConstants.kMaxAccelerationMetersPerSecondSquared)
 				// Add kinematics to ensure max speed is actually obeyed
-				.setKinematics(DriveConstants.kDriveKinematics);
+				.setKinematics(DriveConstants.DRIVE_KINEMATICS);
 
 		// An example trajectory to follow. All units in meters.
 		Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -103,25 +103,25 @@ public class RobotContainer {
 				config);
 
 		var thetaController = new ProfiledPIDController(
-				AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+				AutoConstants.P_THETA_CONTROLLER, 0, 0, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
 				exampleTrajectory,
-				mRobotDrive::getPose, // Functional interface to feed supplier
-				DriveConstants.kDriveKinematics,
+				robotDrive::getPose, // Functional interface to feed supplier
+				DriveConstants.DRIVE_KINEMATICS,
 
 				// Position controllers
-				new PIDController(AutoConstants.kPXController, 0, 0),
-				new PIDController(AutoConstants.kPYController, 0, 0),
+				new PIDController(AutoConstants.PX_CONTROLLER, 0, 0),
+				new PIDController(AutoConstants.PY_CONTROLLER, 0, 0),
 				thetaController,
-				mRobotDrive::setModuleStates,
-				mRobotDrive);
+				robotDrive::setModuleStates,
+				robotDrive);
 
 		// Reset odometry to the starting pose of the trajectory.
-		mRobotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+		robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
 		// Run path following command, then stop at the end.
-		return swerveControllerCommand.andThen(() -> mRobotDrive.drive(0, 0, 0, false, false));
+		return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, false, false));
 	}
 }
