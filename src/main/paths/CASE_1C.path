@@ -1,0 +1,103 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.7254464645244003,
+        "y": 4.426512153353603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.962337654480595,
+        "y": 4.757648377436364
+      },
+      "holonomicAngle": -180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.7509256300157094,
+        "y": 4.63103746822825
+      },
+      "prevControl": {
+        "x": 5.875842848330166,
+        "y": 4.745802423203404
+      },
+      "nextControl": {
+        "x": 7.345022973223014,
+        "y": 4.553123062561718
+      },
+      "holonomicAngle": -6.709836807756907,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.7254464645244003,
+        "y": 4.426512153353603
+      },
+      "prevControl": {
+        "x": 2.3000652063150735,
+        "y": 5.108263202935758
+      },
+      "nextControl": null,
+      "holonomicAngle": -180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 6.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.007127328551164824,
+      "names": [
+        "event",
+        "new event"
+      ]
+    },
+    {
+      "position": 0.0,
+      "names": [
+        "deposit_high_cube_1"
+      ]
+    },
+    {
+      "position": 0.35083643948862353,
+      "names": [
+        "deploy_intake_1"
+      ]
+    },
+    {
+      "position": 2.0,
+      "names": [
+        "deposit_cube_2"
+      ]
+    }
+  ]
+}

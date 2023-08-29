@@ -74,6 +74,8 @@ public class RobotContainer {
             m_robotDrive));
   }
 
+  public Command 
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -153,7 +155,10 @@ public class RobotContainer {
     Trajectory trajectory6b = TrajectoryGenerator.generateTrajectory(
         new Pose2d(-4.70, 0, new Rotation2d(180)),
         // Go to charging station
-        List.of(new Translation2d(1, -1), new Translation2d(1.67, -0.65)),
+        List.of(
+            new Translation2d(1, -1),
+            new Translation2d(1.67, -0.65)
+        ),
         // End at charging station
         new Pose2d(-2.03, -1.65, new Rotation2d(360)),
         config);
@@ -163,7 +168,10 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(
+            new Translation2d(1, 1),
+            new Translation2d(2, -1)
+        ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
         config);
@@ -182,7 +190,8 @@ public class RobotContainer {
         new PIDController(AutoConstants.kPYController, 0, 0),
         thetaController,
         m_robotDrive::setModuleStates,
-        m_robotDrive);
+        m_robotDrive
+    );
 
     // Reset odometry to the starting pose of the trajectory.
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());

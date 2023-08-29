@@ -1,0 +1,65 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.7157071638160841,
+        "y": 2.751352431523167
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.715707163816084,
+        "y": 2.751352431523167
+      },
+      "holonomicAngle": -180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.8973105224789775,
+        "y": 2.751352431523167
+      },
+      "prevControl": {
+        "x": 2.8973105224789775,
+        "y": 2.751352431523167
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 6.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.0,
+      "names": [
+        "deposit_high_cube_1"
+      ]
+    },
+    {
+      "position": 1.0,
+      "names": [
+        "auto_balance"
+      ]
+    }
+  ]
+}

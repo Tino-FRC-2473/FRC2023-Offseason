@@ -1,0 +1,65 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.7254464645244003,
+        "y": 4.426512153353603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.0110341580221776,
+        "y": 4.7868662795613135
+      },
+      "holonomicAngle": -180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.789882832848975,
+        "y": 4.738169776019731
+      },
+      "prevControl": {
+        "x": 5.748870488095496,
+        "y": 4.738169776019731
+      },
+      "nextControl": null,
+      "holonomicAngle": -25.277722235552933,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 6.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.0,
+      "names": [
+        "deposit_high_cube_1"
+      ]
+    },
+    {
+      "position": 1.0,
+      "names": [
+        "pickup_cube_1"
+      ]
+    }
+  ]
+}
