@@ -17,8 +17,6 @@ public class TeleopInput {
 	private static final int ELEVATOR_HIGH = 7;
 	private static final int ELEVATOR_MID = 9;
 	private static final int ELEVATOR_LOW = 11;
-	private static final int ELEVATOR_UP = 3;
-	private static final int ELEVATOR_DOWN = 5;
 	private static final int WRIST_IN = 6;
 	private static final int WRIST_OUT = 4;
 	private static final int INTAKE_BUTTON = 2;
@@ -76,7 +74,7 @@ public class TeleopInput {
 	 * @return True if the button is pressed
 	 */
 	public boolean isFlipButtonPressed() {
-		return leftJoystick.getRawButton(FLIP_BUTTON);
+		return leftJoystick.getRawButtonPressed(FLIP_BUTTON);
 	}
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
@@ -116,22 +114,6 @@ public class TeleopInput {
 	 */
 	public boolean isLowButtonPressed() {
 		return leftJoystick.getRawButton(ELEVATOR_LOW);
-	}
-
-	/**
-	 * Get the value of the elevator up button.
-	 * @return True if button is pressed
-	 */
-	public boolean isElevatorUpButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_UP);
-	}
-
-	/**
-	 * Get the value of the elevator down button.
-	 * @return True if button is pressed
-	 */
-	public boolean isElevatorDownButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_DOWN);
 	}
 
 	/**

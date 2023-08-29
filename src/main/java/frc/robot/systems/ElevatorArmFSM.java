@@ -20,19 +20,19 @@ public class ElevatorArmFSM {
 		HIGH,
 		MIDDLE,
 		LOW,
-		UP,
-		DOWN,
+		MOVING,
 		ZEROING
 	}
 
 	private static final float UP_POWER = 0.1f;
 	private static final float DOWN_POWER = -0.1f;
-	private static final float ZEROING_POWER = -0.01f;
-	private static final double PID_CONSTANT_ARM_P = 0.00000001;
+	private static final float ZEROING_POWER = -0.1f;
+	private static final double PID_CONSTANT_ARM_P = 0.005;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
 	private static final float MAX_UP_POWER = 0.2f;
 	private static final float MAX_DOWN_POWER = -0.2f;
+	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.05f;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -5;
 	private static final float MID_ENCODER_ROTATIONS = 50;
@@ -100,7 +100,8 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-
+		armMotor.getEncoder().setPosition(0);
+		currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -117,6 +118,10 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
+		if (limitSwitchLow.isPressed()) {
+			armMotor.getEncoder().setPosition(0);
+			currentEncoder = 0;
+		}
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -130,19 +135,18 @@ public class ElevatorArmFSM {
 			case LOW:
 				handleLowState(input);
 				break;
-			case UP:
-				handleUpState(input);
-				break;
-			case DOWN:
-				handleDownState(input);
+			case MOVING:
+				handleMovingState(input);
 				break;
 			case ZEROING:
 				handleZeroingState(input);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
 		currentState = nextState(input);
 	}
 
@@ -168,10 +172,8 @@ public class ElevatorArmFSM {
 					return FSMState.MIDDLE;
 				} else if (input.isLowButtonPressed()) {
 					return FSMState.LOW;
-				} else if (input.isElevatorUpButtonPressed()) {
-					return FSMState.UP;
-				} else if (input.isElevatorDownButtonPressed()) {
-					return FSMState.DOWN;
+				} else if (Math.abs(input.getLeftJoystickY()) > JOYSTICK_DRIFT_THRESHOLD) {
+					return FSMState.MOVING;
 				} else if (input.isArmZeroButtonPressed()) {
 					return FSMState.ZEROING;
 				}
@@ -193,21 +195,14 @@ public class ElevatorArmFSM {
 				} else {
 					return FSMState.IDLE;
 				}
-			case UP:
-				if (input.isElevatorUpButtonPressed()) {
-					return FSMState.UP;
-				} else {
-					return FSMState.IDLE;
-				}
-			case DOWN:
-				if (input.isElevatorDownButtonPressed()) {
-					return FSMState.DOWN;
+			case MOVING:
+				if (Math.abs(input.getLeftJoystickY()) > JOYSTICK_DRIFT_THRESHOLD) {
+					return FSMState.MOVING;
 				} else {
 					return FSMState.IDLE;
 				}
 			case ZEROING:
-				if (zeroed) {
-					zeroed = false;
+				if (!input.isArmZeroButtonPressed()) {
 					return FSMState.IDLE;
 				} else {
 					return FSMState.ZEROING;
@@ -235,11 +230,9 @@ public class ElevatorArmFSM {
 	private void handleLowState(TeleopInput input) {
 		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 	}
-	private void handleUpState(TeleopInput input) {
-		pidControllerArm.setReference(UP_POWER, CANSparkMax.ControlType.kDutyCycle);
-	}
-	private void handleDownState(TeleopInput input) {
-		pidControllerArm.setReference(DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+	private void handleMovingState(TeleopInput input) {
+		pidControllerArm.setReference(-input.getLeftJoystickY() / (2 + 1),
+			CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleZeroingState(TeleopInput input) {
 		pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
