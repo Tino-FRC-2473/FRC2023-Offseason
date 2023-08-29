@@ -49,9 +49,10 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		fsmSystem.update(null);
 		//limelight.isCentered();
-		apriltag.isCentered();
+		//apriltag.isCentered();
 		
-		SmartDashboard.putNumber("estimated pose", apriltag.getTagX());
+		SmartDashboard.putNumber("estimated x", apriltag.getX());
+		SmartDashboard.putNumber("estimated y", apriltag.getY());
 	}
 
 	@Override
