@@ -92,22 +92,82 @@ public class RobotContainer {
 				// Add kinematics to ensure max speed is actually obeyed
 				.setKinematics(DriveConstants.DRIVE_KINEMATICS);
 
-		// An example trajectory to follow. All units in meters.
-		Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-				// Start at the origin facing the +X direction
-				new Pose2d(0, 0, new Rotation2d(0)),
-				// Pass through these two interior waypoints, making an 's' curve path
-				List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-				// End 3 meters straight ahead of where we started, facing forward
-				new Pose2d((2 + 1), 0, new Rotation2d(0)),
-				config);
+		// Different path trajectories (see autonomous path doc)
+		// trajectory 1: deposit
+		Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			List.of(new Translation2d(0, 0)),
+			// End at the same spot
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			config);
+
+		// trajectory 2: deposit + exit community
+		Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction, the grid, and unload element
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			// Move out of community
+			List.of(new Translation2d(-3.56, 0)),
+			// End out of community
+			new Pose2d(-3.56, 0, Rotation2d.fromDegrees(180)),
+			config);
+
+		// trajectory 3: deposit + charging station
+		Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction, the grid, and unload element
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			// Move to charging station
+			List.of(new Translation2d(-2.03, 0)),
+			// End at charging station
+			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			config);
+
+		// trajectory 4: deposit + exit community + charging station
+		Trajectory trajectory4 = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction, the grid, and unload element
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			// Exit community
+			List.of(new Translation2d(-3.56, 0),
+			// Move to charging station
+			new Translation2d(1.53, 0)),
+			// End at charging station
+			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			config);
+
+		// trajectory 5: deposit + exit community + pick up
+		Trajectory trajectory5a = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction, the grid, and unload element
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			// Exit community, go to object
+			List.of(new Translation2d(-4.70, 0)),
+			// End at object
+			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			config);
+
+		// trajectory 6: deposit + exit community + pick up + charging station
+		Trajectory trajectory6a = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction, the grid, and unload element
+			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+			// Exit community, go to object
+			List.of(new Translation2d(-4.70, 0)),
+			// End at object
+			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			config);
+		// pick up object
+		Trajectory trajectory6b = TrajectoryGenerator.generateTrajectory(
+			new Pose2d(-4.70, 0, new Rotation2d(180)),
+			// Go to charging station
+			List.of(new Translation2d(1, -1), new Translation2d(1.67, -0.65)),
+			// End at charging station
+			new Pose2d(-2.03, -1.65, new Rotation2d(360)),
+			config);
 
 		var thetaController = new ProfiledPIDController(
 				AutoConstants.P_THETA_CONTROLLER, 0, 0, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-				exampleTrajectory,
+				trajectory1,
 				robotDrive::getPose, // Functional interface to feed supplier
 				DriveConstants.DRIVE_KINEMATICS,
 
@@ -119,7 +179,7 @@ public class RobotContainer {
 				robotDrive);
 
 		// Reset odometry to the starting pose of the trajectory.
-		robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+		robotDrive.resetOdometry(trajectory1.getInitialPose());
 
 		// Run path following command, then stop at the end.
 		return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, false, false));
