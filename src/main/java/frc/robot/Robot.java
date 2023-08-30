@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.SpinningIntakeFSM;
+import frc.robot.systems.EveryBotIntakeFSM;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +21,7 @@ public class Robot extends TimedRobot {
 	// Systems
 	private ElevatorWristFSM fsmSystem;
 	private SpinningIntakeFSM spinningIntake;
+	private EveryBotIntakeFSM everybotIntake;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -37,6 +39,8 @@ public class Robot extends TimedRobot {
 		// 	spinningIntake = new SpinningIntakeFSM();
 		// }
 		fsmSystem = new ElevatorWristFSM();
+		//fsmSystem = new ElevatorArmFSM();
+		everybotIntake = new EveryBotIntakeFSM();
 	}
 
 	@Override
@@ -48,7 +52,8 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake.reset();
 		// }
-		fsmSystem.reset();
+		//fsmSystem.reset();
+		everybotIntake.reset();
 	}
 
 	@Override
@@ -59,7 +64,8 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake.update(null);
 		// }
-		fsmSystem.update(null);
+		//fsmSystem.update(null);
+		everybotIntake.update(null);
 	}
 
 	@Override
@@ -71,7 +77,8 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake.reset();
 		// }
-		fsmSystem.reset();
+		//fsmSystem.reset();
+		everybotIntake.reset();
 	}
 
 	@Override
@@ -82,7 +89,8 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake.update(input);
 		// }
-		fsmSystem.update(input);
+		//fsmSystem.update(input);
+		everybotIntake.update(input);
 	}
 
 	@Override

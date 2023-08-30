@@ -29,16 +29,16 @@ public class EveryBotIntakeFSM {
 	}
 	// hello
 	//HAVE TO CHANGE BASED ON TEST
-	private static final double KEEP_SPEED = 0.07;
-	private static final double INTAKE_SPEED = 0.5;
-	private static final double RELEASE_SPEED = -1; //DONT FORGET -
+	private static final double KEEP_SPEED = 0;
+	private static final double INTAKE_SPEED = 0.1;
+	private static final double RELEASE_SPEED = -0.07; //DONT FORGET -
 	private static final double RELEASE_SPEED_LOW = -0.3;
 	private static final double CURRENT_THRESHOLD = 20;
 	private static final double BASE_THRESHOLD = 100;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	private static final int AVERAGE_SIZE = 10;
-	private static final double TURN_SPEED = -0.5;
+	private static final double TURN_SPEED = -0.1;
 	private static final double OVERRUN_THRESHOLD = 0.007;
 	private static final double FLIP_THRESHOLD = 50;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
@@ -58,7 +58,7 @@ public class EveryBotIntakeFSM {
 	private CANSparkMax spinnerMotor;
 	private CANSparkMax flipMotor;
 	private Timer timer;
-	private ElevatorArmFSM arm;
+	//private ElevatorArmFSM arm;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -66,7 +66,7 @@ public class EveryBotIntakeFSM {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public EveryBotIntakeFSM() {
-		arm = new ElevatorArmFSM();
+		//arm = new ElevatorArmFSM();
 		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
@@ -124,9 +124,10 @@ public class EveryBotIntakeFSM {
 		if (toggleUpdate) {
 			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
 			SmartDashboard.putString("spinning intake state", currentState.toString());
-			SmartDashboard.putNumber("velocity", spinnerMotor.getEncoder().getVelocity());
+			SmartDashboard.putNumber("flip encoder", flipMotor.getEncoder().getPosition());
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
+			//SmartDashboard.putBoolean("Flip Button Pressed", input.isFlipButtonPressed());
 			switch (currentState) {
 				case INTAKING:
 					handleIntakingState();
@@ -225,24 +226,29 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.INTAKING;
 				} else if (input.isFlipButtonPressed()) {
 					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
-					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
+					if (flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
+						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
+					} else {
+						return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
+					}
 				} else {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
 			case IDLE_FLIPCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD
+				if (flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD
 					|| input.isFlipAbortButtonPressed()) {
-					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
+					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
-				} else if (flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
-					return EveryBotIntakeFSMState.IDLE_STOP;
+				} else if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD) {
+					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
 				if (flipMotor.getEncoder().getPosition() < 0
 					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
-				} else if (input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD) {
+				} else if (input.isFlipButtonPressed()) {
+					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				} else {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
@@ -271,14 +277,14 @@ public class EveryBotIntakeFSM {
 		flipMotor.set(0);
 	}
 	private void handleFlipClockWiseState() {
-		flipMotor.set(TURN_SPEED);
+		flipMotor.set(-TURN_SPEED);
 		if (flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD) {
 			flipMotor.set(0);
 		}
 		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
-		flipMotor.set(-TURN_SPEED);
+		flipMotor.set(TURN_SPEED);
 		if (flipMotor.getEncoder().getPosition() <= 0) {
 			flipMotor.set(0);
 		}
