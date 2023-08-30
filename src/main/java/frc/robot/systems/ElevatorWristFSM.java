@@ -21,8 +21,6 @@ public class ElevatorWristFSM {
 		ZEROING,
 		IDLE
 	}
-	private static final double IN_SPEED = -0.1;
-	private static final double OUT_SPEED = 0.1;
 	private static final double ZEROING_SPEED = -0.01;
 	private static final double PID_CONSTANT_WRIST_P = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
@@ -80,7 +78,8 @@ public class ElevatorWristFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		currentEncoder = wristMotor.getEncoder().getPosition();
+		wristMotor.getEncoder().setPosition(0);
+		currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -125,6 +124,7 @@ public class ElevatorWristFSM {
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putBoolean("Wrist Zeroed Limit Switch", wristLimitSwitch.isPressed());
 		SmartDashboard.putNumber("Wrist Encoder", wristMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Wrist Power", wristMotor.getAppliedOutput());
 		currentState = nextState(input);
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
@@ -151,7 +151,8 @@ public class ElevatorWristFSM {
 					&& !input.isWristZeroButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristZeroButtonPressed()) {
+				} else if (input.isWristZeroButtonPressed() && input.isWristOutButtonPressed()
+					&& !input.isWristInButtonPressed()) {
 					//go to zeroing state
 					return FSMState.ZEROING;
 				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
