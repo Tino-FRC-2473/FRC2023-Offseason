@@ -30,54 +30,59 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		if (!HardwareMap.isElevatorArmDisabled()) {
-			fsmSystem = new ElevatorArmFSM();
-		}
-		if (!HardwareMap.isSpinningIntakeDisabled()) {
-			spinningIntake = new SpinningIntakeFSM();
-		}
+		// if (!HardwareMap.isElevatorArmDisabled()) {
+		// 	fsmSystem = new ElevatorArmFSM();
+		// }
+		// if (!HardwareMap.isSpinningIntakeDisabled()) {
+		// 	spinningIntake = new SpinningIntakeFSM();
+		// }
+		fsmSystem = new ElevatorArmFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		if (!HardwareMap.isElevatorArmDisabled()) {
-			fsmSystem.reset();
-		}
-		if (!HardwareMap.isSpinningIntakeDisabled()) {
-			spinningIntake.reset();
-		}
+		// if (!HardwareMap.isElevatorArmDisabled()) {
+		// 	fsmSystem.reset();
+		// }
+		// if (!HardwareMap.isSpinningIntakeDisabled()) {
+		// 	spinningIntake.reset();
+		// }
+		fsmSystem.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		if (!HardwareMap.isElevatorArmDisabled()) {
-			fsmSystem.update(null);
-		}
-		if (!HardwareMap.isSpinningIntakeDisabled()) {
-			spinningIntake.update(null);
-		}
+		// if (!HardwareMap.isElevatorArmDisabled()) {
+		// 	fsmSystem.update(null);
+		// }
+		// if (!HardwareMap.isSpinningIntakeDisabled()) {
+		// 	spinningIntake.update(null);
+		// }
+		fsmSystem.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		if (!HardwareMap.isElevatorArmDisabled()) {
-			fsmSystem.reset();
-		}
-		if (!HardwareMap.isSpinningIntakeDisabled()) {
-			spinningIntake.reset();
-		}
+		// if (!HardwareMap.isElevatorArmDisabled()) {
+		// 	fsmSystem.reset();
+		// }
+		// if (!HardwareMap.isSpinningIntakeDisabled()) {
+		// 	spinningIntake.reset();
+		// }
+		fsmSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		if (!HardwareMap.isElevatorArmDisabled()) {
-			fsmSystem.update(input);
-		}
-		if (!HardwareMap.isSpinningIntakeDisabled()) {
-			spinningIntake.update(input);
-		}
+		// if (!HardwareMap.isElevatorArmDisabled()) {
+		// 	fsmSystem.update(input);
+		// }
+		// if (!HardwareMap.isSpinningIntakeDisabled()) {
+		// 	spinningIntake.update(input);
+		// }
+		fsmSystem.update(input);
 	}
 
 	@Override
