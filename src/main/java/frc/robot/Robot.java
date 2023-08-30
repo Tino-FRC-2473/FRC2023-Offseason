@@ -5,7 +5,6 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.FSMSystem;
 
@@ -19,7 +18,7 @@ public class Robot extends TimedRobot {
 
 	// Systems
 	private FSMSystem fsmSystem;
-
+	private RaspberryPI rpi;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -32,6 +31,7 @@ public class Robot extends TimedRobot {
 
 		// Instantiate all systems here
 		fsmSystem = new FSMSystem();
+		rpi = new RaspberryPI();
 	}
 
 	@Override
