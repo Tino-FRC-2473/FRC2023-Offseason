@@ -19,6 +19,7 @@ public class TeleopInput {
 	private static final int ELEVATOR_LOW = 11;
 	private static final int WRIST_IN = 6;
 	private static final int WRIST_OUT = 4;
+	private static final int ABORT_FLIP_BUTTON = 5;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int FLIP_BUTTON = 10;
 	private static final int ARM_ZERO_BUTTON = 8;
@@ -138,6 +139,14 @@ public class TeleopInput {
 	 */
 	public boolean isWristInButtonPressed() {
 		return leftJoystick.getRawButton(WRIST_IN);
+	}
+
+	/**
+	 * Get the value of the flip abort button.
+	 * @return True if button is pressed
+	 */
+	public boolean isFlipAbortButtonPressed() {
+		return leftJoystick.getRawButton(ABORT_FLIP_BUTTON);
 	}
 
 	/**

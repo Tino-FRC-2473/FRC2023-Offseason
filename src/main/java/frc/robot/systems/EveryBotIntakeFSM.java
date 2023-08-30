@@ -48,8 +48,7 @@ public class EveryBotIntakeFSM {
 	private boolean needsReset = true;
 	private int tick = 0;
 	private boolean hasTimerStarted = false;
-	private double[] currLogsCone = new double[AVERAGE_SIZE];
-	private double[] currLogsCube = new double[AVERAGE_SIZE];
+	private double[] currLogs = new double[AVERAGE_SIZE];
 
 
 	/* ======================== Private variables ======================== */
@@ -71,7 +70,7 @@ public class EveryBotIntakeFSM {
 		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
-		flipMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+		flipMotor = new CANSparkMax(HardwareMap.CAN_ID_FLIP_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
 		// Reset state machine
 		reset();
@@ -96,6 +95,7 @@ public class EveryBotIntakeFSM {
 	public void reset() {
 		currentState = EveryBotIntakeFSMState.IDLE_STOP;
 		hasTimerStarted = false;
+		flipMotor.getEncoder().setPosition(0);
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -203,12 +203,12 @@ public class EveryBotIntakeFSM {
 					needsReset = false;
 				}
 				if (timer.hasElapsed(TIME_RESET_CURRENT)) {
-					currLogsCone[tick % AVERAGE_SIZE] = spinnerMotor.getOutputCurrent();
+					currLogs[tick % AVERAGE_SIZE] = spinnerMotor.getOutputCurrent();
 					tick++;
 
 					double avgcone = 0;
 					for (int i = 0; i < AVERAGE_SIZE; i++) {
-						avgcone += currLogsCone[i];
+						avgcone += currLogs[i];
 					}
 					avgcone /= AVERAGE_SIZE;
 					if (avgcone > CURRENT_THRESHOLD || !(input.isIntakeButtonPressed())) {
@@ -223,13 +223,15 @@ public class EveryBotIntakeFSM {
 				} else if (input.isIntakeButtonPressed()
 					&& !(flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD)) {
 					return EveryBotIntakeFSMState.INTAKING;
-				} else if (input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD) {
+				} else if (input.isFlipButtonPressed()) {
+					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				} else {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
 			case IDLE_FLIPCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD) {
+				if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD
+					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				} else if (input.isFlipButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
@@ -237,7 +239,8 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() < 0) {
+				if (flipMotor.getEncoder().getPosition() < 0
+					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed() && arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
@@ -261,21 +264,25 @@ public class EveryBotIntakeFSM {
 	 */
 	private void handleIntakingState() {
 		spinnerMotor.set(INTAKE_SPEED);
+		flipMotor.set(0);
 	}
 	private void handleIdleStopState() {
 		spinnerMotor.set(KEEP_SPEED);
+		flipMotor.set(0);
 	}
 	private void handleFlipClockWiseState() {
 		flipMotor.set(TURN_SPEED);
 		if (flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD) {
 			flipMotor.set(0);
 		}
+		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
 		flipMotor.set(-TURN_SPEED);
 		if (flipMotor.getEncoder().getPosition() <= 0) {
 			flipMotor.set(0);
 		}
+		spinnerMotor.set(0);
 	}
 	private void handleOuttakingState(TeleopInput input) {
 		if (input == null) {
@@ -286,10 +293,14 @@ public class EveryBotIntakeFSM {
 			}
 		}
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
-			currLogsCone[i] = 0;
+			currLogs[i] = 0;
 		}
 		if (input != null) {
-			spinnerMotor.set(RELEASE_SPEED);
+			if (itemType == ItemType.CUBE) {
+				spinnerMotor.set(RELEASE_SPEED);
+			} else {
+				spinnerMotor.set(RELEASE_SPEED);
+			}
 		}
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
