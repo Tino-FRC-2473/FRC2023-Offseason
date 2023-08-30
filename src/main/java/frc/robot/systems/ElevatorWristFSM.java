@@ -25,6 +25,7 @@ public class ElevatorWristFSM {
 	private static final double PID_CONSTANT_WRIST_P = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
+	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
 	private static final float MAX_UP_POWER = 0.2f;
 	private static final float MAX_DOWN_POWER = -0.2f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = -1;
@@ -83,7 +84,6 @@ public class ElevatorWristFSM {
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
-
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
@@ -163,7 +163,8 @@ public class ElevatorWristFSM {
 				//stay in idle state
 				return FSMState.IDLE;
 			case MOVING_OUT:
-				if (!input.isWristOutButtonPressed()) {
+				if (!input.isWristOutButtonPressed()
+					|| wristMotor.getEncoder().getPosition() > OUTER_LIMIT_ENCODER) {
 					//go to idle state
 					return FSMState.IDLE;
 				}
