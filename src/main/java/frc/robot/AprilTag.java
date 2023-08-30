@@ -13,9 +13,6 @@ import frc.robot.Constants.VisionConstants;
 	* with its coordinates.
 	*/
 public class AprilTag {
-	public static final double APRIL_TAG_ANGLE_DEGREES = 180;
-	public static final double ANGULAR_P = 0.01;
-	public static final double ANGULAR_D = 0;
 	private PhotonCamera photonCamera;
 
 	/** Intializes April Tag detector. */
