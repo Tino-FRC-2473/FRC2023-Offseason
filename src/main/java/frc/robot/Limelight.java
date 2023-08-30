@@ -1,78 +1,48 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.controller.PIDController;
+import frc.robot.Constants.VisionConstants;
 
 public class Limelight {
+	private PhotonCamera photonCamera;
+	private int currPipelineIndex;
+	/** Intializes Limelight object. */
+	public Limelight() {
+		photonCamera = new PhotonCamera("OV5647");
+		photonCamera.setDriverMode(false);
+		currPipelineIndex = VisionConstants.LOWERTAPE_PIPELINE_INDEX;
+	}
 
-    private PhotonCamera photonCamera;
-    // Angle between horizontal and the camera.
-    final double CAMERA_YAW_DEGREES = 3;
-    final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(20.75);
-    //camera height is 20.8 inches
-    final double TARGET_HEIGHT_METERS = Units.feetToMeters(1.927);
-    final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
-    final double TARGET_TO_CAMERA = TARGET_HEIGHT_METERS - CAMERA_HEIGHT_METERS;
-    double TARGET_PITCH_RADIANS =  Units.degreesToRadians(0);
+	/** Gets the yaw to the target.
+	 * @return returns the yaw in degress from the limelight to the target.
+	*/
+	public double getYaw() {
+		photonCamera.setPipelineIndex(currPipelineIndex);
+		var result = photonCamera.getLatestResult();
+		if (result.hasTargets()) {
+			return Units.radiansToDegrees(result.getBestTarget().getYaw());
+		} else {
+			return VisionConstants.NO_TARGETS_RETURN;
+		}
+	}
 
-    public Limelight() {
-        photonCamera = new PhotonCamera("OV5647");
-        photonCamera.setDriverMode(false);
-    }
-    public int isCentered() {
-        photonCamera.setPipelineIndex(5);
-        var result = photonCamera.getLatestResult();
-        if(result.hasTargets()) { //at target = 0, to the left of target = pos, to the right of target = neg
-            TARGET_PITCH_RADIANS = result.getBestTarget().getPitch();
-            boolean centered = false;
-            SmartDashboard.putNumber("Distance to Tape", getTapeDistance2());
-            SmartDashboard.putNumber("Target Pitch", photonCamera.getLatestResult().getBestTarget().getPitch());
-                //System.out.println(Units.radiansToDegrees(result.getBestTarget().getYaw()) + ", without conversion ->" + result.getBestTarget().getYaw());
-            SmartDashboard.putNumber("Actual pitch", Math.atan(TARGET_TO_CAMERA / 0.2925));
-            SmartDashboard.putNumber("dist target to camera", TARGET_TO_CAMERA);
-            if(result.getBestTarget() != null && result.getBestTarget().getYaw() >= -CAMERA_YAW_DEGREES && result.getBestTarget().getYaw() <= CAMERA_YAW_DEGREES) {
-                centered = true;
-                //System.out.println("centered");
-                SmartDashboard.putBoolean("Centered or not", centered);
-                return 0;
-            } else {
-                //System.out.println("not centered");
-                if(result.getBestTarget().getYaw()>0){
-                    return 1;
-                }else{
-                    return -1;
-                }
-            }
-        } else{
-            SmartDashboard.putBoolean("Centered or not", false);
-            System.out.println("no target");
-            return 50;
-        }
-        // SmartDashboard.putNumber("Camera Yaw to target (deg)", result.getBestTarget().getYaw());
-    }
+	/** Gets the distance to the reflective tape.
+	 * @return returns the distance in meters to the tape.
+	*/
+	public double getTapeDistance() {
+		photonCamera.setPipelineIndex(currPipelineIndex);
+		return (VisionConstants.TAG_HEIGHT_METERS - VisionConstants.CAM_HEIGHT_METERS)
+			/ Math.tan(Units.degreesToRadians(photonCamera.getLatestResult()
+			.getBestTarget().getPitch()));
+	}
 
-    //write a method that calculates the distance to the reflective tape
-    public double getTapeDistance() {
-
-
-        if(photonCamera.getLatestResult()!=null){
-            return PhotonUtils.calculateDistanceToTargetMeters(
-            CAMERA_HEIGHT_METERS,
-            TARGET_HEIGHT_METERS,
-            CAMERA_PITCH_RADIANS,
-            Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
-        }else{
-            return -1;
-        }
-
-    }
-    public double getTapeDistance2() {
-
-        return TARGET_TO_CAMERA/Math.tan(Units.degreesToRadians(photonCamera.getLatestResult().getBestTarget().getPitch()));
-    }
-
-    }
+	/**
+	 * Sets the pipeline index of the module.
+	 * @param index the pipeline index of the tape (low tape or high tape)
+	 */
+	public void setTapeMode(int index) {
+		currPipelineIndex = index;
+	}
+}
 

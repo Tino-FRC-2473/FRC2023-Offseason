@@ -3,10 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.FSMSystem;
 
@@ -35,24 +33,19 @@ public class Robot extends TimedRobot {
 
 		// Instantiate all systems here
 		fsmSystem = new FSMSystem();
+		limelight = new Limelight();
+		apriltag = new AprilTag();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		fsmSystem.reset();
-		limelight = new Limelight();
-		apriltag = new AprilTag();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		fsmSystem.update(null);
-		//limelight.isCentered();
-		//apriltag.isCentered();
-		
-		SmartDashboard.putNumber("estimated x", apriltag.getX());
-		SmartDashboard.putNumber("estimated y", apriltag.getY());
 	}
 
 	@Override
