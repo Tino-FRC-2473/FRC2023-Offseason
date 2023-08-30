@@ -21,8 +21,8 @@ public class ElevatorWristFSM {
 		ZEROING,
 		IDLE
 	}
-	private static final double ZEROING_SPEED = -0.01;
-	private static final double PID_CONSTANT_WRIST_P = 0.00000001;
+	private static final double ZEROING_SPEED = -0.1;
+	private static final double PID_CONSTANT_WRIST_P = 0.001;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
@@ -151,7 +151,7 @@ public class ElevatorWristFSM {
 					&& !input.isWristZeroButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristZeroButtonPressed() && input.isWristOutButtonPressed()
+				} else if (input.isWristZeroButtonPressed() && !input.isWristOutButtonPressed()
 					&& !input.isWristInButtonPressed()) {
 					//go to zeroing state
 					return FSMState.ZEROING;

@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
-import frc.robot.systems.ElevatorArmFSM;
+import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.SpinningIntakeFSM;
 
 /**
@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ElevatorArmFSM fsmSystem;
+	private ElevatorWristFSM fsmSystem;
 	private SpinningIntakeFSM spinningIntake;
 
 	/**
@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake = new SpinningIntakeFSM();
 		// }
-		fsmSystem = new ElevatorArmFSM();
+		fsmSystem = new ElevatorWristFSM();
 	}
 
 	@Override
