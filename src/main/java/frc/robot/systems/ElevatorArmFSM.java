@@ -150,6 +150,38 @@ public class ElevatorArmFSM {
 		currentState = nextState(input);
 	}
 
+	/**
+	 * Autonomous update.
+	 * @param autonState current autonomous state
+	 * @return status update
+	 */
+	public boolean autonomousUpdate(FSMState autonState) {
+		if (limitSwitchLow.isPressed()) {
+			armMotor.getEncoder().setPosition(0);
+		}
+
+		switch (autonState) {
+			case IDLE:
+				handleAutonIdleState();
+				return false;
+			case HIGH:
+				handleAutonHighState();
+				return false;
+			case MIDDLE:
+				handleAutonMiddleState();
+				return false;
+			case LOW:
+				handleAutonLowState();
+				return false;
+			case MOVING:
+				return false;
+			case ZEROING:
+				return false;
+			default:
+				return true;
+		}
+	}
+
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -236,5 +268,31 @@ public class ElevatorArmFSM {
 	}
 	private void handleZeroingState(TeleopInput input) {
 		pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+	}
+
+
+	private boolean handleAutonIdleState() {
+		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
+		return true;
+	}
+
+	private boolean handleAutonHighState() {
+		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		return inRange(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS);
+	}
+
+	private boolean handleAutonMiddleState() {
+		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
+	}
+
+	private boolean handleAutonLowState() {
+		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
+	}
+
+
+	private boolean inRange(double a, double b) {
+		return Math.abs(a - b) <= 1.0 / 2;
 	}
 }
