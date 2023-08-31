@@ -35,8 +35,12 @@ public class MAXSwerveModule {
 	 * encoder, and PID controller. This configuration is specific to the REV
 	 * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
 	 * Encoder.
+	 *
+	 * @param drivingCANId id of the driving motor
+	 * @param turningCANId id of the turning motor
+	 * @param newChassisAngularOffset offset of the angle due to the chassis' rotation
 	 */
-	public MAXSwerveModule(int drivingCANId, int turningCANId, double mChassisAngularOffset) {
+	public MAXSwerveModule(int drivingCANId, int turningCANId, double newChassisAngularOffset) {
 		drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
 		turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -107,7 +111,7 @@ public class MAXSwerveModule {
 		drivingSparkMax.burnFlash();
 		turningSparkMax.burnFlash();
 
-		chassisAngularOffset = mChassisAngularOffset;
+		chassisAngularOffset = newChassisAngularOffset;
 		desiredState.angle = new Rotation2d(turningEncoder.getPosition());
 		drivingEncoder.setPosition(0);
 	}
@@ -145,8 +149,8 @@ public class MAXSwerveModule {
 	public void setDesiredState(SwerveModuleState newDesiredState) {
 		// Apply chassis angular offset to the desired state.
 		SwerveModuleState correctedDesiredState = new SwerveModuleState();
-		correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-		correctedDesiredState.angle = desiredState.angle
+		correctedDesiredState.speedMetersPerSecond = newDesiredState.speedMetersPerSecond;
+		correctedDesiredState.angle = newDesiredState.angle
 			.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
 		// Optimize the reference state to avoid spinning further than 90 degrees.
