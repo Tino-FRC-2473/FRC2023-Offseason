@@ -36,7 +36,7 @@ public class MAXSwerveModule {
 	 * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
 	 * Encoder.
 	 */
-	public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+	public MAXSwerveModule(int drivingCANId, int turningCANId, double mChassisAngularOffset) {
 		drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
 		turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -107,7 +107,7 @@ public class MAXSwerveModule {
 		drivingSparkMax.burnFlash();
 		turningSparkMax.burnFlash();
 
-		chassisAngularOffset = chassisAngularOffset;
+		chassisAngularOffset = mChassisAngularOffset;
 		desiredState.angle = new Rotation2d(turningEncoder.getPosition());
 		drivingEncoder.setPosition(0);
 	}
@@ -140,9 +140,9 @@ public class MAXSwerveModule {
 	/**
 	 * Sets the desired state for the module.
 	 *
-	 * @param desiredState Desired state with speed and angle.
+	 * @param newDesiredState Desired state with speed and angle.
 	 */
-	public void setDesiredState(SwerveModuleState desiredState) {
+	public void setDesiredState(SwerveModuleState newDesiredState) {
 		// Apply chassis angular offset to the desired state.
 		SwerveModuleState correctedDesiredState = new SwerveModuleState();
 		correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -159,7 +159,7 @@ public class MAXSwerveModule {
 		turningPIDController.setReference(optimizedDesiredState.angle.getRadians(),
 			CANSparkMax.ControlType.kPosition);
 
-		desiredState = desiredState;
+		desiredState = newDesiredState;
 	}
 
 	/** Zeroes all the SwerveModule encoders. */

@@ -19,8 +19,8 @@ import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // gyro imports
-// import com.kauailabs.navx.frc.AHRS;
-// import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 
 public class DriveSubsystem extends SubsystemBase {
 	// Create MAXSwerveModules
@@ -45,8 +45,8 @@ public class DriveSubsystem extends SubsystemBase {
 		DriveConstants.REAR_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
 	// The gyro sensor
-	//private AHRS gyro = new AHRS(SPI.Port.kMXP);
-	private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	// private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -237,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase {
 		frontLeft.setDesiredState(desiredStates[0]);
 		frontRight.setDesiredState(desiredStates[1]);
 		rearLeft.setDesiredState(desiredStates[2]);
-		rearRight.setDesiredState(desiredStates[(2 + 1)]);
+		rearRight.setDesiredState(desiredStates[3]);
 	}
 
 	/** Resets the drive encoders to currently read a position of 0. */
