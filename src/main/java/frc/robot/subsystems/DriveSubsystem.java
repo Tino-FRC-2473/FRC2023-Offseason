@@ -13,14 +13,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
+// import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import javax.swing.plaf.basic.BasicLookAndFeel;
+
 // gyro imports
-// import com.kauailabs.navx.frc.AHRS;
-// import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 
 public class DriveSubsystem extends SubsystemBase {
 	// Create MAXSwerveModules
@@ -45,8 +47,8 @@ public class DriveSubsystem extends SubsystemBase {
 		DriveConstants.REAR_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
 	// The gyro sensor
-	//private AHRS gyro = new AHRS(SPI.Port.kMXP);
-	private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	// private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -199,17 +201,23 @@ public class DriveSubsystem extends SubsystemBase {
 		rearRight.setDesiredState(swerveModuleStates[3]);
 	}
 
+	/**
+	 * Balances the chassis on the charging station.
+	 */
 	public void balence() {
 		double power;
-		// if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
-		//   > -2) {
-		//   power = 0;
-		// } else if (gyro.getRoll() > 0) {
-		//   power = Math.abs(gyro.getRoll()) / 200;
-		// } else if (gyro.getRoll() < 0) {
-		//   power = -Math.abs(gyro.getRoll()) / 200;
-		// }
+		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > -2) {
+			power = 0;
+		} else if (gyro.getRoll() > 0) {
+			power = Math.abs(gyro.getRoll()) / 200;
+		} else {
+			power = -Math.abs(gyro.getRoll()) / 200;
+		}
 		// set to power field reletive so facing charge station
+		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
+		frontRight.setDesiredState(new SwerveModuleState(power, frontRight.getState().angle));
+		rearLeft.setDesiredState(new SwerveModuleState(power, rearLeft.getState().angle));
+		rearRight.setDesiredState(new SwerveModuleState(power, rearRight.getState().angle));
 	}
 
 	/**
