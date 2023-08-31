@@ -18,7 +18,7 @@ import frc.robot.SwerveConstants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import javax.swing.plaf.basic.BasicLookAndFeel;
+// import javax.swing.plaf.basic.BasicLookAndFeel;
 
 // gyro imports
 import com.kauailabs.navx.frc.AHRS;
@@ -198,7 +198,7 @@ public class DriveSubsystem extends SubsystemBase {
 		frontLeft.setDesiredState(swerveModuleStates[0]);
 		frontRight.setDesiredState(swerveModuleStates[1]);
 		rearLeft.setDesiredState(swerveModuleStates[2]);
-		rearRight.setDesiredState(swerveModuleStates[3]);
+		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
 	/**
@@ -206,12 +206,14 @@ public class DriveSubsystem extends SubsystemBase {
 	 */
 	public void balence() {
 		double power;
-		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > -2) {
+		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > (-1 * 2)) {
 			power = 0;
 		} else if (gyro.getRoll() > 0) {
-			power = Math.abs(gyro.getRoll()) / 200;
+			power = Math.abs(gyro.getRoll())
+				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT;
 		} else {
-			power = -Math.abs(gyro.getRoll()) / 200;
+			power = -Math.abs(gyro.getRoll())
+				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT;
 		}
 		// set to power field reletive so facing charge station
 		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
@@ -245,7 +247,7 @@ public class DriveSubsystem extends SubsystemBase {
 		frontLeft.setDesiredState(desiredStates[0]);
 		frontRight.setDesiredState(desiredStates[1]);
 		rearLeft.setDesiredState(desiredStates[2]);
-		rearRight.setDesiredState(desiredStates[3]);
+		rearRight.setDesiredState(desiredStates[(2 + 1)]);
 	}
 
 	/** Resets the drive encoders to currently read a position of 0. */
