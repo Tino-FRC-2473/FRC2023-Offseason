@@ -162,21 +162,13 @@ public class ElevatorArmFSM {
 
 		switch (autonState) {
 			case IDLE:
-				handleAutonIdleState();
-				return false;
+				return handleAutonIdleState();
 			case HIGH:
-				handleAutonHighState();
-				return false;
+				return handleAutonHighState();
 			case MIDDLE:
-				handleAutonMiddleState();
-				return false;
+				return handleAutonMiddleState();
 			case LOW:
-				handleAutonLowState();
-				return false;
-			case MOVING:
-				return false;
-			case ZEROING:
-				return false;
+				return handleAutonLowState();
 			default:
 				return true;
 		}
