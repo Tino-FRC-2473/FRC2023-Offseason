@@ -8,8 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
-import frc.robot.systems.SpinningIntakeFSM;
+import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,10 +20,9 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ElevatorWristFSM fsmSystem;
-	private SpinningIntakeFSM spinningIntake;
+	private ElevatorWristFSM wristSystem;
+	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
-
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -38,9 +38,10 @@ public class Robot extends TimedRobot {
 		// if (!HardwareMap.isSpinningIntakeDisabled()) {
 		// 	spinningIntake = new SpinningIntakeFSM();
 		// }
-		fsmSystem = new ElevatorWristFSM();
+		wristSystem = new ElevatorWristFSM();
 		//fsmSystem = new ElevatorArmFSM();
 		everybotIntake = new EveryBotIntakeFSM();
+		elevatorArm = new ElevatorArmFSM();
 	}
 
 	@Override
@@ -53,7 +54,13 @@ public class Robot extends TimedRobot {
 		// 	spinningIntake.reset();
 		// }
 		//fsmSystem.reset();
+
 		everybotIntake.reset();
+		wristSystem.reset();
+		elevatorArm.reset();
+
+
+
 	}
 
 	@Override
