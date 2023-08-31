@@ -173,6 +173,32 @@ public class EveryBotIntakeFSM {
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
 	}
+	private boolean updateAutonomous(EveryBotIntakeFSMState currState) {
+		switch (currState) {
+			case INTAKING:
+				handleIntakingState();
+				double avgcone = 0;
+				for (int i = 0; i < AVERAGE_SIZE; i++) {
+					avgcone += currLogs[i];
+				}
+				avgcone /= AVERAGE_SIZE;
+				return  avgcone > CURRENT_THRESHOLD;
+			case IDLE_FLIPCLOCKWISE:
+				handleFlipClockWiseState();
+				return flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD;
+			case IDLE_FLIPCOUNTERCLOCKWISE:
+				handleFlipCounterClockWiseState();
+				return flipMotor.getEncoder().getPosition() <= 0;
+			case IDLE_STOP:
+				handleIdleStopState();
+				return true;
+			case OUTTAKING   :
+				handleOuttakingState(null);
+				return true;
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
+		}
+	}
 
 	/*-------------------------NON HANDLER METHODS ------------------------- */
 	/**
@@ -301,15 +327,14 @@ public class EveryBotIntakeFSM {
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			currLogs[i] = 0;
 		}
-		if (input != null) {
-			if (itemType == ItemType.CUBE) {
-				spinnerMotor.set(RELEASE_SPEED);
-			} else {
-				spinnerMotor.set(RELEASE_SPEED);
-			}
+		if (itemType == ItemType.CUBE) {
+			spinnerMotor.set(RELEASE_SPEED);
+		} else {
+			spinnerMotor.set(RELEASE_SPEED);
 		}
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
 	}
 }
+
 
