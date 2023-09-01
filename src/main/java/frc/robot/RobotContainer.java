@@ -99,6 +99,15 @@ public class RobotContainer {
 				// Add kinematics to ensure max speed is actually obeyed
 				.setKinematics(DriveConstants.DRIVE_KINEMATICS);
 
+		Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction
+			new Pose2d(0, 0, new Rotation2d(0)),
+			// Pass through these two interior waypoints, making an 's' curve path
+			List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+			// End 3 meters straight ahead of where we started, facing forward
+			new Pose2d(3, 0, new Rotation2d(0)),
+			config);
+
 		// Different path trajectories (see autonomous path doc)
 		// trajectory 1: deposit
 		Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
@@ -174,7 +183,7 @@ public class RobotContainer {
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-				trajectory1,
+				exampleTrajectory,
 				robotDrive::getPose, // Functional interface to feed supplier
 				DriveConstants.DRIVE_KINEMATICS,
 
@@ -186,7 +195,7 @@ public class RobotContainer {
 				robotDrive);
 
 		// Reset odometry to the starting pose of the trajectory.
-		robotDrive.resetOdometry(trajectory1.getInitialPose());
+		robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
 		// Run path following command, then stop at the end.
 		return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, false, false));
