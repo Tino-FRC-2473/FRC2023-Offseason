@@ -27,8 +27,8 @@ public final class SwerveConstants {
 	public static final class DriveConstants {
 		// Driving Parameters - Note that these are not the maximum capable speeds of
 		// the robot, rather the allowed maximum speeds
-		public static final double MAX_SPEED_METERS_PER_SECOND = 2; //4.8
-		public static final double MAX_ANGULAR_SPEED = 0.5 * Math.PI; // radians per second //2
+		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //4.8
+		public static final double MAX_ANGULAR_SPEED = 0.3 * Math.PI; // radians per second //2
 
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
@@ -64,6 +64,11 @@ public final class SwerveConstants {
 		public static final int REAR_RIGHT_TURNING_CAN_ID = 2;
 
 		public static final boolean GYRO_REVERSED = false;
+
+		public static final double TIME_CONSTANT = 200;
+
+
+		public static final double BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT = 200;
 	}
 
 	public static final class ModuleConstants {
@@ -129,10 +134,10 @@ public final class SwerveConstants {
 	}
 
 	public static final class AutoConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 3;
-		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //3
+		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1; //3
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 0.3 * Math.PI; // pi
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 0.3 * Math.PI; // pi
 
 		public static final double PX_CONTROLLER = 1;
 		public static final double PY_CONTROLLER = 1;

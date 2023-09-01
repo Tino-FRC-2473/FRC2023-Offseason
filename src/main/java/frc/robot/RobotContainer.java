@@ -77,6 +77,13 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> robotDrive.setX(),
 						robotDrive));
+
+		new JoystickButton(driverController, Button.kTriangle.value)
+			.whileTrue(new RunCommand(
+				() -> System.out.println("triangle")));
+		new JoystickButton(driverController, Button.kL2.value)
+			.whileTrue(new RunCommand(
+				() -> robotDrive.getGyro().reset()));
 	}
 
 	/**
@@ -109,7 +116,7 @@ public class RobotContainer {
 			// Move out of community
 			List.of(new Translation2d(-3.56, 0)),
 			// End out of community
-			new Pose2d(-3.56, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-3.56, 0, Rotation2d.fromDegrees(Math.toDegrees(Math.PI))),
 			config);
 
 		// trajectory 3: deposit + charging station
@@ -119,7 +126,7 @@ public class RobotContainer {
 			// Move to charging station
 			List.of(new Translation2d(-2.03, 0)),
 			// End at charging station
-			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(Math.toDegrees(Math.PI))),
 			config);
 
 		// trajectory 4: deposit + exit community + charging station
@@ -131,7 +138,7 @@ public class RobotContainer {
 			// Move to charging station
 			new Translation2d(1.53, 0)),
 			// End at charging station
-			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(Math.toDegrees(Math.PI))),
 			config);
 
 		// trajectory 5: deposit + exit community + pick up
@@ -141,7 +148,7 @@ public class RobotContainer {
 			// Exit community, go to object
 			List.of(new Translation2d(-4.70, 0)),
 			// End at object
-			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(Math.toDegrees(Math.PI))),
 			config);
 
 		// trajectory 6: deposit + exit community + pick up + charging station
@@ -151,7 +158,7 @@ public class RobotContainer {
 			// Exit community, go to object
 			List.of(new Translation2d(-4.70, 0)),
 			// End at object
-			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(Math.toDegrees(Math.PI))),
 			config);
 		// pick up object
 		Trajectory trajectory6b = TrajectoryGenerator.generateTrajectory(
@@ -159,7 +166,7 @@ public class RobotContainer {
 			// Go to charging station
 			List.of(new Translation2d(1, -1), new Translation2d(1.67, -0.65)),
 			// End at charging station
-			new Pose2d(-2.03, -1.65, new Rotation2d(360)),
+			new Pose2d(-2.03, -1.65, new Rotation2d(Math.toDegrees(2 * Math.PI))),
 			config);
 
 		var thetaController = new ProfiledPIDController(

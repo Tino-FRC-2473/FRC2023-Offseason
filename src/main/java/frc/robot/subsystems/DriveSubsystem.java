@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-// import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,7 +47,6 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
-	// private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -57,12 +55,12 @@ public class DriveSubsystem extends SubsystemBase {
 
 	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-	private double prevTime = WPIUtilJNI.now() * 1e-6;
+	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 
 	// Odometry class for tracking robot pose
 	SwerveDriveOdometry odometry = new SwerveDriveOdometry(
 		DriveConstants.DRIVE_KINEMATICS,
-		Rotation2d.fromDegrees(gyro.getAngle()),
+		Rotation2d.fromDegrees(-gyro.getAngle()),
 		new SwerveModulePosition[] {
 			frontLeft.getPosition(),
 			frontRight.getPosition(),
@@ -74,15 +72,19 @@ public class DriveSubsystem extends SubsystemBase {
 	public DriveSubsystem() {
 	}
 
+	int counter = 0;
 	@Override
 	public void periodic() {
+		counter++;
 	// Update the odometry in the periodic block
 	// System.out.println("front right: " + m_frontRight.getPosition());
 	// System.out.println("front left: " + m_frontLeft.getPosition());
 	// System.out.println("back right: " + m_rearRight.getPosition());
 	// System.out.println("back left: " + m_rearLeft.getPosition());
+
+		if (counter % 40 == 0) System.out.println(getPose());
 		odometry.update(
-			Rotation2d.fromDegrees(gyro.getAngle()),
+			Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
 				frontRight.getPosition(),
@@ -100,6 +102,15 @@ public class DriveSubsystem extends SubsystemBase {
 		return odometry.getPoseMeters();
 	}
 
+		/**
+	 * Returns the gyro of the robot.
+	 *
+	 * @return The gyro.
+	 */
+	public AHRS getGyro() {
+		return gyro;
+	}
+
 	/**
 	 * Resets the odometry to the specified pose.
 	 *
@@ -107,7 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
 	 */
 	public void resetOdometry(Pose2d pose) {
 		odometry.resetPosition(
-			Rotation2d.fromDegrees(gyro.getAngle()),
+			Rotation2d.fromDegrees(-gyro.getAngle()),
 				new SwerveModulePosition[] {
 					frontLeft.getPosition(),
 					frontRight.getPosition(),
@@ -148,13 +159,13 @@ public class DriveSubsystem extends SubsystemBase {
 				//some high number that means the slewrate is effectively instantaneous
 			}
 
-			double currentTime = WPIUtilJNI.now() * 1e-6;
+			double currentTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 			double elapsedTime = currentTime - prevTime;
-			double angleDif = SwerveUtils.AngleDifference(inputTranslationDir,
+			double angleDif = SwerveUtils.angleDifference(inputTranslationDir,
 				currentTranslationDir);
 
 			if (angleDif < 0.45 * Math.PI) {
-				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
+				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
 			} else if (angleDif > 0.85 * Math.PI) {
@@ -163,11 +174,11 @@ public class DriveSubsystem extends SubsystemBase {
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
 				} else {
-					currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
+					currentTranslationDir = SwerveUtils.wrapAngle(currentTranslationDir + Math.PI);
 					currentTranslationMag = magLimiter.calculate(inputTranslationMag);
 				}
 			} else {
-				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
+				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(0.0);
 			}
@@ -191,7 +202,7 @@ public class DriveSubsystem extends SubsystemBase {
 		var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered,
-					rotDelivered, Rotation2d.fromDegrees(gyro.getAngle()))
+					rotDelivered, Rotation2d.fromDegrees(-gyro.getAngle()))
 				: new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
@@ -269,7 +280,7 @@ public class DriveSubsystem extends SubsystemBase {
 	 * @return the robot's heading in degrees, from -180 to 180
 	 */
 	public double getHeading() {
-		return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees();
+		return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
 	}
 
 	/**
