@@ -57,8 +57,15 @@ public class DriveSubsystem extends SubsystemBase {
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
 	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 
+	// Constants
+	private static final double SLEW_RATE_MAX = 500.0;
+	private static final double SMALL_ANGLE_HEADING_THRESHOLD_RADIANS = 0.45 * Math.PI;
+	private static final double LARGE_ANGLE_HEADING_THRESHOLD_RADIANS = 0.85 * Math.PI;
+	private static final double TRANSLATION_MAGNITUDE_THRESHOLD = 1e-4;
+	private static final int COUNTER_PERIOD = 40;
+
 	// Odometry class for tracking robot pose
-	SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
 		DriveConstants.DRIVE_KINEMATICS,
 		Rotation2d.fromDegrees(-gyro.getAngle()),
 		new SwerveModulePosition[] {
@@ -72,7 +79,7 @@ public class DriveSubsystem extends SubsystemBase {
 	public DriveSubsystem() {
 	}
 
-	int counter = 0;
+	private int counter = 0;
 	@Override
 	public void periodic() {
 		counter++;
@@ -82,7 +89,9 @@ public class DriveSubsystem extends SubsystemBase {
 	// System.out.println("back right: " + m_rearRight.getPosition());
 	// System.out.println("back left: " + m_rearLeft.getPosition());
 
-		if (counter % 40 == 0) System.out.println(getPose());
+		if (counter % COUNTER_PERIOD == 0) {
+			System.out.println(getPose());
+		}
 		odometry.update(
 			Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
@@ -155,7 +164,7 @@ public class DriveSubsystem extends SubsystemBase {
 				directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE
 					/ currentTranslationMag);
 			} else {
-				directionSlewRate = 500.0;
+				directionSlewRate = SLEW_RATE_MAX;
 				//some high number that means the slewrate is effectively instantaneous
 			}
 
@@ -164,12 +173,12 @@ public class DriveSubsystem extends SubsystemBase {
 			double angleDif = SwerveUtils.angleDifference(inputTranslationDir,
 				currentTranslationDir);
 
-			if (angleDif < 0.45 * Math.PI) {
+			if (angleDif < SMALL_ANGLE_HEADING_THRESHOLD_RADIANS) {
 				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-			} else if (angleDif > 0.85 * Math.PI) {
-				if (currentTranslationMag > 1e-4) {
+			} else if (angleDif > LARGE_ANGLE_HEADING_THRESHOLD_RADIANS) {
+				if (currentTranslationMag > TRANSLATION_MAGNITUDE_THRESHOLD) {
 					// some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
@@ -215,7 +224,7 @@ public class DriveSubsystem extends SubsystemBase {
 	/**
 	 * Balances the chassis on the charging station.
 	 */
-	public void balence() {
+	public void balance() {
 		double power;
 		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > (-1 * 2)) {
 			power = 0;
