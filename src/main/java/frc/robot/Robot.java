@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
+import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,9 +20,9 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ElevatorWristFSM fsmSystem;
+	private ElevatorWristFSM wristSystem;
+	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
-
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -32,12 +34,18 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		fsmSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
+		elevatorArm = new ElevatorArmFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		everybotIntake.reset();
+		wristSystem.reset();
+		elevatorArm.reset();
+
+
+
 	}
 
 	@Override
