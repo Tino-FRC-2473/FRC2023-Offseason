@@ -39,6 +39,15 @@ public class RobotContainer {
 	private XboxController driverController =
 		new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
+	public static final double THREE_POINT_FIVE_SIX = 3.56;
+	public static final int ONE_EIGHTY = 180;
+	public static final double TWO_POINT_ZERO_THREE = 2.03;
+	public static final double FOUR_POINT_SEVEN_ZERO = 4.70;
+	public static final double ONE_POINT_FIVE_THREE = 1.53;
+	public static final double POINT_SIX_FIVE = 0.65;
+	public static final double ONE_POINT_SIX_SEVEN = 1.67;
+
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -107,9 +116,9 @@ public class RobotContainer {
 			// Start at the origin facing the +X direction, the grid, and unload element
 			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
 			// Move out of community
-			List.of(new Translation2d(-3.56, 0)),
+			List.of(new Translation2d(-THREE_POINT_FIVE_SIX, 0)),
 			// End out of community
-			new Pose2d(-3.56, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-THREE_POINT_FIVE_SIX, 0, Rotation2d.fromDegrees(ONE_EIGHTY)),
 			config);
 
 		// trajectory 3: deposit + charging station
@@ -117,9 +126,9 @@ public class RobotContainer {
 			// Start at the origin facing the +X direction, the grid, and unload element
 			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
 			// Move to charging station
-			List.of(new Translation2d(-2.03, 0)),
+			List.of(new Translation2d(-TWO_POINT_ZERO_THREE, 0)),
 			// End at charging station
-			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-TWO_POINT_ZERO_THREE, 0, Rotation2d.fromDegrees(ONE_EIGHTY)),
 			config);
 
 		// trajectory 4: deposit + exit community + charging station
@@ -127,11 +136,11 @@ public class RobotContainer {
 			// Start at the origin facing the +X direction, the grid, and unload element
 			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
 			// Exit community
-			List.of(new Translation2d(-3.56, 0),
+			List.of(new Translation2d(-THREE_POINT_FIVE_SIX, 0),
 			// Move to charging station
-			new Translation2d(1.53, 0)),
+			new Translation2d(ONE_POINT_FIVE_THREE, 0)),
 			// End at charging station
-			new Pose2d(-2.03, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-TWO_POINT_ZERO_THREE, 0, Rotation2d.fromDegrees(ONE_EIGHTY)),
 			config);
 
 		// trajectory 5: deposit + exit community + pick up
@@ -139,9 +148,9 @@ public class RobotContainer {
 			// Start at the origin facing the +X direction, the grid, and unload element
 			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
 			// Exit community, go to object
-			List.of(new Translation2d(-4.70, 0)),
+			List.of(new Translation2d(-FOUR_POINT_SEVEN_ZERO, 0)),
 			// End at object
-			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-FOUR_POINT_SEVEN_ZERO, 0, Rotation2d.fromDegrees(ONE_EIGHTY)),
 			config);
 
 		// trajectory 6: deposit + exit community + pick up + charging station
@@ -149,18 +158,19 @@ public class RobotContainer {
 			// Start at the origin facing the +X direction, the grid, and unload element
 			new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
 			// Exit community, go to object
-			List.of(new Translation2d(-4.70, 0)),
+			List.of(new Translation2d(-FOUR_POINT_SEVEN_ZERO, 0)),
 			// End at object
-			new Pose2d(-4.70, 0, Rotation2d.fromDegrees(180)),
+			new Pose2d(-FOUR_POINT_SEVEN_ZERO, 0, Rotation2d.fromDegrees(ONE_EIGHTY)),
 			config);
 		// pick up object
 		Trajectory trajectory6b = TrajectoryGenerator.generateTrajectory(
-			new Pose2d(-4.70, 0, new Rotation2d(180)),
+			new Pose2d(-FOUR_POINT_SEVEN_ZERO, 0, new Rotation2d(ONE_EIGHTY)),
 			// Go to charging station
-			List.of(new Translation2d(1, -1), new Translation2d(1.67, -0.65)),
+			List.of(new Translation2d(1, -1),
+				new Translation2d(ONE_POINT_FIVE_THREE, -POINT_SIX_FIVE)),
 			// End at charging station
-			new Pose2d(-2.03, -1.65, new Rotation2d(360)),
-			config);
+			new Pose2d(-TWO_POINT_ZERO_THREE, -1.0 - POINT_SIX_FIVE,
+				new Rotation2d(2 * ONE_EIGHTY)), config);
 
 		var thetaController = new ProfiledPIDController(
 				AutoConstants.P_THETA_CONTROLLER, 0, 0, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);

@@ -53,12 +53,23 @@ public class DriveSubsystem extends SubsystemBase {
 	private double currentTranslationDir = 0.0;
 	private double currentTranslationMag = 0.0;
 
+	//Checkstyle constants
+	public static final double E_MINUS_SIX = 1e-6;
+	public static final double E_MINUS_FOUR = 1e-4;
+	public static final int TWO_HUNDRED = 200;
+	public static final int NEG_TWO = -2;
+	public static final double FIVE_HUNDRED = 500.0;
+	public static final double POINT_FOUR_FIVE = 0.45;
+	public static final double POINT_EIGHT_FIVE = 0.85;
+
+
 	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-	private double prevTime = WPIUtilJNI.now() * 1e-6;
+	private double prevTime = WPIUtilJNI.now() * E_MINUS_SIX;
+
 
 	// Odometry class for tracking robot pose
-	SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
 		DriveConstants.DRIVE_KINEMATICS,
 		Rotation2d.fromDegrees(gyro.getAngle()),
 		new SwerveModulePosition[] {
@@ -142,21 +153,21 @@ public class DriveSubsystem extends SubsystemBase {
 				directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE
 					/ currentTranslationMag);
 			} else {
-				directionSlewRate = 500.0;
+				directionSlewRate = FIVE_HUNDRED;
 				//some high number that means the slewrate is effectively instantaneous
 			}
 
-			double currentTime = WPIUtilJNI.now() * 1e-6;
+			double currentTime = WPIUtilJNI.now() * E_MINUS_SIX;
 			double elapsedTime = currentTime - prevTime;
 			double angleDif = SwerveUtils.AngleDifference(inputTranslationDir,
 				currentTranslationDir);
 
-			if (angleDif < 0.45 * Math.PI) {
+			if (angleDif < POINT_FOUR_FIVE * Math.PI) {
 				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-			} else if (angleDif > 0.85 * Math.PI) {
-				if (currentTranslationMag > 1e-4) {
+			} else if (angleDif > POINT_EIGHT_FIVE * Math.PI) {
+				if (currentTranslationMag > E_MINUS_FOUR) {
 					// some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
@@ -193,22 +204,27 @@ public class DriveSubsystem extends SubsystemBase {
 				: new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-		frontLeft.setDesiredState(swerveModuleStates[0]);
-		frontRight.setDesiredState(swerveModuleStates[1]);
-		rearLeft.setDesiredState(swerveModuleStates[2]);
-		rearRight.setDesiredState(swerveModuleStates[3]);
+
+		int idx = 0;
+		frontLeft.setDesiredState(swerveModuleStates[idx]);
+		frontRight.setDesiredState(swerveModuleStates[++idx]);
+		rearLeft.setDesiredState(swerveModuleStates[++idx]);
+		rearRight.setDesiredState(swerveModuleStates[++idx]);
 	}
 
-	public void balence() {
+	/**
+	 * Balances gyro.
+	 */
+	public void balance() {
 		double power;
-		// if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
-		//   > -2) {
-		//   power = 0;
-		// } else if (gyro.getRoll() > 0) {
-		//   power = Math.abs(gyro.getRoll()) / 200;
-		// } else if (gyro.getRoll() < 0) {
-		//   power = -Math.abs(gyro.getRoll()) / 200;
-		// }
+		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
+			> NEG_TWO) {
+			power = 0;
+		} else if (gyro.getRoll() > 0) {
+			power = Math.abs(gyro.getRoll()) / TWO_HUNDRED;
+		} else if (gyro.getRoll() < 0) {
+			power = -Math.abs(gyro.getRoll()) / TWO_HUNDRED;
+		}
 		// set to power field reletive so facing charge station
 	}
 
@@ -234,10 +250,13 @@ public class DriveSubsystem extends SubsystemBase {
 	public void setModuleStates(SwerveModuleState[] desiredStates) {
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-		frontLeft.setDesiredState(desiredStates[0]);
-		frontRight.setDesiredState(desiredStates[1]);
-		rearLeft.setDesiredState(desiredStates[2]);
-		rearRight.setDesiredState(desiredStates[(2 + 1)]);
+
+
+		int idx = 0;
+		frontLeft.setDesiredState(desiredStates[idx]);
+		frontRight.setDesiredState(desiredStates[++idx]);
+		rearLeft.setDesiredState(desiredStates[++idx]);
+		rearRight.setDesiredState(desiredStates[++idx]);
 	}
 
 	/** Resets the drive encoders to currently read a position of 0. */
