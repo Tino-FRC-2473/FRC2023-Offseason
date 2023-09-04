@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -31,16 +33,20 @@ public class EveryBotIntakeFSM {
 	//HAVE TO CHANGE BASED ON TEST
 	private static final double KEEP_SPEED = 0;
 	private static final double INTAKE_SPEED = 0.1;
-	private static final double RELEASE_SPEED = -0.07; //DONT FORGET -
+	private static final double RELEASE_SPEED = -0.07; //DONT FORGET THE NEGATIVE SIGN (-)
 	private static final double RELEASE_SPEED_LOW = -0.3;
 	private static final double CURRENT_THRESHOLD = 20;
 	private static final double BASE_THRESHOLD = 100;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
 	private static final int AVERAGE_SIZE = 10;
-	private static final double TURN_SPEED = -0.1;
+	private static final double MIN_TURN_SPEED = -0.3;
+	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double OVERRUN_THRESHOLD = 0.007;
 	private static final double FLIP_THRESHOLD = 50;
+	private static final double PID_CONSTANT_ARM_P = 0.005;
+	private static final double PID_CONSTANT_ARM_I = 0.00000001;
+	private static final double PID_CONSTANT_ARM_D = 0.00000001;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 	private boolean isMotorAllowed = false;
@@ -57,6 +63,7 @@ public class EveryBotIntakeFSM {
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
 	private CANSparkMax flipMotor;
+	private SparkMaxPIDController pidControllerFlip;
 	private Timer timer;
 	//private ElevatorArmFSM arm;
 	/* ======================== Constructor ======================== */
@@ -72,6 +79,13 @@ public class EveryBotIntakeFSM {
 				CANSparkMax.MotorType.kBrushless);
 		flipMotor = new CANSparkMax(HardwareMap.CAN_ID_FLIP_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
+
+		pidControllerFlip = flipMotor.getPIDController();
+		pidControllerFlip.setP(PID_CONSTANT_ARM_P);
+		pidControllerFlip.setI(PID_CONSTANT_ARM_I);
+		pidControllerFlip.setD(PID_CONSTANT_ARM_D);
+		pidControllerFlip.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);
+
 		// Reset state machine
 		reset();
 	}
@@ -240,7 +254,7 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
-				} else if (flipMotor.getEncoder().getPosition() < FLIP_THRESHOLD) {
+				} else {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
@@ -248,7 +262,6 @@ public class EveryBotIntakeFSM {
 					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {
-					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				} else {
 					return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
@@ -277,17 +290,11 @@ public class EveryBotIntakeFSM {
 		flipMotor.set(0);
 	}
 	private void handleFlipClockWiseState() {
-		flipMotor.set(-TURN_SPEED);
-		if (flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD) {
-			flipMotor.set(0);
-		}
+		pidControllerFlip.setReference(FLIP_THRESHOLD, CANSparkMax.ControlType.kPosition);
 		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
-		flipMotor.set(TURN_SPEED);
-		if (flipMotor.getEncoder().getPosition() <= 0) {
-			flipMotor.set(0);
-		}
+		pidControllerFlip.setReference(0, CANSparkMax.ControlType.kPosition);
 		spinnerMotor.set(0);
 	}
 	private void handleOuttakingState(TeleopInput input) {

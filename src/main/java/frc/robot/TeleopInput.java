@@ -14,11 +14,11 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 0;
 	private static final int RIGHT_JOYSTICK_PORT = 1;
-	private static final int ELEVATOR_HIGH = 7;
-	private static final int ELEVATOR_MID = 9;
-	private static final int ELEVATOR_LOW = 11;
-	private static final int WRIST_IN = 6;
-	private static final int WRIST_OUT = 4;
+	private static final int ELEVATOR_HIGH_BUTTON = 7;
+	private static final int ELEVATOR_MID_BUTTON = 9;
+	private static final int ELEVATOR_LOW_BUTTON = 11;
+	private static final int WRIST_IN_BUTTON = 6;
+	private static final int WRIST_OUT_BUTTON = 4;
 	private static final int ABORT_FLIP_BUTTON = 5;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int FLIP_BUTTON = 10;
@@ -98,7 +98,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isHighButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_HIGH);
+		return leftJoystick.getRawButton(ELEVATOR_HIGH_BUTTON);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isMidButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_MID);
+		return leftJoystick.getRawButton(ELEVATOR_MID_BUTTON);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isLowButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_LOW);
+		return leftJoystick.getRawButton(ELEVATOR_LOW_BUTTON);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isWristOutButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_OUT);
+		return leftJoystick.getRawButton(WRIST_OUT_BUTTON);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isWristInButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_IN);
+		return leftJoystick.getRawButton(WRIST_IN_BUTTON);
 	}
 
 	/**

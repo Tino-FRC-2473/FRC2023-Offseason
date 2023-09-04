@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
-import frc.robot.systems.SpinningIntakeFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
 
 /**
@@ -20,7 +19,6 @@ public class Robot extends TimedRobot {
 
 	// Systems
 	private ElevatorWristFSM fsmSystem;
-	private SpinningIntakeFSM spinningIntake;
 	private EveryBotIntakeFSM everybotIntake;
 
 	/**
@@ -32,64 +30,29 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem = new ElevatorArmFSM();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake = new SpinningIntakeFSM();
-		// }
 		fsmSystem = new ElevatorWristFSM();
-		//fsmSystem = new ElevatorArmFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.reset();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.reset();
-		// }
-		//fsmSystem.reset();
 		everybotIntake.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.update(null);
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.update(null);
-		// }
-		//fsmSystem.update(null);
 		everybotIntake.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.reset();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.reset();
-		// }
-		//fsmSystem.reset();
 		everybotIntake.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.update(input);
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.update(input);
-		// }
-		//fsmSystem.update(input);
 		everybotIntake.update(input);
 	}
 
