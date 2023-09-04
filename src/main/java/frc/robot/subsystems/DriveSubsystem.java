@@ -65,10 +65,6 @@ public class DriveSubsystem extends SubsystemBase {
 
 	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-<<<<<<< HEAD
-	private double prevTime = WPIUtilJNI.now() * E_MINUS_SIX;
-
-=======
 	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 
 	// Constants
@@ -77,7 +73,6 @@ public class DriveSubsystem extends SubsystemBase {
 	private static final double LARGE_ANGLE_HEADING_THRESHOLD_RADIANS = 0.85 * Math.PI;
 	private static final double TRANSLATION_MAGNITUDE_THRESHOLD = 1e-4;
 	private static final int COUNTER_PERIOD = 40;
->>>>>>> d3ed2592526e45d07e42d4009a34168bc560b5d8
 
 	// Odometry class for tracking robot pose
 	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
@@ -179,38 +174,21 @@ public class DriveSubsystem extends SubsystemBase {
 				directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE
 					/ currentTranslationMag);
 			} else {
-<<<<<<< HEAD
 				directionSlewRate = FIVE_HUNDRED;
 				//some high number that means the slewrate is effectively instantaneous
 			}
 
 			double currentTime = WPIUtilJNI.now() * E_MINUS_SIX;
-=======
-				directionSlewRate = SLEW_RATE_MAX;
-				//some high number that means the slewrate is effectively instantaneous
-			}
-
-			double currentTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
->>>>>>> d3ed2592526e45d07e42d4009a34168bc560b5d8
 			double elapsedTime = currentTime - prevTime;
 			double angleDif = SwerveUtils.angleDifference(inputTranslationDir,
 				currentTranslationDir);
 
-<<<<<<< HEAD
 			if (angleDif < POINT_FOUR_FIVE * Math.PI) {
 				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
 			} else if (angleDif > POINT_EIGHT_FIVE * Math.PI) {
 				if (currentTranslationMag > E_MINUS_FOUR) {
-=======
-			if (angleDif < SMALL_ANGLE_HEADING_THRESHOLD_RADIANS) {
-				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
-					inputTranslationDir, directionSlewRate * elapsedTime);
-				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-			} else if (angleDif > LARGE_ANGLE_HEADING_THRESHOLD_RADIANS) {
-				if (currentTranslationMag > TRANSLATION_MAGNITUDE_THRESHOLD) {
->>>>>>> d3ed2592526e45d07e42d4009a34168bc560b5d8
 					// some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
@@ -247,7 +225,6 @@ public class DriveSubsystem extends SubsystemBase {
 				: new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-<<<<<<< HEAD
 
 		int idx = 0;
 		frontLeft.setDesiredState(swerveModuleStates[idx]);
@@ -268,27 +245,6 @@ public class DriveSubsystem extends SubsystemBase {
 			power = Math.abs(gyro.getRoll()) / TWO_HUNDRED;
 		} else if (gyro.getRoll() < 0) {
 			power = -Math.abs(gyro.getRoll()) / TWO_HUNDRED;
-=======
-		frontLeft.setDesiredState(swerveModuleStates[0]);
-		frontRight.setDesiredState(swerveModuleStates[1]);
-		rearLeft.setDesiredState(swerveModuleStates[2]);
-		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
-	}
-
-	/**
-	 * Balances the chassis on the charging station.
-	 */
-	public void balance() {
-		double power;
-		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > (-1 * 2)) {
-			power = 0;
-		} else if (gyro.getRoll() > 0) {
-			power = Math.abs(gyro.getRoll())
-				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT;
-		} else {
-			power = -Math.abs(gyro.getRoll())
-				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT;
->>>>>>> d3ed2592526e45d07e42d4009a34168bc560b5d8
 		}
 		// set to power field reletive so facing charge station
 		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
