@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.NetworkTablesConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
@@ -22,12 +23,16 @@ public class RaspberryPI {
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
 		timer.start();
-		table = NetworkTableInstance.getDefault().getTable("datatable");
+		table = NetworkTableInstance.getDefault().getTable(NetworkTablesConstants.TABLE_NAME);
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
-		cubeYawSubscriber = table.getDoubleTopic("cube_yaw").subscribe(-1);
-		cubeDistanceSubscriber = table.getDoubleTopic("cube_distance").subscribe(-1);
-		coneYawSubscriber = table.getDoubleTopic("cone_yaw").subscribe(-1);
-		coneDistanceSubscriber = table.getDoubleTopic("cone_distance").subscribe(-1);
+		cubeYawSubscriber = table.getDoubleTopic(
+			NetworkTablesConstants.CUBE_YAW_TOPIC).subscribe(-1);
+		cubeDistanceSubscriber = table.getDoubleTopic(
+			NetworkTablesConstants.CUBE_DISTANCE_TOPIC).subscribe(-1);
+		coneYawSubscriber = table.getDoubleTopic(
+			NetworkTablesConstants.CONE_YAW_TOPIC).subscribe(-1);
+		coneDistanceSubscriber = table.getDoubleTopic(
+			NetworkTablesConstants.CUBE_DISTANCE_TOPIC).subscribe(-1);
 	}
 
 	/**Updates the values in SmartDashboard. */
