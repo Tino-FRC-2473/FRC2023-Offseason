@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		fsmSystem = new ElevatorWristFSM();
+		wristSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
 	}
