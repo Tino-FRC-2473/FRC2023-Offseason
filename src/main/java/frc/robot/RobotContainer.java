@@ -77,10 +77,6 @@ public class RobotContainer {
 				.whileTrue(new RunCommand(
 						() -> robotDrive.setX(),
 						robotDrive));
-
-		new JoystickButton(driverController, Button.kTriangle.value)
-			.whileTrue(new RunCommand(
-				() -> System.out.println("triangle")));
 		new JoystickButton(driverController, Button.kL2.value)
 			.whileTrue(new RunCommand(
 				() -> robotDrive.getGyro().reset()));
