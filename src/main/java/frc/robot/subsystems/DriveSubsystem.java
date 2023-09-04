@@ -184,7 +184,7 @@ public class DriveSubsystem extends SubsystemBase {
 				currentTranslationDir);
 
 			if (angleDif < POINT_FOUR_FIVE * Math.PI) {
-				currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir,
+				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
 			} else if (angleDif > POINT_EIGHT_FIVE * Math.PI) {
@@ -245,6 +245,8 @@ public class DriveSubsystem extends SubsystemBase {
 			power = Math.abs(gyro.getRoll()) / TWO_HUNDRED;
 		} else if (gyro.getRoll() < 0) {
 			power = -Math.abs(gyro.getRoll()) / TWO_HUNDRED;
+		} else {
+			power = 0;
 		}
 		// set to power field reletive so facing charge station
 		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
