@@ -60,7 +60,7 @@ public class RobotContainer {
 				// The left stick controls translation of the robot.
 				// Turning is controlled by the X axis of the right stick.
 				new RunCommand(
-						() -> robotDrive.drive(
+					() -> robotDrive.drive(
 							-MathUtil.applyDeadband(
 								driverController.getLeftY(), OIConstants.DRIVE_DEADBAND),
 							-MathUtil.applyDeadband(
@@ -84,7 +84,7 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		new JoystickButton(driverController, Button.kR1.value)
 				.whileTrue(new RunCommand(
-						() -> robotDrive.setX(),
+					() -> robotDrive.setX(),
 						robotDrive));
 		new JoystickButton(driverController, Button.kL2.value)
 			.whileTrue(new RunCommand(
