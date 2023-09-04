@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.Constants.VisionConstants;
 // Systems
 import frc.robot.systems.FSMSystem;
 
@@ -16,6 +19,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 	private Limelight limelight;
 	private AprilTag apriltag;
+	private PhotonCamera camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
 	// Systems
 	private FSMSystem fsmSystem;
 
@@ -23,9 +27,6 @@ public class Robot extends TimedRobot {
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
 	 */
-
-
-
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
@@ -33,8 +34,8 @@ public class Robot extends TimedRobot {
 
 		// Instantiate all systems here
 		fsmSystem = new FSMSystem();
-		limelight = new Limelight();
-		apriltag = new AprilTag();
+		limelight = new Limelight(camera);
+		apriltag = new AprilTag(camera);
 	}
 
 	@Override

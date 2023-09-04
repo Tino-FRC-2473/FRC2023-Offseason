@@ -1,52 +1,54 @@
 package frc.robot;
 
-import java.io.IOException;
-
 import org.photonvision.PhotonCamera;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
-/**
-	* The PhotonCameraWrapper class contains methods for estimating position
-	* of robot relative to AprilTags on the field and updates SmartDashboard
-	* with its coordinates.
-	*/
+
 public class AprilTag {
 	private PhotonCamera photonCamera;
 
-	/** Intializes April Tag detector. */
-	public AprilTag() {
-		AprilTagFieldLayout atfl = null;
-		try {
-			atfl = AprilTagFieldLayout.loadFromResource(
-				AprilTagFields.k2023ChargedUp.m_resourceFile);
-			System.out.println(atfl);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		photonCamera = new PhotonCamera("OV5647");
+	/** Intializes April Tag detector.
+	 * @param cam the PhotonCamera object that the code gets input from.
+	*/
+	public AprilTag(PhotonCamera cam) {
+		photonCamera = cam;
 		photonCamera.setDriverMode(false);
+	}
+
+	/** @return Returns the latest pipeline result. */
+	public PhotonPipelineResult getResult() {
+		photonCamera.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX);
+		return photonCamera.getLatestResult();
 	}
 
 	/** @return Returns the x coordinate of the robot relative to the april tag found. */
 	public double getX() {
-		return photonCamera.getLatestResult().getBestTarget().getBestCameraToTarget().getX();
+		PhotonPipelineResult result = getResult();
+		if (result.hasTargets()) {
+			return result.getBestTarget().getBestCameraToTarget().getX();
+		}
+		return VisionConstants.NO_TARGETS_RETURN;
 	}
 
 	/** @return Returns the y coordinate of the robot relative to the april tag found. */
 	public double getY() {
-		return photonCamera.getLatestResult().getBestTarget().getBestCameraToTarget().getY();
+		PhotonPipelineResult result = getResult();
+		if (result.hasTargets()) {
+			return result.getBestTarget().getBestCameraToTarget().getY();
+		}
+		return VisionConstants.NO_TARGETS_RETURN;
 	}
 
 	/** @return Returns the angle of the robot relative to the april tag found. */
 	public double getAngle() {
-		photonCamera.setPipelineIndex(VisionConstants.THREEDTAG_PIPELINE_INDEX);
-		return Units.radiansToDegrees(
-			photonCamera.getLatestResult().getBestTarget()
-			.getBestCameraToTarget().getRotation().getAngle());
+		PhotonPipelineResult result = getResult();
+		if (result.hasTargets()) {
+			return Units.radiansToDegrees(result.getBestTarget()
+				.getBestCameraToTarget().getRotation().getAngle());
+		}
+		return VisionConstants.NO_TARGETS_RETURN;
 	}
 
 }
