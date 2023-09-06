@@ -300,4 +300,31 @@ public class DriveSubsystem extends SubsystemBase {
 	public double getTurnRate() {
 		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
 	}
+
+	public void driveToPose(double x, double y, double theta) {
+		double xSpeed;
+		double ySpeed;
+		double angularSpeed;
+		if (limelight.getX() > x + 0.02) {
+			xSpeed = -POWER;
+		} else if (limelight.getX() < x - 0.02) {
+			xSpeed = POWER;
+		} else {
+			xSpeed = 0;
+		}
+		if (limelight.getY() > y + 0.02) {
+			ySpeed = -POWER;
+		} else if (limelight.getY() % 180 < y - 0.02) {
+			ySpeed = POWER;
+		} else {
+			ySpeed = 0;
+		}
+		if (limelight.getAngle() > theta) {
+			xSpeed = -POWER;
+		} else if (limelight.getX() < x - 0.02) {
+			xSpeed = POWER;
+		} else {
+			xSpeed = 0;
+		}
+	}
 }
