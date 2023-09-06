@@ -301,6 +301,13 @@ public class DriveSubsystem extends SubsystemBase {
 		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
 	}
 
+	/**
+	 * Moves the robot from a point to another given Vx, Vy, and W.
+	 *
+	 * @param x Target x position
+	 * @param y Target y position
+	 * @param theta Target angular position
+	 */
 	public void driveToPose(double x, double y, double theta) {
 		double xSpeed;
 		double ySpeed;
