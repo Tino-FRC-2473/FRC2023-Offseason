@@ -5,11 +5,11 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
+
 
 
 /**
@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
+	private RaspberryPI rpi;
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
@@ -32,6 +33,7 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
+		rpi = new RaspberryPI();
 		wristSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
