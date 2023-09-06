@@ -16,7 +16,7 @@ public class RaspberryPI {
 	private DoubleSubscriber cubeDistanceSubscriber;
 	private DoubleSubscriber coneYawSubscriber;
 	private DoubleSubscriber coneDistanceSubscriber;
-	private double previousValueSent = 0;
+	private double previousValueReceived = 0;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
 
@@ -77,11 +77,11 @@ public class RaspberryPI {
 	 */
 	public void updateFPS() {
 		double currentReceivedValue = fpsCounter.get();
-		if (currentReceivedValue != previousValueSent) {
+		if (currentReceivedValue != previousValueReceived) {
 			fps = 1.0 / (timer.get() - previousTimeReceived);
 			previousTimeReceived = timer.get();
 		}
-		previousValueSent = currentReceivedValue;
+		previousValueReceived = currentReceivedValue;
 		SmartDashboard.putNumber("FPS", fps);
 	}
 }
