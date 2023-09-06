@@ -16,8 +16,8 @@ public class RaspberryPI {
 	private DoubleSubscriber cubeDistanceSubscriber;
 	private DoubleSubscriber coneYawSubscriber;
 	private DoubleSubscriber coneDistanceSubscriber;
-	private double lastValue = 0;
-	private double lastTime = 0;
+	private double previousValueSent = 0;
+	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
 
 	/**Updates the FPS each iteration of the robot.*/
@@ -76,12 +76,12 @@ public class RaspberryPI {
 	 * Updates the FPS each iteration of the robot.
 	 */
 	public void updateFPS() {
-		double x = fpsCounter.get();
-		if (x != lastValue) {
-			fps = 1.0 / (timer.get() - lastTime);
-			lastTime = timer.get();
+		double currentReceivedValue = fpsCounter.get();
+		if (currentReceivedValue != previousValueSent) {
+			fps = 1.0 / (timer.get() - previousTimeReceived);
+			previousTimeReceived = timer.get();
 		}
-		lastValue = x;
+		previousValueSent = currentReceivedValue;
 		SmartDashboard.putNumber("FPS", fps);
 	}
 }
