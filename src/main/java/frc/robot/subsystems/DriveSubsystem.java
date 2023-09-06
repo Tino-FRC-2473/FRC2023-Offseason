@@ -63,6 +63,7 @@ public class DriveSubsystem extends SubsystemBase {
 	private static final double LARGE_ANGLE_HEADING_THRESHOLD_RADIANS = 0.85 * Math.PI;
 	private static final double TRANSLATION_MAGNITUDE_THRESHOLD = 1e-4;
 	private static final int COUNTER_PERIOD = 40;
+	private static final double POWER = 0.01;
 
 	// Odometry class for tracking robot pose
 	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
@@ -165,7 +166,7 @@ public class DriveSubsystem extends SubsystemBase {
 					/ currentTranslationMag);
 			} else {
 				directionSlewRate = SLEW_RATE_MAX;
-				//some high number that means the slewrate is effectively instantaneous
+				// some high number that means the slewrate is effectively instantaneous
 			}
 
 			double currentTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
@@ -301,8 +302,7 @@ public class DriveSubsystem extends SubsystemBase {
 		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
 	}
 
-	/**
-	 * Moves the robot from a point to another given Vx, Vy, and W.
+	/** Moves the robot from a point to another given X, Y, and theta.
 	 *
 	 * @param x Target x position
 	 * @param y Target y position
@@ -321,17 +321,18 @@ public class DriveSubsystem extends SubsystemBase {
 		}
 		if (limelight.getY() > y + 0.02) {
 			ySpeed = -POWER;
-		} else if (limelight.getY() % 180 < y - 0.02) {
+		} else if (limelight.getY() < y - 0.02) {
 			ySpeed = POWER;
 		} else {
 			ySpeed = 0;
 		}
-		if (limelight.getAngle() > theta) {
-			xSpeed = -POWER;
-		} else if (limelight.getX() < x - 0.02) {
-			xSpeed = POWER;
+		if (limelight.getAngle() % 360 > theta + 0.1) {
+			angularSpeed = -POWER;
+		} else if (limelight.getX() % 360 < theta - 0.1) {
+			angularSpeed = POWER;
 		} else {
-			xSpeed = 0;
+			angularSpeed = 0;
 		}
+		drive(xSpeed, ySpeed, angularSpeed, false, false);
 	}
 }
