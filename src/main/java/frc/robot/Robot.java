@@ -111,9 +111,22 @@ public class Robot extends TimedRobot {
 	public boolean intakeObject() {
 		if (wristSystem.movingOutState()) {
 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
 		}
 		return true;
 	}
+
+	/** This method is for intake in game and flipping.
+* @return completion of the outtake
+ 	*/
+	public boolean outttakeObject() {
+		if (wristSystem.movingInState()) {
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
+		}
+		return true;
+	}
+
 
 
 }
