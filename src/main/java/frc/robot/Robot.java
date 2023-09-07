@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
+import frc.robot.systems.EveryBotIntakeFSM.EveryBotIntakeFSMState;
 
 
 /**
@@ -121,4 +122,36 @@ public class Robot extends TimedRobot {
 	// Do not use robotPeriodic. Use mode specific periodic methods instead.
 	@Override
 	public void robotPeriodic() { }
+
+	/** This method is for depositing high in game.
+* @return completion of the deposit
+ 	*/
+	public boolean depositHigh() {
+		return elevatorArm.handleAutonHighState();
+	}
+	/** This method is for depositing mid in game.
+* @return completion of the deposit
+ 	*/
+	public boolean depositMid() {
+		return elevatorArm.handleAutonMiddleState();
+	}
+	/** This method is for depositing low in game.
+* @return completion of the deposit
+ 	*/
+	public boolean depositLow() {
+		return elevatorArm.handleAutonLowState();
+	}
+	/** This method is for intake in game and flipping.
+* @return completion of the intake
+ 	*/
+	public boolean intakeObject() {
+		if (wristSystem.movingOutState()) {
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
+		}
+		return true;
+	}
+
+
 }
+
+

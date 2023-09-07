@@ -209,4 +209,19 @@ public class ElevatorWristFSM {
 	private void handleZeroingState(TeleopInput input) {
 		pidControllerWrist.setReference(ZEROING_SPEED, CANSparkMax.ControlType.kDutyCycle);
 	}
+
+
+
+
+	/** This method is for intake in game and flipping.
+	* @return completion of moving out
+ 	*/
+	public boolean movingOutState() {
+		pidControllerWrist.setReference(WRIST_OUT_ENCODER_ROTATIONS,
+			CANSparkMax.ControlType.kPosition);
+		return true;
+	}
 }
+
+
+

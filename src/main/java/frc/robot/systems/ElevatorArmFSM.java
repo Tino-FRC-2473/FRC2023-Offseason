@@ -275,18 +275,24 @@ public class ElevatorArmFSM {
 		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
 		return true;
 	}
-
-	private boolean handleAutonHighState() {
+/** This method is for depositing high in game.
+* @return completion of the deposit
+ 	*/
+	public boolean handleAutonHighState() {
 		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		return inRange(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS);
 	}
-
-	private boolean handleAutonMiddleState() {
+/** This method is for depositing high in game.
+* @return completion of the deposit
+ 	*/
+	public boolean handleAutonMiddleState() {
 		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
-
-	private boolean handleAutonLowState() {
+/** This method is for depositing low in game.
+* @return completion of the deposit
+ 	*/
+	public boolean handleAutonLowState() {
 		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}

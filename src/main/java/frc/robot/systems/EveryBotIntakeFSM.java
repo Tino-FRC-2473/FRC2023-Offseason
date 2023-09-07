@@ -173,7 +173,11 @@ public class EveryBotIntakeFSM {
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
 	}
-	private boolean updateAutonomous(EveryBotIntakeFSMState currState) {
+	/** This method is for intake in game and flipping.
+	 * @param currState
+* @return completion of the updateautonomous
+ 	*/
+	public boolean updateAutonomous(EveryBotIntakeFSMState currState) {
 		switch (currState) {
 			case INTAKING:
 				handleIntakingState();
@@ -294,7 +298,7 @@ public class EveryBotIntakeFSM {
 	/**
 	 * Handle behavior in states.
 	 */
-	private void handleIntakingState() {
+	public void handleIntakingState() {
 		spinnerMotor.set(INTAKE_SPEED);
 		flipMotor.set(0);
 	}
