@@ -45,10 +45,10 @@ public class ElevatorArmFSM {
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax armMotor;
 	private SparkMaxPIDController pidControllerArm;
-	private SparkMaxLimitSwitch limitSwitchHigh;
 	private SparkMaxLimitSwitch limitSwitchLow;
 	private double currentEncoder;
 	private boolean zeroed = true;
+	private int three;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -61,15 +61,15 @@ public class ElevatorArmFSM {
 		armMotor = new CANSparkMax(HardwareMap.CAN_ID_ARM,
 										CANSparkMax.MotorType.kBrushless);
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		limitSwitchHigh = armMotor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
-		limitSwitchHigh.enableLimitSwitch(true);
 		limitSwitchLow.enableLimitSwitch(true);
 		pidControllerArm = armMotor.getPIDController();
 		pidControllerArm.setP(PID_CONSTANT_ARM_P);
 		pidControllerArm.setI(PID_CONSTANT_ARM_I);
 		pidControllerArm.setD(PID_CONSTANT_ARM_D);
 		pidControllerArm.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
+		three = (2 + 1);
+
 		// Reset state machine
 		reset();
 	}
@@ -162,21 +162,13 @@ public class ElevatorArmFSM {
 
 		switch (autonState) {
 			case IDLE:
-				handleAutonIdleState();
-				return false;
+				return handleAutonIdleState();
 			case HIGH:
-				handleAutonHighState();
-				return false;
+				return handleAutonHighState();
 			case MIDDLE:
-				handleAutonMiddleState();
-				return false;
+				return handleAutonMiddleState();
 			case LOW:
-				handleAutonLowState();
-				return false;
-			case MOVING:
-				return false;
-			case ZEROING:
-				return false;
+				return handleAutonLowState();
 			default:
 				return true;
 		}
@@ -208,6 +200,8 @@ public class ElevatorArmFSM {
 					return FSMState.MOVING;
 				} else if (input.isArmZeroButtonPressed()) {
 					return FSMState.ZEROING;
+				} else {
+					return FSMState.IDLE;
 				}
 			case HIGH:
 				if (input.isHighButtonPressed()) {
@@ -263,7 +257,7 @@ public class ElevatorArmFSM {
 		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 	}
 	private void handleMovingState(TeleopInput input) {
-		pidControllerArm.setReference(-input.getLeftJoystickY() / (2 + 1),
+		pidControllerArm.setReference(-input.getLeftJoystickY() / three,
 			CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleZeroingState(TeleopInput input) {

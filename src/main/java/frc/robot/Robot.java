@@ -33,14 +33,7 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem = new ElevatorArmFSM();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake = new SpinningIntakeFSM();
-		// }
 		wristSystem = new ElevatorWristFSM();
-		//fsmSystem = new ElevatorArmFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
 	}
@@ -48,14 +41,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.reset();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.reset();
-		// }
-		//fsmSystem.reset();
-
 		everybotIntake.reset();
 		wristSystem.reset();
 		elevatorArm.reset();
@@ -66,38 +51,17 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.update(null);
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.update(null);
-		// }
-		//fsmSystem.update(null);
 		everybotIntake.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.reset();
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.reset();
-		// }
-		//fsmSystem.reset();
 		everybotIntake.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		// if (!HardwareMap.isElevatorArmDisabled()) {
-		// 	fsmSystem.update(input);
-		// }
-		// if (!HardwareMap.isSpinningIntakeDisabled()) {
-		// 	spinningIntake.update(input);
-		// }
-		//fsmSystem.update(input);
 		everybotIntake.update(input);
 	}
 

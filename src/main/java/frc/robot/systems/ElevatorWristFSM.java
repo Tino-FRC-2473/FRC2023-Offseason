@@ -196,7 +196,8 @@ public class ElevatorWristFSM {
 	 */
 	private void handleIdleState(TeleopInput input) {
 		//PREVIOUS CODE: wristMotor.set(0);
-		pidControllerWrist.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
+		pidControllerWrist.setReference(currentEncoder,
+			CANSparkMax.ControlType.kPosition);
 	}
 	private void handleMovingInState(TeleopInput input) {
 		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,

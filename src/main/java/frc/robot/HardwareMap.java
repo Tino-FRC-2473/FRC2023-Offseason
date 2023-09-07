@@ -26,7 +26,7 @@ public final class HardwareMap {
 	private static final int DIO_ELEVATOR_ARM_CHANNEL = 8;
 	private static final int DIO_WRIST_CHANNEL = 7;
 
-	private static DigitalInput testBoardPin = new DigitalInput(
+	private static DigitalInput spinningIntakePin = new DigitalInput(
 			HardwareMap.DIO_SPINNING_INTAKE_CHANNEL);
 	private static DigitalInput elevatorArmPin = new DigitalInput(
 			HardwareMap.DIO_ELEVATOR_ARM_CHANNEL);
@@ -37,7 +37,7 @@ public final class HardwareMap {
 	 * @return true if the spinning intake is disabled
 	 */
 	public static boolean isSpinningIntakeDisabled() {
-		return !HardwareMap.testBoardPin.get();
+		return !HardwareMap.spinningIntakePin.get();
 	}
 
 	/**
