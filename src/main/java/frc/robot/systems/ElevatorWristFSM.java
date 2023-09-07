@@ -222,6 +222,14 @@ public class ElevatorWristFSM {
 			CANSparkMax.ControlType.kPosition);
 		return true;
 	}
+	/** This method is for intake in game and flipping.
+	 * @return if moving in state is finished
+ 	*/
+	public boolean movingInState() {
+		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
+			CANSparkMax.ControlType.kPosition);
+		return true;
+	}
 }
 
 
