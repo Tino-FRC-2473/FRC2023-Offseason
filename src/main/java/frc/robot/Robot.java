@@ -7,9 +7,10 @@ import org.photonvision.PhotonCamera;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.Constants.VisionConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.FSMSystem;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,16 +18,19 @@ import frc.robot.systems.FSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-	private Limelight limelight;
+	private ReflectiveTape tape;
 	private AprilTag apriltag;
-	private PhotonCamera camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
 	// Systems
 	private FSMSystem fsmSystem;
+	private PhotonCamera camera = new PhotonCamera("photon camera");
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
 	 */
+
+
+
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
@@ -34,8 +38,9 @@ public class Robot extends TimedRobot {
 
 		// Instantiate all systems here
 		fsmSystem = new FSMSystem();
-		limelight = new Limelight(camera);
+		tape = new ReflectiveTape(camera);
 		apriltag = new AprilTag(camera);
+		
 	}
 
 	@Override
@@ -47,6 +52,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		fsmSystem.update(null);
+		//System.out.println("x dist tape " + apriltag.getX());
+		//SmartDashboard.putNumber("x dist tape", apriltag.getX());
+		SmartDashboard.putNumber("target y value", tape.getHighTape().getPitch());
 	}
 
 	@Override

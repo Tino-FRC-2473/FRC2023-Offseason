@@ -7,7 +7,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Transform2d;
->>>>>>> Stashed changes:src/main/java/frc/robot/ReflectiveTape.java
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
 
@@ -17,8 +16,9 @@ public class ReflectiveTape {
 	/** Intializes Limelight object.
 	 * @param cam the PhotonCamera object that the code gets input from.
 	*/
-	public Limelight(PhotonCamera cam) {
+	public ReflectiveTape(PhotonCamera cam) {
 		photonCamera = cam;
+	}
 
 	private int currPipelineIndex;
 	/** Intializes Limelight object. */
@@ -34,15 +34,10 @@ public class ReflectiveTape {
 		photonCamera.setPipelineIndex(VisionConstants.LOWERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
 		if (result.hasTargets()) {
-
-			return Units.radiansToDegrees(result.getBestTarget().getYaw());
-
 			return result.getBestTarget().getYaw();
 		} else {
 			return VisionConstants.NO_TARGETS_RETURN;
-
 		}
-		return VisionConstants.NO_TARGETS_RETURN;
 	}
 	/** Gets the yaw to the target.
 	 * @return returns the yaw in degress from the limelight to the target.
