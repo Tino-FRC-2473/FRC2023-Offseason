@@ -9,7 +9,7 @@ import frc.robot.Constants.NetworkTablesConstants;
 public class RaspberryPI {
 	private double fps = 0;
 	private NetworkTable table;
-
+	int n = 0;
 	//FPS Calculation
 	private DoubleSubscriber fpsCounter;
 	private DoubleSubscriber cubeYawSubscriber;
@@ -24,7 +24,7 @@ public class RaspberryPI {
 	public RaspberryPI() {
 		timer.start();
 		table = NetworkTableInstance.getDefault().getTable(NetworkTablesConstants.TABLE_NAME);
-		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
+		fpsCounter = table.getDoubleTopic(NetworkTablesConstants.FPS_COUNTER_TOPIC).subscribe(-1);
 		cubeYawSubscriber = table.getDoubleTopic(
 			NetworkTablesConstants.CUBE_YAW_TOPIC).subscribe(-1);
 		cubeDistanceSubscriber = table.getDoubleTopic(
@@ -38,6 +38,10 @@ public class RaspberryPI {
 	/**Updates the values in SmartDashboard. */
 	public void update() {
 		updateFPS();
+		SmartDashboard.putNumber("cube yaw", getCubeYaw());
+		SmartDashboard.putNumber("cube distance", getCubeDistance());
+		SmartDashboard.putNumber("cone yaw", getConeYaw());
+		SmartDashboard.putNumber("cone distance", getConeDistance());
 	}
 
 	/**

@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		everybotIntake.update(input);
+		rpi.update();
 	}
 
 	@Override
