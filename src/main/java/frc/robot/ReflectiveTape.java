@@ -6,7 +6,6 @@ import org.photonvision.PhotonCamera;
 
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
 
@@ -20,10 +19,10 @@ public class ReflectiveTape {
 		photonCamera = cam;
 	}
 
-	private int currPipelineIndex;
+	
 	/** Intializes Limelight object. */
 	public ReflectiveTape() {
-		photonCamera = new PhotonCamera("OV5647");
+		photonCamera = new PhotonCamera("photonvision");
 		photonCamera.setDriverMode(false);
 	}
 
@@ -83,9 +82,20 @@ public class ReflectiveTape {
 	}
 
 	public PhotonTrackedTarget getHighTape() {
+		photonCamera.setPipelineIndex(VisionConstants.HIGHERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
-		List<PhotonTrackedTarget> targets = result.getTargets();
-		return targets.get(0).getPitch() > targets.get(1).getPitch() ? targets.get(0) : targets.get(1);
+		
+		//SmartDashboard.putNumber("target pitch", targets.get(0).getPitch());
+		//SmartDashboard.putNumber("target 2", targets.get(1).getPitch());
+		if (result.hasTargets() && result.getTargets().size() >=2) {
+			List<PhotonTrackedTarget> targets = result.getTargets();
+			//return 50;
+			//return targets.get(0);
+			return targets.get(0).getPitch() > targets.get(1).getPitch() ? targets.get(0) : targets.get(1);
+		}
+		return null;
+		//return null;
+		
 
 	}
 }
