@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -16,14 +12,14 @@ import edu.wpi.first.util.WPIUtilJNI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-// import javax.swing.plaf.basic.BasicLookAndFeel;
-
-// gyro imports
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import frc.robot.TeleopInput;
+import edu.wpi.first.math.MathUtil;
+import frc.robot.SwerveConstants.OIConstants;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveFSM {
+
 	// Create MAXSwerveModules
 	private final MAXSwerveModule frontLeft = new MAXSwerveModule(
 		DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
@@ -53,8 +49,8 @@ public class DriveSubsystem extends SubsystemBase {
 	private double currentTranslationDir = 0.0;
 	private double currentTranslationMag = 0.0;
 
-	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
-	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
+	private SlewRateLimiter magLimiter;
+	private SlewRateLimiter rotLimiter;
 	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 
 	// Constants
@@ -63,32 +59,83 @@ public class DriveSubsystem extends SubsystemBase {
 	private static final double LARGE_ANGLE_HEADING_THRESHOLD_RADIANS = 0.85 * Math.PI;
 	private static final double TRANSLATION_MAGNITUDE_THRESHOLD = 1e-4;
 	private static final int COUNTER_PERIOD = 40;
-	private static final double POWER = 0.01;
-
+    private int counter = 0;
 	// Odometry class for tracking robot pose
-	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-		DriveConstants.DRIVE_KINEMATICS,
-		Rotation2d.fromDegrees(-gyro.getAngle()),
-		new SwerveModulePosition[] {
-			frontLeft.getPosition(),
-			frontRight.getPosition(),
-			rearLeft.getPosition(),
-			rearRight.getPosition()
-		});
-
-	/** Creates a new DriveSubsystem. */
-	public DriveSubsystem() {
+	private SwerveDriveOdometry odometry;
+	/* ======================== Constants ======================== */
+	// FSM state definitions
+	public enum FSMState {
+        IDLE,
+		TELEOP,
+		PATH1,
+        PATH2,
+        PATH3,
+        PATH4,
+        PATH5A,
+        PATH6A,
+        PATH6B,
 	}
 
-	private int counter = 0;
-	@Override
-	public void periodic() {
+
+	/* ======================== Private variables ======================== */
+	private FSMState currentState;
+
+
+	/* ======================== Constructor ======================== */
+	/**
+	 * Create FSMSystem and initialize to starting state. Also perform any
+	 * one-time initialization or configuration of hardware required. Note
+	 * the constructor is called only once when the robot boots.
+	 */
+	public DriveFSM() {
+        odometry = new SwerveDriveOdometry(
+            DriveConstants.DRIVE_KINEMATICS,
+            Rotation2d.fromDegrees(-gyro.getAngle()),
+            new SwerveModulePosition[] {
+                frontLeft.getPosition(),
+                frontRight.getPosition(),
+                rearLeft.getPosition(),
+                rearRight.getPosition()
+            });
+        magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
+        rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
+		reset();
+	}
+
+	/* ======================== Public methods ======================== */
+	/**
+	 * Return current FSM state.
+	 * @return Current FSM state
+	 */
+	public FSMState getCurrentState() {
+		return currentState;
+	}
+	/**
+	 * Reset this system to its start state. This may be called from mode init
+	 * when the robot is enabled.
+	 *
+	 * Note this is distinct from the one-time initialization in the constructor
+	 * as it may be called multiple times in a boot cycle,
+	 * Ex. if the robot is enabled, disabled, then reenabled.
+	 */
+	public void reset() {
+		currentState = FSMState.IDLE;
+		// Call one tick of update to ensure outputs reflect start state
+		update(null);
+	}
+	/**
+	 * Update FSM based on new inputs. This function only calls the FSM state
+	 * specific handlers.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	public void update(TeleopInput input) {
 		counter++;
-	// Update the odometry in the periodic block
-	// System.out.println("front right: " + m_frontRight.getPosition());
-	// System.out.println("front left: " + m_frontLeft.getPosition());
-	// System.out.println("back right: " + m_rearRight.getPosition());
-	// System.out.println("back left: " + m_rearLeft.getPosition());
+        // Update the odometry in the periodic block
+        // System.out.println("front right: " + m_frontRight.getPosition());
+        // System.out.println("front left: " + m_frontLeft.getPosition());
+        // System.out.println("back right: " + m_rearRight.getPosition());
+        // System.out.println("back left: " + m_rearLeft.getPosition());
 
 		if (counter % COUNTER_PERIOD == 0) {
 			System.out.println(getPose());
@@ -101,8 +148,58 @@ public class DriveSubsystem extends SubsystemBase {
 				rearLeft.getPosition(),
 				rearRight.getPosition()
 			});
+		switch (currentState) {
+			case IDLE:
+                handleIdleState(input);
+				break;
+			case TELEOP:
+                handleTeleopState(input);
+				break;
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
+		}
+		currentState = nextState(input);
 	}
 
+
+	/* ======================== Private methods ======================== */
+	/**
+	 * Decide the next state to transition to. This is a function of the inputs
+	 * and the current state of this FSM. This method should not have any side
+	 * effects on outputs. In other words, this method should only read or get
+	 * values to decide what state to go to.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @return FSM state for the next iteration
+	 */
+	private FSMState nextState(TeleopInput input) {
+		switch (currentState) {
+			case IDLE:
+                return FSMState.IDLE;
+			case TELEOP:
+				return FSMState.TELEOP;
+
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
+		}
+	}
+    private void handleTeleopState(TeleopInput input) {
+        if (input == null) {
+			return;
+		}
+        drive(
+            -MathUtil.applyDeadband(
+                input.getLeftY(), OIConstants.DRIVE_DEADBAND),
+            -MathUtil.applyDeadband(
+                input.getLeftX(), OIConstants.DRIVE_DEADBAND),
+            -MathUtil.applyDeadband(
+                input.getRightX(), OIConstants.DRIVE_DEADBAND),
+            true,
+            true);
+    }
+    private void handleIdleState(TeleopInput input) {
+
+    }
 	/**
 	 * Returns the currently-estimated pose of the robot.
 	 *

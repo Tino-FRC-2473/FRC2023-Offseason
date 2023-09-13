@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -37,7 +36,6 @@ public class TeleopInput {
 	private Joystick leftJoystick;
 	private Joystick rightJoystick;
 	private XboxController driverController;
-	private final DriveSubsystem robotDrive;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -48,37 +46,18 @@ public class TeleopInput {
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
-		robotDrive = new DriveSubsystem();
 		driverController = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-
-		new JoystickButton(driverController, Button.kR1.value)
-				.whileTrue(new RunCommand(
-						() -> robotDrive.setX(),
-						robotDrive));
-
-		new JoystickButton(driverController, Button.kTriangle.value)
-				.whileTrue(new RunCommand(
-						() -> System.out.println("triangle")));
-		new JoystickButton(driverController, Button.kL2.value)
-				.whileTrue(new RunCommand(
-						() -> robotDrive.getGyro().reset()));
-
-		robotDrive.setDefaultCommand(
-				// The left stick controls translation of the robot.
-				// Turning is controlled by the X axis of the right stick.
-				new RunCommand(
-						() -> robotDrive.drive(
-								-MathUtil.applyDeadband(
-										driverController.getLeftY(), OIConstants.DRIVE_DEADBAND),
-								-MathUtil.applyDeadband(
-										driverController.getLeftX(), OIConstants.DRIVE_DEADBAND),
-								-MathUtil.applyDeadband(
-										driverController.getRightX(), OIConstants.DRIVE_DEADBAND),
-								true,
-								true),
-						robotDrive));
 	}
-
+	
+	public double getRightX() {
+		return driverController.getRightX();
+	}
+	public double getLeftX() {
+		return driverController.getLeftX();
+	}
+	public double getLeftY() {
+		return driverController.getLeftY();
+	}
 	/* ======================== Public methods ======================== */
 	// Getter methods for fetch input values should be defined here.
 	// Method names should be descriptive of the behavior, so the
@@ -238,6 +217,6 @@ public class TeleopInput {
 	public boolean isThrottleForward() {
 		return leftJoystick.getThrottle() <= 0;
 	}
+	
 	/* ======================== Private methods ======================== */
-
 }
