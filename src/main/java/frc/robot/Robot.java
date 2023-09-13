@@ -9,7 +9,7 @@ import org.photonvision.PhotonCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
-import frc.robot.systems.FSMSystem;
+//import frc.robot.systems.FSMSystem;
 
 
 /**
@@ -17,12 +17,12 @@ import frc.robot.systems.FSMSystem;
  * each mode, as described in the TimedRobot documentation.
  */
 public class Robot extends TimedRobot {
-	private TeleopInput input;
+	//private TeleopInput input;
 	private ReflectiveTape tape;
 	private AprilTag apriltag;
 	// Systems
-	private FSMSystem fsmSystem;
-	private PhotonCamera camera = new PhotonCamera("photon camera");
+	//private FSMSystem fsmSystem;
+	private PhotonCamera camera = new PhotonCamera("OV5647");
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -34,38 +34,43 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
-		input = new TeleopInput();
-
+		//input = new TeleopInput();
+		//fsmSystem = new FSMSystem();
 		// Instantiate all systems here
-		fsmSystem = new FSMSystem();
+		
 		tape = new ReflectiveTape(camera);
-		apriltag = new AprilTag(camera);
+		//apriltag = new AprilTag(camera);
 		
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		fsmSystem.reset();
+		// fsmSystem.reset();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		fsmSystem.update(null);
+		//fsmSystem.update(null);
 		//System.out.println("x dist tape " + apriltag.getX());
 		//SmartDashboard.putNumber("x dist tape", apriltag.getX());
-		SmartDashboard.putNumber("target y value", tape.getHighTape().getPitch());
+		if (tape.getHighTape() != null){
+			SmartDashboard.putNumber("target pitch value", tape.getHighTape().getPitch());
+		}else{
+			SmartDashboard.putNumber("target pitch value", 0);
+		}
+		
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		fsmSystem.reset();
+		//fsmSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		fsmSystem.update(input);
+		//fsmSystem.update(input);
 	}
 
 	@Override
