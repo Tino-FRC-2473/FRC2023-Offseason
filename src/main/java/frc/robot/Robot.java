@@ -21,8 +21,8 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private ElevatorWristFSM wristSystem;
-	private ElevatorArmFSM elevatorArm;
+	//private ElevatorWristFSM wristSystem;
+	//private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -33,17 +33,17 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		wristSystem = new ElevatorWristFSM();
+		//wristSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
-		elevatorArm = new ElevatorArmFSM();
+		//elevatorArm = new ElevatorArmFSM();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		everybotIntake.reset();
-		wristSystem.reset();
-		elevatorArm.reset();
+		// wristSystem.reset();
+		// elevatorArm.reset();
 
 
 
@@ -90,42 +90,42 @@ public class Robot extends TimedRobot {
 	/** This method is for depositing high in game.
 * @return completion of the deposit
  	*/
-	public boolean depositHigh() {
-		return elevatorArm.handleAutonHighState();
-	}
-	/** This method is for depositing mid in game.
-* @return completion of the deposit
- 	*/
-	public boolean depositMid() {
-		return elevatorArm.handleAutonMiddleState();
-	}
+// 	public boolean depositHigh() {
+// 		return elevatorArm.handleAutonHighState();
+// 	}
+// 	/** This method is for depositing mid in game.
+// * @return completion of the deposit
+//  	*/
+// 	public boolean depositMid() {
+// 		return elevatorArm.handleAutonMiddleState();
+// 	}
 	/** This method is for depositing low in game.
 * @return completion of the deposit
  	*/
-	public boolean depositLow() {
-		return elevatorArm.handleAutonLowState();
-	}
-	/** This method is for intake in game and flipping.
-* @return completion of the intake
- 	*/
-	public boolean intakeObject() {
-		if (wristSystem.movingOutState()) {
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
-		}
-		return true;
-	}
+// 	public boolean depositLow() {
+// 		return elevatorArm.handleAutonLowState();
+// 	}
+// 	/** This method is for intake in game and flipping.
+// * @return completion of the intake
+//  	*/
+// 	public boolean intakeObject() {
+// 		if (wristSystem.movingOutState()) {
+// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
+// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
+// 		}
+// 		return true;
+// 	}
 
 	/** This method is for intake in game and flipping.
-* @return completion of the outtake
- 	*/
-	public boolean outttakeObject() {
-		if (wristSystem.movingInState()) {
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
-		}
-		return true;
-	}
+// * @return completion of the outtake
+//  	*/
+// 	public boolean outttakeObject() {
+// 		if (wristSystem.movingInState()) {
+// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
+// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
+// 		}
+// 		return true;
+// 	}
 
 
 
