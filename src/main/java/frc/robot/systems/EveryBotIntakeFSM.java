@@ -44,9 +44,9 @@ public class EveryBotIntakeFSM {
 	private static final int AVERAGE_SIZE = 10;
 	private static final double MIN_TURN_SPEED = -0.3;
 	private static final double MAX_TURN_SPEED = 0.3;
-	private static final double OVERRUN_THRESHOLD = 0.007;
-	private static final double FLIP_THRESHOLD = 50;
-	private static final double PID_CONSTANT_ARM_P = 0.005;
+	private static final double OVERRUN_THRESHOLD = 0.01;
+	private static final double FLIP_THRESHOLD = 16;
+	private static final double PID_CONSTANT_ARM_P = 0.008;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube

@@ -21,8 +21,8 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	//private ElevatorWristFSM wristSystem;
-	//private ElevatorArmFSM elevatorArm;
+	private ElevatorWristFSM wristSystem;
+	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -91,44 +91,44 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() { }
 
 	/** This method is for depositing high in game.
-* @return completion of the deposit
+	* @return completion of the deposit
  	*/
-// 	public boolean depositHigh() {
-// 		return elevatorArm.handleAutonHighState();
-// 	}
-// 	/** This method is for depositing mid in game.
-// * @return completion of the deposit
-//  	*/
-// 	public boolean depositMid() {
-// 		return elevatorArm.handleAutonMiddleState();
-// 	}
+	public boolean depositHigh() {
+		return elevatorArm.handleAutonHighState();
+	}
+	/** This method is for depositing mid in game.
+	* @return completion of the deposit
+ 	*/
+	public boolean depositMid() {
+		return elevatorArm.handleAutonMiddleState();
+	}
 	/** This method is for depositing low in game.
 * @return completion of the deposit
  	*/
-// 	public boolean depositLow() {
-// 		return elevatorArm.handleAutonLowState();
-// 	}
-// 	/** This method is for intake in game and flipping.
-// * @return completion of the intake
-//  	*/
-// 	public boolean intakeObject() {
-// 		if (wristSystem.movingOutState()) {
-// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
-// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
-// 		}
-// 		return true;
-// 	}
+	public boolean depositLow() {
+		return elevatorArm.handleAutonLowState();
+	}
+	/** This method is for intake in game and flipping.
+	* @return completion of the intake
+ 	*/
+	public boolean intakeObject() {
+		if (wristSystem.movingOutState()) {
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
+		}
+		return true;
+	}
 
 	/** This method is for intake in game and flipping.
-// * @return completion of the outtake
-//  	*/
-// 	public boolean outttakeObject() {
-// 		if (wristSystem.movingInState()) {
-// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
-// 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
-// 		}
-// 		return true;
-// 	}
+	* @return completion of the outtake
+ 	*/
+	public boolean outttakeObject() {
+		if (wristSystem.movingInState()) {
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
+			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
+		}
+		return true;
+	}
 
 
 
