@@ -51,7 +51,6 @@ public final class SwerveConstants {
 		public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
 		public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
 
-
 		// SPARK MAX CAN IDs
 		public static final int FRONT_LEFT_DRIVING_CAN_ID = 7;
 		public static final int FRONT_RIGHT_DRIVING_CAN_ID = 5;
@@ -67,8 +66,9 @@ public final class SwerveConstants {
 
 		public static final double TIME_CONSTANT = 200;
 
-
 		public static final double BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT = 200;
+		public static final double TELEOP_DRIVE_POWER_CURVE_CONSTANT = 3;
+
 	}
 
 	public static final class ModuleConstants {
