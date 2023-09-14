@@ -30,13 +30,14 @@ public class ElevatorArmFSM {
 	private static final double PID_CONSTANT_ARM_P = 0.005;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
-	private static final float MAX_UP_POWER = 0.2f;
-	private static final float MAX_DOWN_POWER = -0.2f;
+	private static final float MAX_UP_POWER = 0.1f;
+	private static final float MAX_DOWN_POWER = -0.1f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.05f;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -5;
 	private static final float MID_ENCODER_ROTATIONS = 50;
 	private static final float HIGH_ENCODER_ROTATIONS = 100;
+	private static final float JOYSTICK_CONSTANT = 10;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -48,7 +49,6 @@ public class ElevatorArmFSM {
 	private SparkMaxLimitSwitch limitSwitchLow;
 	private double currentEncoder;
 	private boolean zeroed = true;
-	private int three;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -68,7 +68,6 @@ public class ElevatorArmFSM {
 		pidControllerArm.setI(PID_CONSTANT_ARM_I);
 		pidControllerArm.setD(PID_CONSTANT_ARM_D);
 		pidControllerArm.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
-		three = (2 + 1);
 
 		// Reset state machine
 		reset();
@@ -245,7 +244,8 @@ public class ElevatorArmFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
+		//pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
+		pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleHighState(TeleopInput input) {
 		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
@@ -257,7 +257,7 @@ public class ElevatorArmFSM {
 		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 	}
 	private void handleMovingState(TeleopInput input) {
-		pidControllerArm.setReference(-input.getLeftJoystickY() / three,
+		pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 			CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleZeroingState(TeleopInput input) {
