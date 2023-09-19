@@ -27,8 +27,8 @@ public final class SwerveConstants {
 	public static final class DriveConstants {
 		// Driving Parameters - Note that these are not the maximum capable speeds of
 		// the robot, rather the allowed maximum speeds
-		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //4.8
-		public static final double MAX_ANGULAR_SPEED = 0.3 * Math.PI; // radians per second //2
+		public static final double MAX_SPEED_METERS_PER_SECOND = 2; //4.8
+		public static final double MAX_ANGULAR_SPEED = 0.6 * Math.PI; // radians per second //2
 
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
@@ -53,15 +53,15 @@ public final class SwerveConstants {
 
 
 		// SPARK MAX CAN IDs
-		public static final int FRONT_LEFT_DRIVING_CAN_ID = 7;
-		public static final int FRONT_RIGHT_DRIVING_CAN_ID = 5;
-		public static final int REAR_LEFT_DRIVING_CAN_ID = 3;
-		public static final int REAR_RIGHT_DRIVING_CAN_ID = 1;
+		public static final int FRONT_LEFT_DRIVING_CAN_ID = 4;
+		public static final int FRONT_RIGHT_DRIVING_CAN_ID = 2;
+		public static final int REAR_LEFT_DRIVING_CAN_ID = 6;
+		public static final int REAR_RIGHT_DRIVING_CAN_ID = 8;
 
-		public static final int FRONT_LEFT_TURNING_CAN_ID = 8;
-		public static final int FRONT_RIGHT_TURNING_CAN_ID = 6;
-		public static final int REAR_LEFT_TURNING_CAN_ID = 4;
-		public static final int REAR_RIGHT_TURNING_CAN_ID = 2;
+		public static final int FRONT_LEFT_TURNING_CAN_ID = 3;
+		public static final int FRONT_RIGHT_TURNING_CAN_ID = 1;
+		public static final int REAR_LEFT_TURNING_CAN_ID = 5;
+		public static final int REAR_RIGHT_TURNING_CAN_ID = 7;
 
 		public static final boolean GYRO_REVERSED = false;
 
@@ -108,15 +108,15 @@ public final class SwerveConstants {
 				= TURNING_ENCODER_POSITION_FACTOR; // radians
 
 		public static final double DRIVING_P = 0.04; //0.04
-		public static final double DRIVING_I = 0.0001;
-		public static final double DRIVING_D = 0.001;
+		public static final double DRIVING_I = 0;
+		public static final double DRIVING_D = 0;
 		public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED_RPS;
 		public static final double DRIVING_MIN_OUTPUT = -1;
 		public static final double DRIVING_MAX_OUTPUT = 1;
 
 		public static final double TURNING_P = 1; // 1
 		public static final double TURNING_I = 0;
-		public static final double TURNING_D = 0.05;
+		public static final double TURNING_D = 0.07;
 		public static final double TURNING_FF = 0;
 		public static final double TURNING_MIN_OUTPUT = -1;
 		public static final double TURNING_MAX_OUTPUT = 1;
@@ -130,14 +130,14 @@ public final class SwerveConstants {
 
 	public static final class OIConstants {
 		public static final int DRIVER_CONTROLLER_PORT = 0;
-		public static final double DRIVE_DEADBAND = 0.05;
+		public static final double DRIVE_DEADBAND = 0.02;
 	}
 
 	public static final class AutoConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 3; //3
-		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //3
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI; // pi
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI; // pi
+		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //3
+		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1; //3
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 2; // pi
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2; // pi
 
 		public static final double PX_CONTROLLER = 1;
 		public static final double PY_CONTROLLER = 1;

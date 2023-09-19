@@ -62,9 +62,11 @@ public class RobotContainer {
 				new RunCommand(
 					() -> robotDrive.drive(
 							-MathUtil.applyDeadband(
-								driverController.getLeftY(), OIConstants.DRIVE_DEADBAND),
-							-MathUtil.applyDeadband(
-								driverController.getLeftX(), OIConstants.DRIVE_DEADBAND),
+								Math.pow(driverController.getLeftY(), 3),
+								OIConstants.DRIVE_DEADBAND),
+								-MathUtil.applyDeadband(
+								Math.pow(driverController.getLeftX(), 3),
+								OIConstants.DRIVE_DEADBAND),
 							-MathUtil.applyDeadband(
 								driverController.getRightX(), OIConstants.DRIVE_DEADBAND),
 							true,
@@ -83,12 +85,18 @@ public class RobotContainer {
 	 */
 	private void configureButtonBindings() {
 		new JoystickButton(driverController, Button.kR1.value)
-				.whileTrue(new RunCommand(
-					() -> robotDrive.setX(),
-						robotDrive));
+			.whileTrue(new RunCommand(
+				() -> robotDrive.setX(),
+					robotDrive));
 		new JoystickButton(driverController, Button.kL2.value)
 			.whileTrue(new RunCommand(
 				() -> robotDrive.getGyro().reset()));
+		new JoystickButton(driverController, Button.kCircle.value)
+			.whileTrue(new RunCommand(
+				() -> robotDrive.auto1()));
+		new JoystickButton(driverController, Button.kCircle.value)
+			.toggleOnTrue(new RunCommand(
+				() -> robotDrive.resetEncoders()));
 	}
 
 	/**
@@ -179,7 +187,7 @@ public class RobotContainer {
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 		SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-			exampleTrajectory,
+			trajectory2,
 			robotDrive::getPose, // Functional interface to feed supplier
 			DriveConstants.DRIVE_KINEMATICS,
 
@@ -191,7 +199,7 @@ public class RobotContainer {
 				robotDrive);
 
 		// Reset odometry to the starting pose of the trajectory.
-		robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+		robotDrive.resetOdometry(trajectory2.getInitialPose());
 
 		// Run path following command, then stop at the end.
 		return swerveControllerCommand.andThen(() -> robotDrive.drive(0, 0, 0, false, false));

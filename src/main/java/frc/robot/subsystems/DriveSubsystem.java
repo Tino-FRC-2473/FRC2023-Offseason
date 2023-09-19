@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import frc.robot.SwerveConstants.DriveConstants;
+import frc.robot.SwerveConstants.AutoConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -254,6 +255,22 @@ public class DriveSubsystem extends SubsystemBase {
 		rearLeft.setDesiredState(new SwerveModuleState(power, rearLeft.getState().angle));
 		rearRight.setDesiredState(new SwerveModuleState(power, rearRight.getState().angle));
 	}
+
+
+	public void auto1() {
+		System.out.println(getPose());
+		double power;
+		if (getPose().getX() >= -1) {
+			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+		} else {
+			power = 0;
+		}
+		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+	}
+
 
 	/**
 	 * Sets the wheels into an X formation to prevent movement.
