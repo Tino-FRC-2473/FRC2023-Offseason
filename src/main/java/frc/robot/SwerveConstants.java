@@ -33,6 +33,8 @@ public final class SwerveConstants {
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
 		public static final double ROTATIONAL_SLEW_RATE = 2.0; // percent per second (1 = 100%)
+		public static final double INSTANTANEOUS_SLEW_RATE = 500;
+		//some high number that means the slewrate is effectively instantaneous
 
 		// Chassis configuration
 		public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
@@ -52,23 +54,14 @@ public final class SwerveConstants {
 		public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
 
 
-		// SPARK MAX CAN IDs
-		public static final int FRONT_LEFT_DRIVING_CAN_ID = 4;
-		public static final int FRONT_RIGHT_DRIVING_CAN_ID = 2;
-		public static final int REAR_LEFT_DRIVING_CAN_ID = 6;
-		public static final int REAR_RIGHT_DRIVING_CAN_ID = 8;
-
-		public static final int FRONT_LEFT_TURNING_CAN_ID = 3;
-		public static final int FRONT_RIGHT_TURNING_CAN_ID = 1;
-		public static final int REAR_LEFT_TURNING_CAN_ID = 5;
-		public static final int REAR_RIGHT_TURNING_CAN_ID = 7;
-
-		public static final boolean GYRO_REVERSED = false;
-
-		public static final double TIME_CONSTANT = 200;
-
-
-		public static final double BALENCE_SPEED_INVERSE_PROPORTION_CONSTANT = 200;
+		public static final boolean GYRO_REVERSED = true;
+		public static final double TIME_CONSTANT = 1e-6;
+		public static final double CURRENT_THRESHOLD = 1e-4;
+		// some small number to avoid floating-point errors with equality checking
+		public static final double ANGLE_MULTIPLIER_1 = 0.45;
+		public static final double ANGLE_MULTIPLIER_2 = 0.85;
+		public static final double BALENCE_SPEED_INVERSE_PROPORTION = 120;
+		public static final double TELEOP_JOYSTICK_POWER_CURVE = 3;
 	}
 
 	public static final class ModuleConstants {
@@ -129,7 +122,6 @@ public final class SwerveConstants {
 	}
 
 	public static final class OIConstants {
-		public static final int DRIVER_CONTROLLER_PORT = 0;
 		public static final double DRIVE_DEADBAND = 0.02;
 	}
 

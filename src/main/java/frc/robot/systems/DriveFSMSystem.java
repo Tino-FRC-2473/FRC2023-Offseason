@@ -1,9 +1,13 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+package frc.robot.systems;
 
-package frc.robot.subsystems;
+import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.MathUtil;
+
+// WPILib Imports
+
+// Third party Hardware Imports
+//import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,38 +17,28 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import frc.robot.SwerveConstants.DriveConstants;
-import frc.robot.SwerveConstants.AutoConstants;
-import frc.utils.SwerveUtils;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-// import javax.swing.plaf.basic.BasicLookAndFeel;
-
-// gyro imports
-import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 
-public class DriveSubsystem extends SubsystemBase {
-	// Create MAXSwerveModules
-	private final MAXSwerveModule frontLeft = new MAXSwerveModule(
-		DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
-		DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-		DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+// Robot Imports
+import frc.robot.TeleopInput;
+import frc.utils.SwerveUtils;
+import frc.robot.HardwareMap;
+import frc.robot.SwerveConstants.DriveConstants;
+import frc.robot.SwerveConstants.OIConstants;
+import frc.robot.SwerveConstants.AutoConstants;
 
-	private final MAXSwerveModule frontRight = new MAXSwerveModule(
-		DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
-		DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-		DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+public class DriveFSMSystem {
+	/* ======================== Constants ======================== */
+	// FSM state definitions
+	public enum FSMState {
+		TELEOP_STATE
+	}
 
-	private final MAXSwerveModule rearLeft = new MAXSwerveModule(
-		DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
-		DriveConstants.REAR_LEFT_TURNING_CAN_ID,
-		DriveConstants.REAR_LEFT_CHASSIS_ANGULAR_OFFSET);
+	/* ======================== Private variables ======================== */
+	private FSMState currentState;
 
-	private final MAXSwerveModule rearRight = new MAXSwerveModule(
-		DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
-		DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
-		DriveConstants.REAR_RIGHT_CHASSIS_ANGULAR_OFFSET);
+	// Hardware devices should be owned by one and only one system. They must
+	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
@@ -54,26 +48,30 @@ public class DriveSubsystem extends SubsystemBase {
 	private double currentTranslationDir = 0.0;
 	private double currentTranslationMag = 0.0;
 
-	//Checkstyle constants
-	public static final double E_MINUS_SIX = 1e-6;
-	public static final double E_MINUS_FOUR = 1e-4;
-	public static final int TWO_HUNDRED = 200;
-	public static final int NEG_TWO = -2;
-	public static final double FIVE_HUNDRED = 500.0;
-	public static final double POINT_FOUR_FIVE = 0.45;
-	public static final double POINT_EIGHT_FIVE = 0.85;
-
-
 	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
 	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 
-	// Constants
-	private static final double SLEW_RATE_MAX = 500.0;
-	private static final double SMALL_ANGLE_HEADING_THRESHOLD_RADIANS = 0.45 * Math.PI;
-	private static final double LARGE_ANGLE_HEADING_THRESHOLD_RADIANS = 0.85 * Math.PI;
-	private static final double TRANSLATION_MAGNITUDE_THRESHOLD = 1e-4;
-	private static final int COUNTER_PERIOD = 40;
+	// Create MAXSwerveModules
+	private final MAXSwerveModule frontLeft = new MAXSwerveModule(
+		HardwareMap.FRONT_LEFT_DRIVING_CAN_ID,
+		HardwareMap.FRONT_LEFT_TURNING_CAN_ID,
+		DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+
+	private final MAXSwerveModule frontRight = new MAXSwerveModule(
+		HardwareMap.FRONT_RIGHT_DRIVING_CAN_ID,
+		HardwareMap.FRONT_RIGHT_TURNING_CAN_ID,
+		DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+
+	private final MAXSwerveModule rearLeft = new MAXSwerveModule(
+		HardwareMap.REAR_LEFT_DRIVING_CAN_ID,
+		HardwareMap.REAR_LEFT_TURNING_CAN_ID,
+		DriveConstants.REAR_LEFT_CHASSIS_ANGULAR_OFFSET);
+
+	private final MAXSwerveModule rearRight = new MAXSwerveModule(
+		HardwareMap.REAR_RIGHT_DRIVING_CAN_ID,
+		HardwareMap.REAR_RIGHT_TURNING_CAN_ID,
+		DriveConstants.REAR_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
 	// Odometry class for tracking robot pose
 	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
@@ -86,31 +84,27 @@ public class DriveSubsystem extends SubsystemBase {
 			rearRight.getPosition()
 		});
 
-	/** Creates a new DriveSubsystem. */
-	public DriveSubsystem() {
+	/* ======================== Constructor ======================== */
+	/**
+	 * Create FSMSystem and initialize to starting state. Also perform any
+	 * one-time initialization or configuration of hardware required. Note
+	 * the constructor is called only once when the robot boots.
+	 */
+	public DriveFSMSystem() {
+		// Perform hardware init
+		gyro = new AHRS(SPI.Port.kMXP);
+
+		// Reset state machine
+		reset();
 	}
 
-	private int counter = 0;
-	@Override
-	public void periodic() {
-		counter++;
-	// Update the odometry in the periodic block
-	// System.out.println("front right: " + m_frontRight.getPosition());
-	// System.out.println("front left: " + m_frontLeft.getPosition());
-	// System.out.println("back right: " + m_rearRight.getPosition());
-	// System.out.println("back left: " + m_rearLeft.getPosition());
-
-		if (counter % COUNTER_PERIOD == 0) {
-			System.out.println(getPose());
-		}
-		odometry.update(
-			Rotation2d.fromDegrees(-gyro.getAngle()),
-			new SwerveModulePosition[] {
-				frontLeft.getPosition(),
-				frontRight.getPosition(),
-				rearLeft.getPosition(),
-				rearRight.getPosition()
-			});
+	/* ======================== Public methods ======================== */
+	/**
+	 * Return current FSM state.
+	 * @return Current FSM state
+	 */
+	public FSMState getCurrentState() {
+		return currentState;
 	}
 
 	/**
@@ -122,13 +116,20 @@ public class DriveSubsystem extends SubsystemBase {
 		return odometry.getPoseMeters();
 	}
 
-		/**
-	 * Returns the gyro of the robot.
+	/**
+	 * Reset this system to its start state. This may be called from mode init
+	 * when the robot is enabled.
 	 *
-	 * @return The gyro.
+	 * Note this is distinct from the one-time initialization in the constructor
+	 * as it may be called multiple times in a boot cycle,
+	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
-	public AHRS getGyro() {
-		return gyro;
+
+	public void reset() {
+		currentState = FSMState.TELEOP_STATE;
+
+		// Call one tick of update to ensure outputs reflect start state
+		update(null);
 	}
 
 	/**
@@ -147,6 +148,51 @@ public class DriveSubsystem extends SubsystemBase {
 				},
 				pose);
 	}
+
+	/**
+	 * Update FSM based on new inputs. This function only calls the FSM state
+	 * specific handlers.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	public void update(TeleopInput input) {
+		switch (currentState) {
+			case TELEOP_STATE:
+				drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
+					DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
+					DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
+					OIConstants.DRIVE_DEADBAND), true, true);
+				break;
+
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
+		}
+		currentState = nextState(input);
+	}
+
+	/* ======================== Private methods ======================== */
+	/**
+	 * Decide the next state to transition to. This is a function of the inputs
+	 * and the current state of this FSM. This method should not have any side
+	 * effects on outputs. In other words, this method should only read or get
+	 * values to decide what state to go to.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @return FSM state for the next iteration
+	 */
+	private FSMState nextState(TeleopInput input) {
+		switch (currentState) {
+			case TELEOP_STATE:
+				return FSMState.TELEOP_STATE;
+
+			default:
+				throw new IllegalStateException("Invalid state: " + currentState.toString());
+		}
+	}
+
+	/* ------------------------ FSM state handlers ------------------------ */
 
 	/**
 	 * Method to drive the robot using joystick info.
@@ -175,21 +221,21 @@ public class DriveSubsystem extends SubsystemBase {
 				directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE
 					/ currentTranslationMag);
 			} else {
-				directionSlewRate = FIVE_HUNDRED;
+				directionSlewRate = DriveConstants.INSTANTANEOUS_SLEW_RATE;
 				//some high number that means the slewrate is effectively instantaneous
 			}
 
-			double currentTime = WPIUtilJNI.now() * E_MINUS_SIX;
+			double currentTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
 			double elapsedTime = currentTime - prevTime;
 			double angleDif = SwerveUtils.angleDifference(inputTranslationDir,
 				currentTranslationDir);
 
-			if (angleDif < POINT_FOUR_FIVE * Math.PI) {
+			if (angleDif < DriveConstants.ANGLE_MULTIPLIER_1 * Math.PI) {
 				currentTranslationDir = SwerveUtils.stepTowardsCircular(currentTranslationDir,
 					inputTranslationDir, directionSlewRate * elapsedTime);
 				currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-			} else if (angleDif > POINT_EIGHT_FIVE * Math.PI) {
-				if (currentTranslationMag > E_MINUS_FOUR) {
+			} else if (angleDif > DriveConstants.ANGLE_MULTIPLIER_2 * Math.PI) {
+				if (currentTranslationMag > DriveConstants.CURRENT_THRESHOLD) {
 					// some small number to avoid floating-point errors with equality checking
 					// keep currentTranslationDir unchanged
 					currentTranslationMag = magLimiter.calculate(0.0);
@@ -239,13 +285,14 @@ public class DriveSubsystem extends SubsystemBase {
 	 */
 	public void balance() {
 		double power;
-		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll())
-			> NEG_TWO) {
+		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > (-1 * 2)) {
 			power = 0;
 		} else if (gyro.getRoll() > 0) {
-			power = Math.abs(gyro.getRoll()) / TWO_HUNDRED;
+			power = Math.abs(gyro.getRoll())
+				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
 		} else if (gyro.getRoll() < 0) {
-			power = -Math.abs(gyro.getRoll()) / TWO_HUNDRED;
+			power = -Math.abs(gyro.getRoll())
+				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
 		} else {
 			power = 0;
 		}
@@ -256,7 +303,9 @@ public class DriveSubsystem extends SubsystemBase {
 		rearRight.setDesiredState(new SwerveModuleState(power, rearRight.getState().angle));
 	}
 
-
+	/**
+	 * auto method.
+	 */
 	public void auto1() {
 		System.out.println(getPose());
 		double power;
@@ -270,7 +319,6 @@ public class DriveSubsystem extends SubsystemBase {
 		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 	}
-
 
 	/**
 	 * Sets the wheels into an X formation to prevent movement.
@@ -333,4 +381,5 @@ public class DriveSubsystem extends SubsystemBase {
 	public double getTurnRate() {
 		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
 	}
+
 }
