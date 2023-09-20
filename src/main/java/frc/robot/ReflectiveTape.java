@@ -1,31 +1,18 @@
 package frc.robot;
 
 import java.util.List;
-
 import org.photonvision.PhotonCamera;
-
 import org.photonvision.targeting.PhotonTrackedTarget;
-
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
-
 public class ReflectiveTape {
 	private PhotonCamera photonCamera;
-
 	/** Intializes Limelight object.
 	 * @param cam the PhotonCamera object that the code gets input from.
 	*/
 	public ReflectiveTape(PhotonCamera cam) {
 		photonCamera = cam;
 	}
-
-	
-	/** Intializes Limelight object. */
-	public ReflectiveTape() {
-		photonCamera = new PhotonCamera("photonvision");
-		photonCamera.setDriverMode(false);
-	}
-
 	/** Gets the yaw to the target.
 	 * @return returns the yaw in degress from the limelight to the target.
 	*/
@@ -75,28 +62,29 @@ public class ReflectiveTape {
 		}
 		return VisionConstants.NO_TARGETS_RETURN;
 	}
-
+	/** Gets the y distance of the target.
+	 * @return returns the y distance of target
+	*/
 	public double getY() {
 		PhotonTrackedTarget target = photonCamera.getLatestResult().getBestTarget();
-		return photonCamera.getLatestResult().hasTargets() ? target.getBestCameraToTarget().getY() : 10000;
+		return photonCamera.getLatestResult().hasTargets()
+			? target.getBestCameraToTarget().getY() : VisionConstants.NO_Y_RETURN;
 	}
-
+	/** Gets the higher target from the pipeline.
+	 * @return returns the y distance of target
+	*/
 	public PhotonTrackedTarget getHighTape() {
 		photonCamera.setPipelineIndex(VisionConstants.HIGHERTAPE_PIPELINE_INDEX);
 		var result = photonCamera.getLatestResult();
-		
 		//SmartDashboard.putNumber("target pitch", targets.get(0).getPitch());
 		//SmartDashboard.putNumber("target 2", targets.get(1).getPitch());
-		if (result.hasTargets() && result.getTargets().size() >=2) {
+		if (result.hasTargets() && result.getTargets().size() >= 2) {
 			List<PhotonTrackedTarget> targets = result.getTargets();
 			//return 50;
 			//return targets.get(0);
-			return targets.get(0).getPitch() > targets.get(1).getPitch() ? targets.get(0) : targets.get(1);
+			return targets.get(0).getPitch() > targets.get(1).getPitch()
+				? targets.get(0) : targets.get(1);
 		}
 		return null;
-		//return null;
-		
-
 	}
 }
-
