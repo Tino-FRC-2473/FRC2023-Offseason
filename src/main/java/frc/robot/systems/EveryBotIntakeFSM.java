@@ -343,9 +343,9 @@ public class EveryBotIntakeFSM {
 	 */
 	public void handleIntakingState(TeleopInput input) {
 		if (input != null && input.isThrottleForward()) {
-			//spinnerMotor.set(INTAKE_SPEED);
+			spinnerMotor.set(INTAKE_SPEED);
 		} else {
-			//spinnerMotor.set(-INTAKE_SPEED);
+			spinnerMotor.set(-INTAKE_SPEED);
 		}
 		flipMotor.set(0);
 	}
@@ -355,17 +355,17 @@ public class EveryBotIntakeFSM {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
 
 		if (holding) {
-			//spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));
+			spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));
 		}
 	}
 	private void handleFlipClockWiseState() {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_THRESHOLD));
-		//spinnerMotor.set(0);
+		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
 		//pidControllerFlip.setReference(1, CANSparkMax.ControlType.kPosition);
-		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), -0.2));
-		//spinnerMotor.set(0);
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), RELEASE_SPEED));
+		spinnerMotor.set(0);
 	}
 	private void handleOuttakingState(TeleopInput input) {
 		if (input == null) {
@@ -379,9 +379,9 @@ public class EveryBotIntakeFSM {
 			currLogs[i] = 0;
 		}
 		if (input.isThrottleForward()) {
-			//spinnerMotor.set(RELEASE_SPEED);
+			spinnerMotor.set(RELEASE_SPEED);
 		} else {
-			//spinnerMotor.set(-RELEASE_SPEED);
+			spinnerMotor.set(-RELEASE_SPEED);
 		}
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
