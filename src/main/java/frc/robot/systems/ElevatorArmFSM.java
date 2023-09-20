@@ -34,9 +34,9 @@ public class ElevatorArmFSM {
 	private static final float MAX_DOWN_POWER = -0.1f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.05f;
 	// arbitrary encoder amounts
-	private static final float LOW_ENCODER_ROTATIONS = -5;
-	private static final float MID_ENCODER_ROTATIONS = 50;
-	private static final float HIGH_ENCODER_ROTATIONS = 100;
+	private static final float LOW_ENCODER_ROTATIONS = 5;
+	private static final float MID_ENCODER_ROTATIONS = -50;
+	private static final float HIGH_ENCODER_ROTATIONS = -100;
 	private static final float JOYSTICK_CONSTANT = 10;
 
 	/* ======================== Private variables ======================== */
@@ -63,6 +63,7 @@ public class ElevatorArmFSM {
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
 		limitSwitchLow.enableLimitSwitch(true);
+		armMotor.setInverted(true);
 		pidControllerArm = armMotor.getPIDController();
 		pidControllerArm.setP(PID_CONSTANT_ARM_P);
 		pidControllerArm.setI(PID_CONSTANT_ARM_I);
@@ -117,10 +118,10 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
-		if (limitSwitchLow.isPressed()) {
-			armMotor.getEncoder().setPosition(0);
-			currentEncoder = 0;
-		}
+		// if (limitSwitchLow.isPressed()) {
+		// 	armMotor.getEncoder().setPosition(0);
+		// 	currentEncoder = 0;
+		// }
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);

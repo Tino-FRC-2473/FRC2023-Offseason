@@ -44,11 +44,12 @@ public class EveryBotIntakeFSM {
 	private static final int AVERAGE_SIZE = 7;
 	private static final double MIN_TURN_SPEED = -0.3;
 	private static final double MAX_TURN_SPEED = 0.3;
+	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_THRESHOLD = 16;
-	private static final double PID_CONSTANT_ARM_P = 0.008;
-	private static final double PID_CONSTANT_ARM_I = 0.00000001;
-	private static final double PID_CONSTANT_ARM_D = 0.00000001;
+	private static final double FLIP_THRESHOLD = 0.7; //16
+	private static final double PID_CONSTANT_ARM_P = 0.000000; //0.008
+	private static final double PID_CONSTANT_ARM_I = 0.0000000;
+	private static final double PID_CONSTANT_ARM_D = 0.0000000;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
 	private static ItemType itemType = ItemType.EMPTY;
 	private boolean isMotorAllowed = false;
@@ -143,14 +144,17 @@ public class EveryBotIntakeFSM {
 		}
 		if (toggleUpdate) {
 			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
+			SmartDashboard.putNumber("Flip Motor output", flipMotor.getAppliedOutput());
 			SmartDashboard.putString("spinning intake state", currentState.toString());
 			SmartDashboard.putNumber("flip encoder", flipMotor.getEncoder().getPosition());
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
 			SmartDashboard.putBoolean("holding", holding);
-			SmartDashboard.putBoolean("Flip Button Pressed", input.isFlipButtonPressed());
+			//SmartDashboard.putBoolean("Flip Button Pressed", input.isFlipButtonPressed());
 			SmartDashboard.putBoolean("Outtaking to intaking", prevOuttaking);
 			SmartDashboard.putBoolean("forward", forward);
+			//SmartDashboard.putBoolean("Flip Button", input.isFlipButtonPressed());
+
 			switch (currentState) {
 				case INTAKING:
 					handleIntakingState(input);
@@ -291,7 +295,7 @@ public class EveryBotIntakeFSM {
 					}
 				} else if (input.isFlipButtonPressed()) {
 					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
-					if (flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
+					if (flipMotor.getEncoder().getPosition() >= FLIP_THRESHOLD) {
 						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
 					} else {
 						return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
@@ -344,18 +348,20 @@ public class EveryBotIntakeFSM {
 	}
 	private void handleIdleStopState(TeleopInput input) {
 		spinnerMotor.set(KEEP_SPEED);
-		flipMotor.set(0);
+		//flipMotor.set(0);
+		pidControllerFlip.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 
 		if (holding) {
 			spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));
 		}
 	}
 	private void handleFlipClockWiseState() {
-		pidControllerFlip.setReference(FLIP_THRESHOLD, CANSparkMax.ControlType.kPosition);
+		pidControllerFlip.setReference(FLIP_SPEED, CANSparkMax.ControlType.kDutyCycle);
 		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
-		pidControllerFlip.setReference(0, CANSparkMax.ControlType.kPosition);
+		//pidControllerFlip.setReference(1, CANSparkMax.ControlType.kPosition);
+		pidControllerFlip.setReference(-FLIP_SPEED, CANSparkMax.ControlType.kDutyCycle);
 		spinnerMotor.set(0);
 	}
 	private void handleOuttakingState(TeleopInput input) {
