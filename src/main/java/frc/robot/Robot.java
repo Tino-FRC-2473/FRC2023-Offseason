@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		driveFSMSystem.reset();
+		driveFSMSystem.resetAutonomus();
 	}
 
 	@Override

@@ -31,7 +31,8 @@ public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
-		TELEOP_STATE
+		TELEOP_STATE,
+		AUTO_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -128,6 +129,26 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 
+		resetEncoders();
+		resetOdometry(getPose());
+		// Call one tick of update to ensure outputs reflect start state
+		update(null);
+	}
+
+	/**
+	 * Reset this system to its start state. This may be called from mode init
+	 * when the robot is enabled.
+	 *
+	 * Note this is distinct from the one-time initialization in the constructor
+	 * as it may be called multiple times in a boot cycle,
+	 * Ex. if the robot is enabled, disabled, then reenabled.
+	 */
+
+	 public void resetAutonomus() {
+		currentState = FSMState.AUTO_STATE;
+
+		resetEncoders();
+		resetOdometry(getPose());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -156,16 +177,31 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+		new SwerveModulePosition[] {
+			frontLeft.getPosition(),
+			frontRight.getPosition(),
+			rearLeft.getPosition(),
+			rearRight.getPosition()});
 		switch (currentState) {
 			case TELEOP_STATE:
-				drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
-					DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
-					DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+				if (input != null) {
+					drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+						-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
+						OIConstants.DRIVE_DEADBAND), true, true);
+					if (input.isBackButtonPressed()) {
+						gyro.reset();
+					}
+				}
 				break;
-
+			case AUTO_STATE:
+				if (input == null) {
+					auto1(input);
+				}
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -186,6 +222,8 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				return FSMState.TELEOP_STATE;
+			case AUTO_STATE:
+				return FSMState.AUTO_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -306,10 +344,13 @@ public class DriveFSMSystem {
 	/**
 	 * auto method.
 	 */
-	public void auto1() {
+	public void auto1(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
 		System.out.println(getPose());
 		double power;
-		if (getPose().getX() >= -1) {
+		if (getPose().getX() > -1) {
 			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else {
 			power = 0;
