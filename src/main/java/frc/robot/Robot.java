@@ -9,6 +9,7 @@ import org.photonvision.PhotonCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 //import frc.robot.systems.FSMSystem;
+import frc.robot.Constants.VisionConstants;
 
 
 /**
@@ -21,7 +22,7 @@ public class Robot extends TimedRobot {
 	private AprilTag apriltag;
 	// Systems
 	//private FSMSystem fsmSystem;
-	private PhotonCamera camera = new PhotonCamera("OV5647");
+	private PhotonCamera camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any

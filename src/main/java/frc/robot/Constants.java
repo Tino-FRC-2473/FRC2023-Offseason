@@ -93,5 +93,6 @@ public class Constants {
 		public static final int CONE_PIPELINE_INDEX = 2;
 		public static final int NO_TARGETS_RETURN = -180;
 		public static final int NO_Y_RETURN = 1000;
+		public static final String CAMERA_NAME = "OV5647";
 	}
 }
