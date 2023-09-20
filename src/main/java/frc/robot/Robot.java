@@ -7,7 +7,6 @@ import org.photonvision.PhotonCamera;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 //import frc.robot.systems.FSMSystem;
 
@@ -37,10 +36,8 @@ public class Robot extends TimedRobot {
 		//input = new TeleopInput();
 		//fsmSystem = new FSMSystem();
 		// Instantiate all systems here
-		
 		tape = new ReflectiveTape(camera);
-		//apriltag = new AprilTag(camera);
-		
+		apriltag = new AprilTag(camera);
 	}
 
 	@Override
@@ -51,15 +48,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//fsmSystem.update(null);
-		//System.out.println("x dist tape " + apriltag.getX());
-		//SmartDashboard.putNumber("x dist tape", apriltag.getX());
-		if (tape.getHighTape() != null){
-			SmartDashboard.putNumber("target pitch value", tape.getHighTape().getPitch());
-		}else{
-			SmartDashboard.putNumber("target pitch value", 0);
-		}
-		
 	}
 
 	@Override
