@@ -34,10 +34,10 @@ public class EveryBotIntakeFSM {
 	//HAVE TO CHANGE BASED ON TEST
 	private static final double KEEP_SPEED = 0;
 	private static final double HOLDING_SPEED = 0.05;
-	private static final double INTAKE_SPEED = 0.3;
+	private static final double INTAKE_SPEED = 0.3; //0.3
 	private static final double RELEASE_SPEED = -0.2; //DONT FORGET THE NEGATIVE SIGN (-)
 	private static final double RELEASE_SPEED_LOW = -0.3;
-	private static final double CURRENT_THRESHOLD = 11;
+	private static final double CURRENT_THRESHOLD = 15;
 	private static final double BASE_THRESHOLD = 100;
 	private static final double TIME_RESET_CURRENT = 0.5;
 	private static final int MIN_RELEASE_DISTANCE = 800;
@@ -46,8 +46,8 @@ public class EveryBotIntakeFSM {
 	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_THRESHOLD = 0.85; //16
-	private static final double PID_CONSTANT_ARM_P = 0.11; //0.008
+	private static final double FLIP_THRESHOLD = 0.87; //16
+	private static final double PID_CONSTANT_ARM_P = 0.15; //0.008
 	private static final double PID_CONSTANT_ARM_I = 0.0000000;
 	private static final double PID_CONSTANT_ARM_D = 0.0000000;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
@@ -84,8 +84,8 @@ public class EveryBotIntakeFSM {
 	public EveryBotIntakeFSM() {
 		//arm = new ElevatorArmFSM();
 		timer = new Timer();
-		//spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
-		//		CANSparkMax.MotorType.kBrushless);
+		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
+				CANSparkMax.MotorType.kBrushless);
 		flipMotor = new CANSparkMax(HardwareMap.CAN_ID_FLIP_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
 
@@ -146,14 +146,13 @@ public class EveryBotIntakeFSM {
 			itemType = ItemType.CONE;
 		}
 		if (toggleUpdate) {
-			//SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
+			SmartDashboard.putNumber("output current", spinnerMotor.getOutputCurrent());
 			SmartDashboard.putNumber("Flip Motor output", flipMotor.getAppliedOutput());
 			SmartDashboard.putString("spinning intake state", currentState.toString());
 			SmartDashboard.putNumber("flip encoder", flipMotor.getEncoder().getPosition());
 			SmartDashboard.putString("item type", itemType.toString());
-			//SmartDashboard.putNumber("spinner power", spinnerMotor.get());
+			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
 			SmartDashboard.putBoolean("holding", holding);
-			//SmartDashboard.putBoolean("Flip Button Pressed", input.isFlipButtonPressed());
 			SmartDashboard.putBoolean("Outtaking to intaking", prevOuttaking);
 			SmartDashboard.putBoolean("forward", forward);
 			//SmartDashboard.putBoolean("Flip Button", input.isFlipButtonPressed());
@@ -343,14 +342,14 @@ public class EveryBotIntakeFSM {
 	 */
 	public void handleIntakingState(TeleopInput input) {
 		if (input != null && input.isThrottleForward()) {
-			//spinnerMotor.set(INTAKE_SPEED);
+			spinnerMotor.set(INTAKE_SPEED);
 		} else {
-			//spinnerMotor.set(-INTAKE_SPEED);
+			spinnerMotor.set(-INTAKE_SPEED);
 		}
 		flipMotor.set(0);
 	}
 	private void handleIdleStopState(TeleopInput input) {
-		//spinnerMotor.set(KEEP_SPEED);
+		spinnerMotor.set(KEEP_SPEED);
 		//flipMotor.set(0);
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
 
@@ -360,12 +359,12 @@ public class EveryBotIntakeFSM {
 	}
 	private void handleFlipClockWiseState() {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_THRESHOLD));
-		//spinnerMotor.set(0);
+		spinnerMotor.set(0);
 	}
 	private void handleFlipCounterClockWiseState() {
 		//pidControllerFlip.setReference(1, CANSparkMax.ControlType.kPosition);
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), -0.2));
-		//spinnerMotor.set(0);
+		spinnerMotor.set(0);
 	}
 	private void handleOuttakingState(TeleopInput input) {
 		if (input == null) {
@@ -379,9 +378,9 @@ public class EveryBotIntakeFSM {
 			currLogs[i] = 0;
 		}
 		if (input.isThrottleForward()) {
-			//spinnerMotor.set(RELEASE_SPEED);
+			spinnerMotor.set(RELEASE_SPEED);
 		} else {
-			//spinnerMotor.set(-RELEASE_SPEED);
+			spinnerMotor.set(-RELEASE_SPEED);
 		}
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
@@ -401,5 +400,4 @@ public class EveryBotIntakeFSM {
 		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 }
-
 
