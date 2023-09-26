@@ -222,7 +222,7 @@ public class EveryBotIntakeFSM {
 				return flipMotor.getEncoder().getPosition() >= FLIP_CW_THRESHOLD;
 			case IDLE_FLIPCOUNTERCLOCKWISE:
 				handleFlipCounterClockWiseState();
-				return flipMotor.getEncoder().getPosition() <= 0;
+				return flipMotor.getEncoder().getPosition() <= FLIP_CCW_THRESHOLD;
 			case IDLE_STOP:
 				handleIdleStopState(null);
 				return true;
