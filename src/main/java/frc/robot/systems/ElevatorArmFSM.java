@@ -78,7 +78,6 @@ public class ElevatorArmFSM {
 	/* ======================== Public methods ======================== */
 	/**
 	 * Return current FSM state.
-	 *
 	 * @return Current FSM state
 	 */
 	public FSMState getCurrentState() {
@@ -87,7 +86,6 @@ public class ElevatorArmFSM {
 
 	/**
 	 * Return current arm encoder count.
-	 *
 	 * @return Current arm encoder count
 	 */
 	public double getEncoderCount() {
@@ -109,13 +107,11 @@ public class ElevatorArmFSM {
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
-
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
-	 *
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *              the robot is in autonomous mode.
+	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
 		if (input == null) {
@@ -162,7 +158,6 @@ public class ElevatorArmFSM {
 
 	/**
 	 * Autonomous update.
-	 *
 	 * @param autonState current autonomous state
 	 * @return status update
 	 */
@@ -191,9 +186,8 @@ public class ElevatorArmFSM {
 	 * and the current state of this FSM. This method should not have any side
 	 * effects on outputs. In other words, this method should only read or get
 	 * values to decide what state to go to.
-	 *
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *              the robot is in autonomous mode.
+	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
 	private FSMState nextState(TeleopInput input) {

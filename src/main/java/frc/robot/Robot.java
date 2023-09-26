@@ -5,20 +5,11 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
-// Camera Imports
-//import edu.wpi.first.cameraserver.CameraServer;
-//import edu.wpi.first.cscore.CvSink;
-//import edu.wpi.first.cscore.CvSource;
-//import edu.wpi.first.cscore.UsbCamera;
-//import org.opencv.core.Mat;
-
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
 import frc.robot.systems.EveryBotIntakeFSM.EveryBotIntakeFSMState;
-
 
 
 
@@ -29,12 +20,8 @@ import frc.robot.systems.EveryBotIntakeFSM.EveryBotIntakeFSMState;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 
-	private static final int WIDTH = 640;
-	private static final int HEIGHT = 480;
-
-	private Thread visionThread;
-
 	// Systems
+	private RaspberryPI rpi;
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
@@ -47,35 +34,10 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		//wristSystem = new ElevatorWristFSM();
-		//everybotIntake = new EveryBotIntakeFSM();
+		rpi = new RaspberryPI();
+		wristSystem = new ElevatorWristFSM();
+		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
-
-		/*visionThread = new Thread(
-			() -> {
-				UsbCamera camera = CameraServer.startAutomaticCapture();
-				camera.setResolution(WIDTH, HEIGHT);
-
-				CvSink cvSink = CameraServer.getVideo();
-				CvSource outputStream = CameraServer.putVideo("Stream", WIDTH, HEIGHT);
-
-				Mat mat = new Mat();
-
-				while (!Thread.interrupted()) {
-					// Tell the CvSink to grab a frame from the camera and put it
-					// in the source mat.  If there is an error notify the output.
-					if (cvSink.grabFrame(mat) == 0) {
-						outputStream.notifyError(cvSink.getError());
-						continue;
-					}
-
-					outputStream.putFrame(mat);
-				}
-			}
-		);
-
-		visionThread.setDaemon(true);
-		visionThread.start();*/
 	}
 
 	@Override

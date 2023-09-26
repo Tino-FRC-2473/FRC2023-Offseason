@@ -204,9 +204,6 @@ public class ElevatorWristFSM {
 		pidControllerWrist.setReference(ZEROING_SPEED, CANSparkMax.ControlType.kDutyCycle);
 	}
 
-
-
-
 	/** This method is for intake in game and flipping.
 	* @return completion of moving out
  	*/
@@ -224,6 +221,3 @@ public class ElevatorWristFSM {
 		return true;
 	}
 }
-
-
-
