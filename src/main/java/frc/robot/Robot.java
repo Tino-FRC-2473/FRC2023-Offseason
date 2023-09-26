@@ -48,8 +48,8 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		// Instantiate all systems here
 		//wristSystem = new ElevatorWristFSM();
-		everybotIntake = new EveryBotIntakeFSM();
-		//elevatorArm = new ElevatorArmFSM();
+		//everybotIntake = new EveryBotIntakeFSM();
+		elevatorArm = new ElevatorArmFSM();
 
 		/*visionThread = new Thread(
 			() -> {
@@ -81,9 +81,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		everybotIntake.reset();
+		//everybotIntake.reset();
 		//wristSystem.reset();
-		//elevatorArm.reset();
+		elevatorArm.reset();
 
 
 
@@ -91,21 +91,21 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		everybotIntake.update(null);
-		//elevatorArm.update(null);
+		//everybotIntake.update(null);
+		elevatorArm.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		everybotIntake.reset();
-		//elevatorArm.reset();
+		//everybotIntake.reset();
+		elevatorArm.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		everybotIntake.update(input);
-		//elevatorArm.update(input);
+		//everybotIntake.update(input);
+		elevatorArm.update(input);
 	}
 
 	@Override
@@ -154,9 +154,11 @@ public class Robot extends TimedRobot {
 	public boolean intakeObject() {
 		if (wristSystem.movingOutState()) {
 			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE);
+			if (everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE)) {
+				return everybotIntake.updateAutonomous(EveryBotIntakeFSMState.INTAKING);
+			}
 		}
-		return true;
+		return false;
 	}
 
 	/** This method is for intake in game and flipping.
@@ -164,10 +166,11 @@ public class Robot extends TimedRobot {
  	*/
 	public boolean outttakeObject() {
 		if (wristSystem.movingInState()) {
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE);
-			everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
+			if (everybotIntake.updateAutonomous(EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE)) {
+				return everybotIntake.updateAutonomous(EveryBotIntakeFSMState.OUTTAKING);
+			}
 		}
-		return true;
+		return false;
 	}
 
 
