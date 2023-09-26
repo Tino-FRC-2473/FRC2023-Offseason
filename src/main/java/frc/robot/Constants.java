@@ -19,7 +19,7 @@ public class Constants {
 		public static final int NO_TARGETS_RETURN = -180;
 		public static final int NO_Y_RETURN = 1000;
 		public static final String CAMERA_NAME = "OV5647";
-  }
+	}
 	public static class NetworkTablesConstants {
 		public static final String TABLE_NAME = "datatable";
 		public static final String CUBE_YAW_TOPIC = "cube_yaw";
