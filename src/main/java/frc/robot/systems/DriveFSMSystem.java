@@ -144,7 +144,7 @@ public class DriveFSMSystem {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 
-	 public void resetAutonomus() {
+	public void resetAutonomus() {
 		currentState = FSMState.AUTO_STATE;
 
 		resetEncoders();
@@ -178,11 +178,11 @@ public class DriveFSMSystem {
 	 */
 	public void update(TeleopInput input) {
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
-		new SwerveModulePosition[] {
-			frontLeft.getPosition(),
-			frontRight.getPosition(),
-			rearLeft.getPosition(),
-			rearRight.getPosition()});
+			new SwerveModulePosition[] {
+				frontLeft.getPosition(),
+				frontRight.getPosition(),
+				rearLeft.getPosition(),
+				rearRight.getPosition()});
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
@@ -343,6 +343,8 @@ public class DriveFSMSystem {
 
 	/**
 	 * auto method.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
 	public void auto1(TeleopInput input) {
 		if (input != null) {
