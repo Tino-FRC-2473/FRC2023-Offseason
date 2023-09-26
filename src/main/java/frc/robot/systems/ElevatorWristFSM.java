@@ -7,7 +7,6 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxLimitSwitch;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -37,7 +36,6 @@ public class ElevatorWristFSM {
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax wristMotor;
 	private SparkMaxPIDController pidControllerWrist;
-	private SparkMaxLimitSwitch wristLimitSwitch;
 	private double currentEncoder;
 	/* ======================== Constructor ======================== */
 	/**
@@ -48,9 +46,6 @@ public class ElevatorWristFSM {
 	public ElevatorWristFSM() {
 		wristMotor = new CANSparkMax(HardwareMap.CAN_ID_WRIST_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
-		wristLimitSwitch = wristMotor.getReverseLimitSwitch(
-				SparkMaxLimitSwitch.Type.kNormallyClosed);
-		wristLimitSwitch.enableLimitSwitch(true);
 		pidControllerWrist = wristMotor.getPIDController();
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		pidControllerWrist.setP(PID_CONSTANT_WRIST_P);
@@ -99,9 +94,6 @@ public class ElevatorWristFSM {
 			toggleUpdate = !toggleUpdate;
 			SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		}*/
-		if (wristLimitSwitch.isPressed()) {
-			wristMotor.getEncoder().setPosition(0);
-		}
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = wristMotor.getEncoder().getPosition();
 		}
@@ -122,7 +114,6 @@ public class ElevatorWristFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putBoolean("Wrist Zeroed Limit Switch", wristLimitSwitch.isPressed());
 		SmartDashboard.putNumber("Wrist Encoder", wristMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Wrist Power", wristMotor.getAppliedOutput());
 		currentState = nextState(input);
@@ -196,8 +187,10 @@ public class ElevatorWristFSM {
 	 */
 	private void handleIdleState(TeleopInput input) {
 		//PREVIOUS CODE: wristMotor.set(0);
-		pidControllerWrist.setReference(currentEncoder,
-			CANSparkMax.ControlType.kPosition);
+		//pidControllerWrist.setReference(currentEncoder,
+		//	CANSparkMax.ControlType.kPosition);
+		pidControllerWrist.setReference(0,
+			CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleMovingInState(TeleopInput input) {
 		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
