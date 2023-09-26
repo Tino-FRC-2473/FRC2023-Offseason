@@ -1,7 +1,7 @@
 package frc.robot;
 
 // WPILib Imports
-//import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -15,7 +15,7 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 
 	public static final int DRIVER_CONTROLLER_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int LEFT_JOYSTICK_PORT = 0;
 	private static final int ELEVATOR_HIGH_BUTTON = 7;
 	private static final int ELEVATOR_MID_BUTTON = 9;
 	private static final int ELEVATOR_LOW_BUTTON = 11;
@@ -29,6 +29,7 @@ public class TeleopInput {
 
 	/* ======================== Private variables ======================== */
 	// Input objects
+	private Joystick leftJoystick;
 	private XboxController driverController;
 
 	/* ======================== Constructor ======================== */
@@ -39,6 +40,7 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		driverController = new XboxController(DRIVER_CONTROLLER_PORT);
+		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
 	}
 
 	/* ======================== Public methods ======================== */
@@ -67,6 +69,13 @@ public class TeleopInput {
 	 */
 	public double getControllerRightJoystickY() {
 		return driverController.getRightY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getLeftJoystickY() {
+		return leftJoystick.getY();
 	}
 	/**
 	 * Get the value of the flip button.
