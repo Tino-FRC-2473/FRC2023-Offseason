@@ -7,23 +7,19 @@ import org.photonvision.PhotonCamera;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-// Systems
-//import frc.robot.systems.FSMSystem;
-import frc.robot.Constants.VisionConstants;
 
+import frc.robot.Constants.VisionConstants;
+import frc.robot.ReflectiveTape;
+import frc.robot.AprilTag;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation.
  */
 public class Robot extends TimedRobot {
-	//private TeleopInput input;
 	private ReflectiveTape tape;
 	private AprilTag apriltag;
-	// Systems
-	//private FSMSystem fsmSystem;
 	private PhotonCamera camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
-
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -34,9 +30,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
-		//input = new TeleopInput();
-		//fsmSystem = new FSMSystem();
-		// Instantiate all systems here
 		tape = new ReflectiveTape(camera);
 		apriltag = new AprilTag(camera);
 	}
@@ -44,7 +37,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		// fsmSystem.reset();
 	}
 
 	@Override
@@ -54,12 +46,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		//fsmSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		//fsmSystem.update(input);
+
 	}
 
 	@Override
@@ -71,17 +62,6 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {
 
 	}
-
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	@Override
-	public void testPeriodic() {
-
-	}
-
 	/* Simulation mode handlers, only used for simulation testing  */
 	@Override
 	public void simulationInit() {
