@@ -9,8 +9,6 @@ import org.photonvision.PhotonCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import frc.robot.Constants.VisionConstants;
-import frc.robot.ReflectiveTape;
-import frc.robot.AprilTag;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
