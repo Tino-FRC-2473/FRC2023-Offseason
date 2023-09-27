@@ -15,6 +15,7 @@ import frc.robot.Constants.VisionConstants;
  * each mode, as described in the TimedRobot documentation.
  */
 public class Robot extends TimedRobot {
+	private TeleopInput input;
 	private ReflectiveTape tape;
 	private AprilTag apriltag;
 	private PhotonCamera camera = new PhotonCamera(VisionConstants.CAMERA_NAME);
@@ -28,6 +29,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		System.out.println("robotInit");
+		input = new TeleopInput();
 		tape = new ReflectiveTape(camera);
 		apriltag = new AprilTag(camera);
 	}
