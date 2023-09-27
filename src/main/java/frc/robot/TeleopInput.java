@@ -55,40 +55,40 @@ public class TeleopInput {
 
 	/* ------------------------ Driver Controller ------------------------ */
 	/**
-		 * Get X axis of Left Joystick.
-		 * @return Axis value
-		 */
-		public double getControllerLeftJoystickY() {
-			return driverController.getLeftY();
-		}
-		/**
-		 * Get Y axis of Left Joystick.
-		 * @return Axis value
-		 */
-		public double getControllerLeftJoystickX() {
-			return driverController.getLeftX();
-		}
-		/**
-		 * Get Y axis of Left Joystick.
-		 * @return Axis value
-		 */
-		public double getControllerRightJoystickY() {
-			return driverController.getRightY();
-		}
-		/**
-		 * Get Y axis of Left Joystick.
-		 * @return Axis value
-		 */
-		public double getControllerRightJoystickX() {
-			return driverController.getRightX();
-		}
-		/**
-		 * Get the value of the A button.
-		 * @return True if button is pressed
-		 */
-		public boolean isBackButtonPressed() {
-			return driverController.getBackButtonPressed();
-		}
+	 * Get X axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerLeftJoystickY() {
+		return driverController.getLeftY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerLeftJoystickX() {
+		return driverController.getLeftX();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickY() {
+		return driverController.getRightY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickX() {
+		return driverController.getRightX();
+	}
+	/**
+	 * Get the value of the A button.
+	 * @return True if button is pressed
+	 */
+	public boolean isBackButtonPressed() {
+		return driverController.getBackButtonPressed();
+	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**
