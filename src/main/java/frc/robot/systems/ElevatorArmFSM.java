@@ -260,11 +260,15 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleHighState(TeleopInput input) {
-		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		//pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS));
+		System.out.println("In high state");
 	}
 
 	private void handleMiddleState(TeleopInput input) {
-		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		//pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
+		System.out.println("In mid state");
 	}
 
 	private void handleLowState(TeleopInput input) {
