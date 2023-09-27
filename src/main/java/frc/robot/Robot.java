@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {
 
 	}
-	
+
 	/* Simulation mode handlers, only used for simulation testing  */
 	@Override
 	public void simulationInit() {
