@@ -34,7 +34,7 @@ public class TeleopInput {
 	private Joystick leftJoystick;
 	private Joystick rightJoystick;
 	private XboxController driverController;
-	
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create a TeleopInput and register input devices. Note that while inputs
@@ -120,7 +120,7 @@ public class TeleopInput {
 	public boolean isFlipButtonPressed() {
 		return leftJoystick.getRawButtonPressed(FLIP_BUTTON);
 	}
-	
+
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
