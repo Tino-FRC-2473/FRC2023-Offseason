@@ -46,8 +46,8 @@ public class EveryBotIntakeFSM {
 	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_CW_THRESHOLD = 0.87; //16
-	private static final double FLIP_CCW_THRESHOLD = -0.2;
+	private static final double FLIP_CW_THRESHOLD = 3.0; //16
+	private static final double FLIP_CCW_THRESHOLD = -1.0;
 	private static final double PID_CONSTANT_ARM_P = 0.15; //0.008
 	private static final double PID_CONSTANT_ARM_I = 0.0000000;
 	private static final double PID_CONSTANT_ARM_D = 0.0000000;
@@ -298,10 +298,10 @@ public class EveryBotIntakeFSM {
 					}
 				} else if (input.isFlipButtonPressed()) {
 					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
-					if (flipMotor.getEncoder().getPosition() >= FLIP_CW_THRESHOLD) {
-						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
-					} else {
+					if (flipMotor.getEncoder().getPosition() <= FLIP_CCW_THRESHOLD) {
 						return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
+					} else {
+						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
 					}
 				} else {
 					return EveryBotIntakeFSMState.IDLE_STOP;
@@ -351,8 +351,8 @@ public class EveryBotIntakeFSM {
 	}
 	private void handleIdleStopState(TeleopInput input) {
 		spinnerMotor.set(KEEP_SPEED);
-		//flipMotor.set(0);
-		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
+		flipMotor.set(0);
+		//flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
 
 		if (holding) {
 			spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));

@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		// Instantiate all systems here
 		rpi = new RaspberryPI();
-		wristSystem = new ElevatorWristFSM();
-		everybotIntake = new EveryBotIntakeFSM();
+		//wristSystem = new ElevatorWristFSM();
+		//everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
 	}
 
