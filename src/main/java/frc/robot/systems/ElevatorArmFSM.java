@@ -281,18 +281,20 @@ public class ElevatorArmFSM {
 
 		} else if (armMotor.getEncoder().getPosition() < LOW_ENCODER_ROTATIONS) {
 
-			if (armMotor.get() < -input.getLeftJoystickY() / JOYSTICK_CONSTANT) {
+			if (input.getLeftJoystickY() > 0) {
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			}
 
-		} else if (armMotor.getEncoder().getPosition() > HIGH_ENCODER_ROTATIONS) {
-			if (armMotor.get() > -input.getLeftJoystickY() / JOYSTICK_CONSTANT) {
+		} else {
+			if (input.getLeftJoystickY() < 0) {
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			}
-		} else {
-			pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
 	}
 
