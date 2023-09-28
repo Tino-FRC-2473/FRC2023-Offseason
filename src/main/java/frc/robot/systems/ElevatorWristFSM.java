@@ -202,16 +202,18 @@ public class ElevatorWristFSM {
 	* @return completion of moving out
  	*/
 	public boolean movingOutState() {
-		pidControllerWrist.setReference(WRIST_OUT_ENCODER_ROTATIONS,
-			CANSparkMax.ControlType.kPosition);
+		//pidControllerWrist.setReference(WRIST_OUT_ENCODER_ROTATIONS,
+		//	CANSparkMax.ControlType.kPosition);
+		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS));
 		return true;
 	}
 	/** This method is for intake in game and flipping.
 	 * @return if moving in state is finished
  	*/
 	public boolean movingInState() {
-		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
-			CANSparkMax.ControlType.kPosition);
+		//pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
+		//	CANSparkMax.ControlType.kPosition);
+		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS));
 		return true;
 	}
 
