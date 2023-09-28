@@ -311,11 +311,10 @@ public class DriveFSMSystem {
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
 
-		int idx = 0;
-		frontLeft.setDesiredState(swerveModuleStates[idx]);
-		frontRight.setDesiredState(swerveModuleStates[++idx]);
-		rearLeft.setDesiredState(swerveModuleStates[++idx]);
-		rearRight.setDesiredState(swerveModuleStates[++idx]);
+		frontLeft.setDesiredState(swerveModuleStates[0]);
+		frontRight.setDesiredState(swerveModuleStates[1]);
+		rearLeft.setDesiredState(swerveModuleStates[2]);
+		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
 	/**
@@ -386,12 +385,10 @@ public class DriveFSMSystem {
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
 
-
-		int idx = 0;
-		frontLeft.setDesiredState(desiredStates[idx]);
-		frontRight.setDesiredState(desiredStates[++idx]);
-		rearLeft.setDesiredState(desiredStates[++idx]);
-		rearRight.setDesiredState(desiredStates[++idx]);
+		frontLeft.setDesiredState(desiredStates[0]);
+		frontRight.setDesiredState(desiredStates[1]);
+		rearLeft.setDesiredState(desiredStates[2]);
+		rearRight.setDesiredState(desiredStates[2 + 1]);
 	}
 
 	/** Resets the drive encoders to currently read a position of 0. */
