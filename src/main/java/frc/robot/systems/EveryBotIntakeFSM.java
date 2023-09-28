@@ -156,6 +156,7 @@ public class EveryBotIntakeFSM {
 			SmartDashboard.putBoolean("holding", holding);
 			SmartDashboard.putBoolean("Outtaking to intaking", prevOuttaking);
 			SmartDashboard.putBoolean("forward", forward);
+			SmartDashboard.putString("Current Intake State", currentState.toString());
 			//SmartDashboard.putBoolean("Flip Button", input.isFlipButtonPressed());
 
 			switch (currentState) {
