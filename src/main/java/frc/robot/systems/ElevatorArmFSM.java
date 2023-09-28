@@ -322,7 +322,7 @@ public class ElevatorArmFSM {
 	 * @return completion of the deposit
 	 */
 	public boolean handleAutonHighState() {
-		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS);
 	}
 
@@ -332,7 +332,7 @@ public class ElevatorArmFSM {
 	 * @return completion of the deposit
 	 */
 	public boolean handleAutonMiddleState() {
-		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
 
@@ -342,7 +342,7 @@ public class ElevatorArmFSM {
 	 * @return completion of the deposit
 	 */
 	public boolean handleAutonLowState() {
-		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
 
