@@ -18,7 +18,6 @@ public class ElevatorWristFSM {
 		MOVING_IN,
 		MOVING_OUT,
 		FREE_MOVING,
-		ZEROING,
 		IDLE
 	}
 	private static final double ZEROING_SPEED = -0.1;
@@ -105,9 +104,6 @@ public class ElevatorWristFSM {
 			case MOVING_OUT:
 				handleMovingOutState(input);
 				break;
-			case ZEROING:
-				handleZeroingState(input);
-				break;
 			case IDLE:
 				handleIdleState(input);
 				break;
@@ -139,16 +135,10 @@ public class ElevatorWristFSM {
 		}
 		switch (currentState) {
 			case IDLE:
-				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()
-					&& !input.isWristZeroButtonPressed()) {
+				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristZeroButtonPressed() && !input.isWristOutButtonPressed()
-					&& !input.isWristInButtonPressed()) {
-					//go to zeroing state
-					return FSMState.ZEROING;
-				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
-					&& !input.isWristZeroButtonPressed()) {
+				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()) {
 					//go to moving in state
 					return FSMState.MOVING_IN;
 				}
@@ -161,13 +151,6 @@ public class ElevatorWristFSM {
 					return FSMState.IDLE;
 				}
 				return FSMState.MOVING_OUT;
-			case ZEROING:
-				if (!input.isWristZeroButtonPressed()) {
-					//go to idle state
-					return FSMState.IDLE;
-				}
-				//stay in zeroing state
-				return FSMState.ZEROING;
 			case MOVING_IN:
 				if (!input.isWristInButtonPressed()) {
 					//go to idle state
