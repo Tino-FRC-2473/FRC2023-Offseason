@@ -35,9 +35,10 @@ public class ElevatorArmFSM {
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -130;
-	private static final float MID_ENCODER_ROTATIONS = 50;
-	private static final float HIGH_ENCODER_ROTATIONS = 100;
+	private static final float MID_ENCODER_ROTATIONS = 15;
+	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 4;
+	private static final float ENCODER_OFFSET = 5;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -120,13 +121,7 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
-		if (limitSwitchLow.isPressed() && !lastPressed) {
-			armMotor.getEncoder().setPosition(0);
-			currentEncoder = 0;
-		} else if (!limitSwitchLow.isPressed() && lastPressed) {
-			armMotor.getEncoder().setPosition(0);
-			currentEncoder = 0;
-		}
+
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -278,8 +273,27 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleMovingState(TeleopInput input) {
-		pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
-				CANSparkMax.ControlType.kDutyCycle);
+		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
+				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
+
+			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+
+		} else if (armMotor.getEncoder().getPosition() < LOW_ENCODER_ROTATIONS) {
+
+			if (armMotor.get() < -input.getLeftJoystickY() / JOYSTICK_CONSTANT) {
+				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+			}
+
+		} else if (armMotor.getEncoder().getPosition() > HIGH_ENCODER_ROTATIONS) {
+			if (armMotor.get() > -input.getLeftJoystickY() / JOYSTICK_CONSTANT) {
+				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+			}
+		} else {
+			pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
 	}
 
 	private void handleZeroingState(TeleopInput input) {

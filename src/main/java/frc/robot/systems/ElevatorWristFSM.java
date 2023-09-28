@@ -17,6 +17,7 @@ public class ElevatorWristFSM {
 	private enum FSMState {
 		MOVING_IN,
 		MOVING_OUT,
+		FREE_MOVING,
 		ZEROING,
 		IDLE
 	}
@@ -193,13 +194,23 @@ public class ElevatorWristFSM {
 			CANSparkMax.ControlType.kDutyCycle);
 	}
 	private void handleMovingInState(TeleopInput input) {
-		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
-			CANSparkMax.ControlType.kPosition);
+		if (wristMotor.getEncoder().getPosition() > WRIST_IN_ENCODER_ROTATIONS
+				&& input.isWristInButtonPressed()) {
+			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
 	}
+
 	private void handleMovingOutState(TeleopInput input) {
-		pidControllerWrist.setReference(WRIST_OUT_ENCODER_ROTATIONS,
-			CANSparkMax.ControlType.kPosition);
+		if (wristMotor.getEncoder().getPosition() < WRIST_OUT_ENCODER_ROTATIONS
+			&& input.isWristOutButtonPressed()) {
+			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
 	}
+
 	private void handleZeroingState(TeleopInput input) {
 		pidControllerWrist.setReference(ZEROING_SPEED, CANSparkMax.ControlType.kDutyCycle);
 	}
@@ -219,5 +230,17 @@ public class ElevatorWristFSM {
 		pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
 			CANSparkMax.ControlType.kPosition);
 		return true;
+	}
+
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double error = targetEncoder - currentEncoderPID;
+		//double errorChange = error - lastError;
+		double correction = PID_CONSTANT_WRIST_P * error;
+						//+ PID_CONSTANT_ARM_I * errorSum + PID_CONSTANT_ARM_D * errorChange;
+		//errorSum += error;
+
+
+
+		return Math.min(MAX_UP_POWER, Math.max(MAX_DOWN_POWER, correction));
 	}
 }

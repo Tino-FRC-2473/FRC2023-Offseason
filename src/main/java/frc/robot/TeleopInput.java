@@ -19,7 +19,7 @@ public class TeleopInput {
 	private static final int ELEVATOR_LOW_BUTTON = 11;
 	private static final int WRIST_IN_BUTTON = 6;
 	private static final int WRIST_OUT_BUTTON = 4;
-	private static final int ABORT_FLIP_BUTTON = 5;
+	private static final int ABORT_FLIP_BUTTON = 12;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int FLIP_BUTTON = 10;
 	private static final int ARM_ZERO_BUTTON = 8;
