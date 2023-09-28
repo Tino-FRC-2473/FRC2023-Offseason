@@ -199,7 +199,7 @@ public class DriveFSMSystem {
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					auto1(input);
+					sampleAuto(input);
 				}
 				break;
 			default:
@@ -342,10 +342,10 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Autopath method for the first path.
+	 * Sample autopath for testing purposes.
 	 * @param input Teleop input
 	 */
-	public void auto1(TeleopInput input) {
+	public void sampleAuto(TeleopInput input) {
 		if (input != null) {
 			return;
 		}
@@ -360,6 +360,99 @@ public class DriveFSMSystem {
 		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+	}
+
+	/**
+	 * Autopath #1 (Deposit only: (0, 0)).
+	 * @param input Teleop input
+	 */
+	public void autopath01(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		System.out.println(getPose());
+	}
+
+	/**
+	 * Autopath #2 (Deposit, exit community: (0, 0), (-140, 0)).
+	 * @param input Teleop input
+	 */
+	public void autopath02(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		System.out.println(getPose());
+		double power;
+		if (metersToInches(getPose().getX()) > -140) {
+			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+		} else {
+			power = 0;
+		}
+		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+	}
+
+	/**
+	 * Autopath #3 (Deposit, charge station: (0, 0), (-80, 0)).
+	 * @param input Teleop input
+	 */
+	public void autopath03(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		System.out.println(getPose());
+		double power;
+		if (metersToInches(getPose().getX()) > -80) {
+			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+		} else {
+			power = 0;
+			balance();
+		}
+		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+	}
+
+	/**
+	 * Autopath #4 (Deposit, exit community, charge station: (0, 0), (-140, 0), (-80, 0)).
+	 * @param input Teleop input
+	 */
+	public void autopath04(TeleopInput input) {
+		if (input != null) {
+			return;
+		}
+		System.out.println(getPose());
+		double power;
+		if (metersToInches(getPose().getX()) > -140) {
+			if (frontLeft.getState().speedMetersPerSecond >= 0) {
+				power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+			} else {
+				power = -AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+			}
+		} else if (metersToInches(getPose().getX()) > -80) {
+			if (frontLeft.getState().speedMetersPerSecond >= 0) {
+				power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+			} else {
+				power = -AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+			}
+		}
+		// frontLeft.getState().speedMetersPerSecond
+		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
+	}
+
+	/**
+	 * Conversion method for metric - coordinate system unit conversion.
+	 * @param displacement Distance value in meters
+	 * @return Distance value in inches; coordinate system unit
+	 */
+	private double metersToInches(double displacement) {
+		return displacement * 39.3701;
 	}
 
 	/**
