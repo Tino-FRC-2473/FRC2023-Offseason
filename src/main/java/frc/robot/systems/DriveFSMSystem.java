@@ -432,14 +432,17 @@ public class DriveFSMSystem {
 			} else {
 				power = -AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 			}
+		} else if (metersToInches(getPose().getX()) <= -140) {
+			power = -AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else if (metersToInches(getPose().getX()) > -80) {
 			if (frontLeft.getState().speedMetersPerSecond >= 0) {
 				power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 			} else {
 				power = -AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 			}
+		} else {
+			power = 0;
 		}
-		// frontLeft.getState().speedMetersPerSecond
 		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
