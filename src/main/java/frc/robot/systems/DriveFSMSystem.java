@@ -322,16 +322,11 @@ public class DriveFSMSystem {
 	 */
 	public void balance() {
 		double power;
-		if (Math.abs(gyro.getRoll()) < 2 && Math.abs(gyro.getRoll()) > (-1 * 2)) {
+		if (Math.abs(gyro.getRoll()) < 2) {
 			power = 0;
-		} else if (gyro.getRoll() > 0) {
-			power = Math.abs(gyro.getRoll())
-				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
-		} else if (gyro.getRoll() < 0) {
-			power = -Math.abs(gyro.getRoll())
-				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
 		} else {
-			power = 0;
+			power = gyro.getRoll()
+				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
 		}
 		// set to power field reletive so facing charge station
 		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
@@ -412,14 +407,4 @@ public class DriveFSMSystem {
 	public double getHeading() {
 		return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
 	}
-
-	/**
-	 * Returns the turn rate of the robot.
-	 *
-	 * @return The turn rate of the robot, in degrees per second
-	 */
-	public double getTurnRate() {
-		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
-	}
-
 }
