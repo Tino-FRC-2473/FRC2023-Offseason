@@ -326,7 +326,7 @@ public class DriveFSMSystem {
 			power = 0;
 		} else {
 			power = gyro.getRoll()
-				/ DriveConstants.BALENCE_SPEED_INVERSE_PROPORTION;
+				/ DriveConstants.BALANCE_SPEED_INVERSE_PROPORTION;
 		}
 		// set to power field reletive so facing charge station
 		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
