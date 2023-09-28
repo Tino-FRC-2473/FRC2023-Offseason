@@ -442,6 +442,7 @@ public class DriveFSMSystem {
 			}
 		} else {
 			power = 0;
+			balance();
 		}
 		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
 		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
