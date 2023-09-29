@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
-
-
+import frc.robot.systems.DriveFSMSystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -24,6 +23,8 @@ public class Robot extends TimedRobot {
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
+	private DriveFSMSystem driveFSMSystem;
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
 		wristSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
+		driveFSMSystem = new DriveFSMSystem();
 	}
 
 	@Override
@@ -45,25 +47,26 @@ public class Robot extends TimedRobot {
 		everybotIntake.reset();
 		wristSystem.reset();
 		elevatorArm.reset();
-
-
-
+		driveFSMSystem.resetAutonomus();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
 		everybotIntake.update(null);
+		driveFSMSystem.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		everybotIntake.reset();
+		driveFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		everybotIntake.update(input);
+		driveFSMSystem.update(input);
 	}
 
 	@Override
@@ -75,6 +78,7 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {
 
 	}
+
 	/* Simulation mode handlers, only used for simulation testing  */
 	@Override
 	public void simulationInit() {
