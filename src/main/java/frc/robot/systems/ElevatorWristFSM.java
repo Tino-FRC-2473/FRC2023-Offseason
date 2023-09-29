@@ -7,6 +7,8 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.IdleMode;
+
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -18,17 +20,21 @@ public class ElevatorWristFSM {
 		MOVING_IN,
 		MOVING_OUT,
 		FREE_MOVING,
-		IDLE
+		IDLE,
 	}
 	private static final double ZEROING_SPEED = -0.1;
-	private static final double PID_CONSTANT_WRIST_P = 0.001;
+	private static final double PID_CONSTANT_WRIST_P = 0.005;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
-	private static final float MAX_UP_POWER = 0.2f;
-	private static final float MAX_DOWN_POWER = -0.2f;
-	private static final double WRIST_IN_ENCODER_ROTATIONS = -1;
-	private static final double WRIST_OUT_ENCODER_ROTATIONS = 50;
+	private static final float MAX_UP_POWER = -0.1f;
+	private static final float MAX_DOWN_POWER = 0.1f;
+	private static final double WRIST_IN_ENCODER_ROTATIONS = 200;
+	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200;
+	private static final double ZEROING_ENCODER = -2.0;
+	private static final double PEAK_ENCODER_LOWER = -50;
+	private static final double PEAK_ENCODER_HIGHER = -70;
+
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -36,7 +42,7 @@ public class ElevatorWristFSM {
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax wristMotor;
 	private SparkMaxPIDController pidControllerWrist;
-	private double currentEncoder;
+	private double currentEncoder = 0;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -46,6 +52,7 @@ public class ElevatorWristFSM {
 	public ElevatorWristFSM() {
 		wristMotor = new CANSparkMax(HardwareMap.CAN_ID_WRIST_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
+		wristMotor.setIdleMode(IdleMode.kBrake);
 		pidControllerWrist = wristMotor.getPIDController();
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		pidControllerWrist.setP(PID_CONSTANT_WRIST_P);
@@ -74,8 +81,8 @@ public class ElevatorWristFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		wristMotor.getEncoder().setPosition(0);
-		currentEncoder = 0;
+		//wristMotor.getEncoder().setPosition(0);
+		//currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -97,6 +104,7 @@ public class ElevatorWristFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = wristMotor.getEncoder().getPosition();
 		}
+
 		switch (currentState) {
 			case MOVING_IN:
 				handleMovingInState(input);
@@ -113,6 +121,7 @@ public class ElevatorWristFSM {
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putNumber("Wrist Encoder", wristMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Wrist Power", wristMotor.getAppliedOutput());
+		SmartDashboard.putNumber("Current Encoder Var Wrist", currentEncoder);
 		currentState = nextState(input);
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
@@ -169,26 +178,34 @@ public class ElevatorWristFSM {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 * the robot is in autonomous mode.
 	 */
+
 	private void handleIdleState(TeleopInput input) {
 		//PREVIOUS CODE: wristMotor.set(0);
-		//pidControllerWrist.setReference(currentEncoder,
-		//	CANSparkMax.ControlType.kPosition);
-		pidControllerWrist.setReference(0,
-			CANSparkMax.ControlType.kDutyCycle);
+		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
 	}
 	private void handleMovingInState(TeleopInput input) {
-		if (wristMotor.getEncoder().getPosition() > WRIST_IN_ENCODER_ROTATIONS
+		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
 				&& input.isWristInButtonPressed()) {
-			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//if (wristMotor.getEncoder().getPosition() > PEAK_ENCODER_HIGHER
+			//	&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
+			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+			//} else {
+				pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
 	}
 
 	private void handleMovingOutState(TeleopInput input) {
-		if (wristMotor.getEncoder().getPosition() < WRIST_OUT_ENCODER_ROTATIONS
+		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
 			&& input.isWristOutButtonPressed()) {
-			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//if (wristMotor.getEncoder().getPosition() > PEAK_ENCODER_HIGHER
+			//		&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
+			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+			//} else {
+				pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
@@ -226,6 +243,6 @@ public class ElevatorWristFSM {
 
 
 
-		return Math.min(MAX_UP_POWER, Math.max(MAX_DOWN_POWER, correction));
+		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
 	}
 }

@@ -26,7 +26,7 @@ public class ElevatorArmFSM {
 
 	private static final float UP_POWER = 0.1f;
 	private static final float DOWN_POWER = -0.1f;
-	private static final float ZEROING_POWER = 0.1f;
+	private static final float ZEROING_POWER = 0.2f;
 	private static final double PID_CONSTANT_ARM_P = 0.01;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
@@ -34,7 +34,7 @@ public class ElevatorArmFSM {
 	private static final float MAX_DOWN_POWER = -0.35f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
-	private static final float LOW_ENCODER_ROTATIONS = -130;
+	private static final float LOW_ENCODER_ROTATIONS = -145;
 	private static final float MID_ENCODER_ROTATIONS = 15;
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 4;
@@ -103,8 +103,8 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		armMotor.getEncoder().setPosition(0);
-		currentEncoder = 0;
+		//armMotor.getEncoder().setPosition(0);
+		//currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -281,7 +281,8 @@ public class ElevatorArmFSM {
 
 		} else if (armMotor.getEncoder().getPosition() < LOW_ENCODER_ROTATIONS) {
 
-			if (input.getLeftJoystickY() > 0) {
+			if (-input.getLeftJoystickY() > 0) {
+				System.out.println("OVER ");
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
 			} else {
@@ -289,7 +290,8 @@ public class ElevatorArmFSM {
 			}
 
 		} else {
-			if (input.getLeftJoystickY() < 0) {
+			if (-input.getLeftJoystickY() < 0) {
+				System.out.println("UNDER ");
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
 			} else {
