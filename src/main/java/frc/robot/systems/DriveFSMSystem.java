@@ -170,6 +170,8 @@ public class DriveFSMSystem {
 				pose);
 	}
 
+	int counter = 0;
+
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state
 	 * specific handlers.
@@ -177,12 +179,15 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+		counter++;
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
 				frontRight.getPosition(),
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
+
+		if (counter % 20 == 0) System.out.println(getPose());
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
