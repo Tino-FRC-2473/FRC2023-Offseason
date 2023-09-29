@@ -61,12 +61,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		//everybotIntake.reset();
 		driveFSMSystem.reset();
+		elevatorArm.reset();
+		wristSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		//everybotIntake.update(input);
 		driveFSMSystem.update(input);
+		elevatorArm.update(input);
+		wristSystem.update(input);
 	}
 
 	@Override
