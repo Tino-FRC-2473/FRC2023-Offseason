@@ -109,7 +109,7 @@ public final class SwerveConstants {
 
 		public static final double TURNING_P = 1; // 1
 		public static final double TURNING_I = 0;
-		public static final double TURNING_D = 0.03;
+		public static final double TURNING_D = 0;
 		public static final double TURNING_FF = 0;
 		public static final double TURNING_MIN_OUTPUT = -1;
 		public static final double TURNING_MAX_OUTPUT = 1;
