@@ -39,6 +39,7 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 4;
 	private static final float ENCODER_OFFSET = 5;
+	private static final float STARTING_ER = (MID_ENCODER_ROTATIONS - LOW_ENCODER_ROTATIONS)/4;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -49,7 +50,7 @@ public class ElevatorArmFSM {
 	private SparkMaxPIDController pidControllerArm;
 	private SparkMaxLimitSwitch limitSwitchLow;
 	private double currentEncoder;
-	private boolean zeroed = true;
+	private boolean zeroed = false;
 	private boolean lastPressed = false;
 
 	/* ======================== Constructor ======================== */
@@ -64,7 +65,7 @@ public class ElevatorArmFSM {
 				CANSparkMax.MotorType.kBrushless);
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
-		limitSwitchLow.enableLimitSwitch(false);
+		limitSwitchLow.enableLimitSwitch(true);
 		armMotor.setInverted(true);
 		pidControllerArm = armMotor.getPIDController();
 		pidControllerArm.setP(PID_CONSTANT_ARM_P);
@@ -103,8 +104,10 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		//armMotor.getEncoder().setPosition(0);
-		//currentEncoder = 0;
+		//armMotor.getEncoder().setPosition(STARTING_ER);
+		//currentEncoder = STARTING_ER;
+		armMotor.getEncoder().setPosition(0);
+		currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -121,6 +124,14 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
+		System.out.println(armMotor.getAppliedOutput());
+		System.out.println(currentState);
+		SmartDashboard.putString("Elevator Current State", currentState.toString());
+		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
+		SmartDashboard.putBoolean("Is Limit Switch Pressed", limitSwitchLow.isPressed());
+		SmartDashboard.putBoolean("Last Pressed", lastPressed);
+		SmartDashboard.putBoolean("Is Zero button pressed", input.isArmZeroButtonPressed());
 
 		switch (currentState) {
 			case IDLE:
@@ -145,11 +156,7 @@ public class ElevatorArmFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		lastPressed = limitSwitchLow.isPressed();
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
-		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
-		SmartDashboard.putBoolean("Is Limit Switch Pressed", limitSwitchLow.isPressed());
-		SmartDashboard.putBoolean("Last Pressed", lastPressed);
+
 		currentState = nextState(input);
 	}
 
@@ -232,8 +239,10 @@ public class ElevatorArmFSM {
 				}
 			case ZEROING:
 				if (!input.isArmZeroButtonPressed()) {
+					System.out.println("Leaving zero state");
 					return FSMState.IDLE;
 				} else {
+					System.out.println("Staying in zero state");
 					return FSMState.ZEROING;
 				}
 			default:
@@ -273,6 +282,13 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleMovingState(TeleopInput input) {
+		System.out.println("Zeroed: " + zeroed);
+		//if (!zeroed) {
+		//	System.out.println("here");
+		//	pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+		//	CANSparkMax.ControlType.kDutyCycle);
+		//	return;
+		//}
 		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
 				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
 
@@ -301,18 +317,25 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleZeroingState(TeleopInput input) {
-		if (limitSwitchLow.isPressed() && lastPressed) {
-			pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
-			System.out.println("going up to zero");
-		} else if (!limitSwitchLow.isPressed() && !lastPressed) {
-			pidControllerArm.setReference(-ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
-			System.out.println("going down to zero");
-		} else {
-			pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
-			armMotor.getEncoder().setPosition(0);
-			currentEncoder = 0;
-			System.out.println("has zeroed");
-		}
+
+
+		//if (zeroed) {
+		//	armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
+		//} else {
+			if (limitSwitchLow.isPressed() && lastPressed) {
+				pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+				System.out.println("going up to zero");
+			} else if (!limitSwitchLow.isPressed() && !lastPressed) {
+				pidControllerArm.setReference(-ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+				System.out.println("going down to zero");
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+				armMotor.getEncoder().setPosition(0);
+				currentEncoder = 0;
+				zeroed = true;
+				System.out.println("has zeroed");
+			}
+		//}
 	}
 
 	private boolean handleAutonIdleState() {

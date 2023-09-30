@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -26,6 +27,7 @@ import frc.robot.HardwareMap;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
+
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
@@ -187,7 +189,9 @@ public class DriveFSMSystem {
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
 
-		if (counter % 20 == 0) System.out.println(getPose());
+		//if (counter % 20 == 0) System.out.println(getPose());
+		SmartDashboard.putNumber("X Pos", getPose().getX());
+		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
