@@ -72,7 +72,8 @@ public class ElevatorArmFSM {
 		pidControllerArm.setI(PID_CONSTANT_ARM_I);
 		pidControllerArm.setD(PID_CONSTANT_ARM_D);
 		pidControllerArm.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
-
+		armMotor.getEncoder().setPosition(STARTING_ER);
+		currentEncoder = STARTING_ER;
 		// Reset state machine
 		reset();
 	}
@@ -104,8 +105,6 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		armMotor.getEncoder().setPosition(STARTING_ER);
-		currentEncoder = STARTING_ER;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
