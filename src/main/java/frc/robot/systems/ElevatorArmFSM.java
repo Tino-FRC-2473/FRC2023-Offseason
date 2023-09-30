@@ -39,7 +39,7 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 4;
 	private static final float ENCODER_OFFSET = 5;
-	private static final float STARTING_ER = (MID_ENCODER_ROTATIONS - LOW_ENCODER_ROTATIONS)/4;
+	private static final float STARTING_ER = -100;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -104,10 +104,8 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		//armMotor.getEncoder().setPosition(STARTING_ER);
-		//currentEncoder = STARTING_ER;
-		armMotor.getEncoder().setPosition(0);
-		currentEncoder = 0;
+		armMotor.getEncoder().setPosition(STARTING_ER);
+		currentEncoder = STARTING_ER;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -283,12 +281,12 @@ public class ElevatorArmFSM {
 
 	private void handleMovingState(TeleopInput input) {
 		System.out.println("Zeroed: " + zeroed);
-		//if (!zeroed) {
-		//	System.out.println("here");
-		//	pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
-		//	CANSparkMax.ControlType.kDutyCycle);
-		//	return;
-		//}
+		if (!zeroed) {
+			System.out.println("here");
+			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+				CANSparkMax.ControlType.kDutyCycle);
+			return;
+		}
 		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
 				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
 
@@ -319,9 +317,9 @@ public class ElevatorArmFSM {
 	private void handleZeroingState(TeleopInput input) {
 
 
-		//if (zeroed) {
-		//	armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
-		//} else {
+		if (zeroed) {
+			armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
+		} else {
 			if (limitSwitchLow.isPressed() && lastPressed) {
 				pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
 				System.out.println("going up to zero");
@@ -335,7 +333,7 @@ public class ElevatorArmFSM {
 				zeroed = true;
 				System.out.println("has zeroed");
 			}
-		//}
+		}
 	}
 
 	private boolean handleAutonIdleState() {
