@@ -4,6 +4,8 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
 
+import frc.robot.*;
+
 // WPILib Imports
 
 // Third party Hardware Imports
@@ -26,6 +28,10 @@ import frc.robot.HardwareMap;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
+
+// CV Imports
+import org.photonvision.PhotonCamera;
+import edu.wpi.first.math.controller.PIDController;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
@@ -52,6 +58,15 @@ public class DriveFSMSystem {
 	private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
 	private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
 	private double prevTime = WPIUtilJNI.now() * DriveConstants.TIME_CONSTANT;
+
+	private RaspberryPI pi = new RaspberryPI();
+	private PhotonCamera photon = new PhotonCamera(Constants.VisionConstants.CAMERA_NAME); 
+	private ReflectiveTape tape = new ReflectiveTape(photon);
+	private AprilTag tag = new AprilTag(photon);
+
+	private static final double ANGULAR_P = 0.01;
+	private static final double ANGULAR_D = 0;
+	private PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
 	// Create MAXSwerveModules
 	private final MAXSwerveModule frontLeft = new MAXSwerveModule(
@@ -341,6 +356,149 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(new SwerveModuleState(power, rearRight.getState().angle));
 	}
 
+	
+	/**
+	 * CV align to apriltag and drive up.
+	 */
+	public void alignTag() {
+		double ang = tag.getAngle();
+		if (tag.getY() < Constants.VisionConstants.TAG_DRIVEUP_DISTANCE_METERS) {
+			//forward
+			cvDrive(Constants.VisionConstants.CV_FORWARD_POWER, 2);
+		} else if(Math.abs(tag.getX()) < Constants.VisionConstants.TAG_STRAFE_DISTANCE_METERS) {
+			//strafe left or right
+			cvDrive(Math.signum(tag.getX())*Constants.VisionConstants.CV_STRAFE_POWER, 4);
+		} else if(ang > Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn left
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 1);
+		} else if(ang < -Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn right
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 3);
+		}
+	}
+
+	/**
+	 * CV align to high tape and drive up.
+	 */
+	public void alignHTape() {
+		double ang = tape.getHighTapeYaw();
+		if(ang > Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn left
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 1);
+		} else if(ang < -Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn right
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 3);
+		} else if(tape.getHighTapeDistance() < Constants.VisionConstants.HIGH_TAPE_DRIVEUP_DISTANCE_METERS) {
+			//forward
+			cvDrive(Constants.VisionConstants.CV_FORWARD_POWER, 2);
+		}
+	}
+
+	/**
+	 * CV align to low tape and drive up.
+	 */
+	public void alignLTape() {
+		double ang = tape.getLowTapeYaw();
+		if(ang > Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn left
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 1);
+		} else if(ang < -Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn right
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 3);
+		} else if(tape.getLowTapeDistance() < Constants.VisionConstants.LOW_TAPE_DRIVEUP_DISTANCE_METERS) {
+			//forward
+			cvDrive(Constants.VisionConstants.CV_FORWARD_POWER, 2);
+		}
+	}
+
+	/**
+	 * CV align to cone.
+	 */
+	public void alignCone() {
+		double ang = pi.getConeYaw();
+		if(ang > Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn left
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 1);
+		} else if(pi.getConeYaw() < -Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn right
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 3);
+		} else if(pi.getConeDistance() < Constants.VisionConstants.CONE_DRIVEUP_DISTANCE_METERS) {
+			//forward
+			cvDrive(Constants.VisionConstants.CV_FORWARD_POWER, 2);
+		}
+	}
+
+	/**
+	 * CV align to cube.
+	 */
+	public void alignCube() {
+		double ang = pi.getCubeYaw();
+		if(ang > Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn left
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 1);
+		} else if(pi.getCubeYaw() < -Constants.VisionConstants.ALIGNMENT_THRESHOLD_DEGREES) {
+			//turn right
+			double power = turnController.calculate(ang, 0);
+			cvDrive(power, 3);
+		} else if(pi.getCubeDistance() < Constants.VisionConstants.CUBE_DRIVEUP_DISTANCE_METERS) {
+			//forward
+			cvDrive(Constants.VisionConstants.CV_FORWARD_POWER, 2);
+		}
+	}
+
+
+	public void cvDrive(double power, int num) {
+		switch (num) {
+			//stop
+			case 0:
+				frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+				frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+				rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+				rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+				break;
+			//left
+			case 1:
+				frontLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(-135)));
+				frontRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees( -45)));
+				rearLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(135)));
+				rearRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(45)));
+				break;
+			//forward
+			case 2:
+				frontLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(0)));
+				frontRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(0)));
+				rearLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(0)));
+				rearRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(0)));
+				break;
+			//right
+			case 3:
+				frontLeft.setDesiredState(new SwerveModuleState(-power, Rotation2d.fromDegrees(-135)));
+				frontRight.setDesiredState(new SwerveModuleState(-power, Rotation2d.fromDegrees( -45)));
+				rearLeft.setDesiredState(new SwerveModuleState(-power, Rotation2d.fromDegrees(135)));
+				rearRight.setDesiredState(new SwerveModuleState(-power, Rotation2d.fromDegrees(45)));
+				break;
+			//strafe (+pow: right, -pow: left)
+			case 4:
+				frontLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(90)));
+				frontRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(90)));
+				rearLeft.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(90)));
+				rearRight.setDesiredState(new SwerveModuleState(power, Rotation2d.fromDegrees(90)));
+				break;
+			default:
+				throw new IllegalStateException("Invalid cv drive state: " + num);
+		}
+
+	}
+
 	/**
 	 * auto method.
 	 */
@@ -406,7 +564,7 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Returns the heading of the robot.
+	 * Returns the heading of the robot. Positive is clockwise
 	 *
 	 * @return the robot's heading in degrees, from -180 to 180
 	 */
@@ -422,5 +580,6 @@ public class DriveFSMSystem {
 	public double getTurnRate() {
 		return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
 	}
+
 
 }

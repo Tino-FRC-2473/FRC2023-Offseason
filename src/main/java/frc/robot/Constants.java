@@ -8,11 +8,6 @@ public class Constants {
 	public static final double SUBSTATION_ANGLE_THRESHOLD_DEGREES = 5;
 	public static final double CV_TURN_POWER = 0.05;
 	public static final double CV_PID_CLAMP_THRESHOLD = 0.08;
-	public static final double CV_FORWARD_POWER = 0.1;
-	public static final double HIGHER_TAPE_DRIVEUP_DISTANCE_INCHES = 67;
-	public static final double LOWER_TAPE_DRIVEUP_DISTANCE_INCHES = 45;
-	public static final double TAG_DRIVEUP_DISTANCE_INCHES = 32;
-	public static final double CUBE_DRIVEUP_DISTANCE_INCHES = 45;
 	public static final double CUBE_DISTANCE_ADD = 10;
 	public static final double CONE_DISTANCE_ADD = 20;
 	public static final int WEBCAM_PIXELS_WIDTH = 480;
@@ -76,6 +71,14 @@ public class Constants {
 	public static final double HUB_X_COORDINATE = 40;
 	public static final double HUB_Y_COORDINATE = 0;
 	public static final double QUARTER_PI = Math.PI / 4;
+	public static class NetworkTablesConstants {
+		public static final String TABLE_NAME = "datatable";
+		public static final String CUBE_YAW_TOPIC = "cube_yaw";
+		public static final String CUBE_DISTANCE_TOPIC = "cube_distance";
+		public static final String CONE_YAW_TOPIC = "cone_yaw";
+		public static final String CONE_DISTANCE_TOPIC = "cone_distance";
+		public static final String FPS_COUNTER_TOPIC = "fps_incremented_value";
+	}
 	public static class VisionConstants {
 		public static final double CAM_HEIGHT_METERS = Units.inchesToMeters(20.75);
 		public static final double CAM_PITCH_RADIANS = Units.degreesToRadians(0);
@@ -84,7 +87,6 @@ public class Constants {
 		public static final double HIGH_TAPE_HEIGHT_METERS = Units.inchesToMeters(43.75);
 		public static final double LOW_TAPE_HEIGHT_METERS = Units.inchesToMeters(24);
 		public static final double TAG_HEIGHT_METERS = Units.inchesToMeters(1.927);
-		public static final double ALIGNMENT_THRESHOLD_DEGREES = 3;
 		public static final int LOWERTAPE_PIPELINE_INDEX = 3;
 		public static final int HIGHERTAPE_PIPELINE_INDEX = 1;
 		public static final int THREEDTAG_PIPELINE_INDEX = 0;
@@ -93,5 +95,15 @@ public class Constants {
 		public static final int NO_TARGETS_RETURN = -180;
 		public static final int NO_Y_RETURN = 1000;
 		public static final String CAMERA_NAME = "OV5647";
+		public static final double CV_FORWARD_POWER = 0.1;
+		public static final double CV_STRAFE_POWER = 0.1;
+		public static final double ALIGNMENT_THRESHOLD_DEGREES = 3;
+		public static final double HIGH_TAPE_DRIVEUP_DISTANCE_METERS = 2;
+		public static final double LOW_TAPE_DRIVEUP_DISTANCE_METERS = 2;
+		public static final double TAG_DRIVEUP_DISTANCE_METERS = 2;
+		public static final double TAG_STRAFE_DISTANCE_METERS = 0.2;
+		public static final double CUBE_DRIVEUP_DISTANCE_METERS = 2;
+		public static final double CONE_DRIVEUP_DISTANCE_METERS = 2;
+		
 	}
 }

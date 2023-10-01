@@ -23,17 +23,8 @@ public class AprilTag {
 		return photonCamera.getLatestResult();
 	}
 
-	/** @return Returns the x coordinate of the robot relative to the april tag found. */
+	/** @return Returns the x (horizontal) coordinate in meters of the robot relative to the april tag found. */
 	public double getX() {
-		PhotonPipelineResult result = getResult();
-		if (result.hasTargets()) {
-			return result.getBestTarget().getBestCameraToTarget().getX();
-		}
-		return VisionConstants.NO_TARGETS_RETURN;
-	}
-
-	/** @return Returns the y coordinate of the robot relative to the april tag found. */
-	public double getY() {
 		PhotonPipelineResult result = getResult();
 		if (result.hasTargets()) {
 			return result.getBestTarget().getBestCameraToTarget().getY();
@@ -41,7 +32,16 @@ public class AprilTag {
 		return VisionConstants.NO_TARGETS_RETURN;
 	}
 
-	/** @return Returns the angle of the robot relative to the april tag found. */
+	/** @return Returns the y (forward/backward) coordinate in meters of the robot relative to the april tag found. */
+	public double getY() {
+		PhotonPipelineResult result = getResult();
+		if (result.hasTargets()) {
+			return result.getBestTarget().getBestCameraToTarget().getX();
+		}
+		return VisionConstants.NO_TARGETS_RETURN;
+	}
+
+	/** @return Returns the angle (in degrees) of the robot relative to the april tag found. */
 	public double getAngle() {
 		PhotonPipelineResult result = getResult();
 		if (result.hasTargets()) {
