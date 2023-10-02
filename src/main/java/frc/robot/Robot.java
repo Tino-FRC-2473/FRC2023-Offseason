@@ -52,8 +52,12 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		everybotIntake.update(null);
-		driveFSMSystem.update(null);
+		//everybotIntake.update(null);
+		//driveFSMSystem.update(null);
+		//PIDS ARM to middle state, moves the wrist out, then runs drive function
+		if (elevatorArm.handleAutonMiddleState() && wristSystem.movingOutState()) {
+
+		}
 	}
 
 	@Override

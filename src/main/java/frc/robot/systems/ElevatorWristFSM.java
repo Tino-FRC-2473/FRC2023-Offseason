@@ -59,6 +59,8 @@ public class ElevatorWristFSM {
 		pidControllerWrist.setI(PID_CONSTANT_WRIST_I);
 		pidControllerWrist.setD(PID_CONSTANT_WRIST_D);
 		pidControllerWrist.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
+		wristMotor.getEncoder().setPosition(0);
+		currentEncoder = 0;
 		// Reset state machine
 		reset();
 	}
@@ -81,8 +83,6 @@ public class ElevatorWristFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		//wristMotor.getEncoder().setPosition(0);
-		//currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -190,7 +190,7 @@ public class ElevatorWristFSM {
 			//	&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
-				pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
 			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
@@ -204,16 +204,16 @@ public class ElevatorWristFSM {
 			//		&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
-				pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
 			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
 	}
 
-	private void handleZeroingState(TeleopInput input) {
-		pidControllerWrist.setReference(ZEROING_SPEED, CANSparkMax.ControlType.kDutyCycle);
-	}
+	// private void handleZeroingState(TeleopInput input) {
+	// 	pidControllerWrist.setReference(ZEROING_SPEED, CANSparkMax.ControlType.kDutyCycle);
+	// }
 
 	/** This method is for intake in game and flipping.
 	* @return completion of moving out
@@ -222,7 +222,7 @@ public class ElevatorWristFSM {
 		//pidControllerWrist.setReference(WRIST_OUT_ENCODER_ROTATIONS,
 		//	CANSparkMax.ControlType.kPosition);
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS));
-		return true;
+		return inRange(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS);
 	}
 	/** This method is for intake in game and flipping.
 	 * @return if moving in state is finished
@@ -231,7 +231,7 @@ public class ElevatorWristFSM {
 		//pidControllerWrist.setReference(WRIST_IN_ENCODER_ROTATIONS,
 		//	CANSparkMax.ControlType.kPosition);
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS));
-		return true;
+		return inRange(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS);
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
@@ -244,5 +244,9 @@ public class ElevatorWristFSM {
 
 
 		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
+	}
+
+	private boolean inRange(double a, double b) {
+		return Math.abs(a - b) <= 1.0 / 2;
 	}
 }

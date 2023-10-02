@@ -157,29 +157,29 @@ public class ElevatorArmFSM {
 		currentState = nextState(input);
 	}
 
-	/**
-	 * Autonomous update.
-	 * @param autonState current autonomous state
-	 * @return status update
-	 */
-	public boolean autonomousUpdate(FSMState autonState) {
-		if (limitSwitchLow.isPressed()) {
-			armMotor.getEncoder().setPosition(0);
-		}
+	// /**
+	//  * Autonomous update.
+	//  * @param autonState current autonomous state
+	//  * @return status update
+	//  */
+	// public boolean autonomousUpdate(FSMState autonState) {
+	// 	if (limitSwitchLow.isPressed()) {
+	// 		armMotor.getEncoder().setPosition(0);
+	// 	}
 
-		switch (autonState) {
-			case IDLE:
-				return handleAutonIdleState();
-			case HIGH:
-				return handleAutonHighState();
-			case MIDDLE:
-				return handleAutonMiddleState();
-			case LOW:
-				return handleAutonLowState();
-			default:
-				return true;
-		}
-	}
+	// 	switch (autonState) {
+	// 		case IDLE:
+	// 			return handleAutonIdleState();
+	// 		case HIGH:
+	// 			return handleAutonHighState();
+	// 		case MIDDLE:
+	// 			return handleAutonMiddleState();
+	// 		case LOW:
+	// 			return handleAutonLowState();
+	// 		default:
+	// 			return true;
+	// 	}
+	// }
 
 	/* ======================== Private methods ======================== */
 	/**
