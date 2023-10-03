@@ -39,7 +39,7 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 4;
 	private static final float ENCODER_OFFSET = 5;
-	private static final float STARTING_ER = -100;
+	private static final float STARTING_ER = -135;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -65,7 +65,7 @@ public class ElevatorArmFSM {
 				CANSparkMax.MotorType.kBrushless);
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
-		limitSwitchLow.enableLimitSwitch(true);
+		limitSwitchLow.enableLimitSwitch(false);
 		armMotor.setInverted(true);
 		pidControllerArm = armMotor.getPIDController();
 		pidControllerArm.setP(PID_CONSTANT_ARM_P);

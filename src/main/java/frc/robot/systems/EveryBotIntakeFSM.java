@@ -388,6 +388,27 @@ public class EveryBotIntakeFSM {
 		holding = false;
 	}
 
+	public boolean handleAutoOuttakingState() {
+		if (!hasTimerStarted) {
+			timer.reset();
+			timer.start();
+			hasTimerStarted = true;
+			holding = true;
+		}
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			currLogs[i] = 0;
+		}
+		spinnerMotor.set(RELEASE_SPEED);
+		if (timer.get() >= 2) {
+			itemType = ItemType.EMPTY;
+			isMotorAllowed = true;
+			holding = false;
+			return true;
+		}
+		return false;
+
+	}
+
 	private double pid(double currentEncoder, double targetEncoder) {
 		double error = targetEncoder - currentEncoder;
 		//double errorChange = error - lastError;
