@@ -23,6 +23,7 @@ public class ElevatorWristFSM {
 		IDLE,
 	}
 	private static final double PID_CONSTANT_WRIST_P = 0.005;
+	private static final double PID_CONSTANT_WRIST_P_VELOCITY = 0.05;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
@@ -30,7 +31,9 @@ public class ElevatorWristFSM {
 	private static final float MAX_DOWN_POWER = 0.1f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
-
+	private static final double ELEVATOR_COLLISION_ER = -0.5;
+	private static final double WRIST_UP_RPM = -7;
+	private static final double WRIST_DOWN_RPM = 7;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -119,6 +122,7 @@ public class ElevatorWristFSM {
 		SmartDashboard.putNumber("Wrist Power", wristMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Current Encoder Var Wrist", currentEncoder);
 		SmartDashboard.putNumber("Wrist motor current", wristMotor.getOutputCurrent());
+		SmartDashboard.putNumber("Wrist Velocity (RPM)", wristMotor.getEncoder().getVelocity());
 		currentState = nextState(input);
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
@@ -185,14 +189,18 @@ public class ElevatorWristFSM {
 			wristMotor.getEncoder().setPosition(0);
 		}
 	}
+
 	private void handleMovingInState(TeleopInput input) {
 		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
-				&& input.isWristInButtonPressed()) {
+				&& input.isWristInButtonPressed()
+				//&& !(arm < base && wristMotor.getEncoder().getPosition() > ELEVATOR_COLLISION_ER)
+		) {
 			//if (wristMotor.getEncoder().getPosition() > PEAK_ENCODER_HIGHER
 			//	&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
 			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//wristMotor.set(pid_velocity(wristMotor.getEncoder().getVelocity(), WRIST_DOWN_RPM))
 			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
@@ -207,6 +215,7 @@ public class ElevatorWristFSM {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
 			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+			//wristMotor.set(pid_velocity(wristMotor.getEncoder().getVelocity(), WRIST_UP_RPM))
 			//}
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
@@ -248,6 +257,17 @@ public class ElevatorWristFSM {
 		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
 	}
 
+	private double pidVelocity(double currentRPM, double targetRPM) {
+		double error = currentRPM - targetRPM;
+		//double errorChange = error - lastError;
+		double correction = PID_CONSTANT_WRIST_P * error;
+						//+ PID_CONSTANT_ARM_I * errorSum + PID_CONSTANT_ARM_D * errorChange;
+		//errorSum += error;
+
+
+
+		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
+	}
 	private boolean inRange(double a, double b) {
 		return Math.abs(a - b) <= 1.0 / 2;
 	}

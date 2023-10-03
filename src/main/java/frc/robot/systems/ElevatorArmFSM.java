@@ -37,6 +37,7 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
+	private static final float BASE_ER = -20; //SUBJECT TO CHANGE AFTER TESTING
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -49,6 +50,7 @@ public class ElevatorArmFSM {
 	private double currentEncoder;
 	private boolean zeroed = false;
 	private boolean lastPressed = false;
+
 
 	/* ======================== Constructor ======================== */
 	/**
