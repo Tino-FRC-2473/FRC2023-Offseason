@@ -46,9 +46,9 @@ public class EveryBotIntakeFSM {
 	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_CW_THRESHOLD = 14.0; //16
+	private static final double FLIP_CW_THRESHOLD = -14.0; //16
 	private static final double FLIP_CCW_THRESHOLD = 0.0;
-	private static final double PID_CONSTANT_ARM_P = 0.075; //0.008
+	private static final double PID_CONSTANT_ARM_P = 0.075; //0.075
 	private static final double PID_CONSTANT_ARM_I = 0.0000000;
 	private static final double PID_CONSTANT_ARM_D = 0.0000000;
 	//variable for armFSM, 0 means no object, 1 means cone, 2 means cube
@@ -220,10 +220,10 @@ public class EveryBotIntakeFSM {
 				return  avgcone > CURRENT_THRESHOLD;
 			case IDLE_FLIPCLOCKWISE:
 				handleFlipClockWiseState();
-				return flipMotor.getEncoder().getPosition() >= FLIP_CW_THRESHOLD;
+				return flipMotor.getEncoder().getPosition() <= FLIP_CW_THRESHOLD;
 			case IDLE_FLIPCOUNTERCLOCKWISE:
 				handleFlipCounterClockWiseState();
-				return flipMotor.getEncoder().getPosition() <= FLIP_CCW_THRESHOLD;
+				return flipMotor.getEncoder().getPosition() >= FLIP_CCW_THRESHOLD;
 			case IDLE_STOP:
 				handleIdleStopState(null);
 				return true;
@@ -298,7 +298,7 @@ public class EveryBotIntakeFSM {
 					}
 				} else if (input.isFlipButtonPressed()) {
 					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
-					if (flipMotor.getEncoder().getPosition() <= FLIP_CW_THRESHOLD) {
+					if (flipMotor.getEncoder().getPosition() >= FLIP_CW_THRESHOLD) {
 						return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 					} else {
 						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
@@ -307,7 +307,7 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				}
 			case IDLE_FLIPCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() > FLIP_CW_THRESHOLD
+				if (flipMotor.getEncoder().getPosition() < FLIP_CW_THRESHOLD
 					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {
@@ -316,7 +316,7 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() < 0
+				if (flipMotor.getEncoder().getPosition() > 0
 					|| input.isFlipAbortButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {

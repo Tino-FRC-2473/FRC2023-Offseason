@@ -45,6 +45,7 @@ public class DriveFSMSystem {
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	private int counter = 0;
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -171,8 +172,6 @@ public class DriveFSMSystem {
 				},
 				pose);
 	}
-
-	int counter = 0;
 
 	/**
 	 * Update FSM based on new inputs. This function only calls the FSM state

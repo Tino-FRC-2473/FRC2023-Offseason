@@ -22,7 +22,6 @@ public class ElevatorWristFSM {
 		FREE_MOVING,
 		IDLE,
 	}
-	private static final double ZEROING_SPEED = -0.1;
 	private static final double PID_CONSTANT_WRIST_P = 0.005;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
@@ -31,9 +30,6 @@ public class ElevatorWristFSM {
 	private static final float MAX_DOWN_POWER = 0.1f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200;
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200;
-	private static final double ZEROING_ENCODER = -2.0;
-	private static final double PEAK_ENCODER_LOWER = -50;
-	private static final double PEAK_ENCODER_HIGHER = -70;
 
 
 	/* ======================== Private variables ======================== */
@@ -122,6 +118,7 @@ public class ElevatorWristFSM {
 		SmartDashboard.putNumber("Wrist Encoder", wristMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Wrist Power", wristMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Current Encoder Var Wrist", currentEncoder);
+		SmartDashboard.putNumber("Wrist motor current", wristMotor.getOutputCurrent());
 		currentState = nextState(input);
 		//Robot.getStringLog().append("spinning intake ending");
 		//Robot.getStringLog().append("Time taken for loop: " + timeTaken);
@@ -167,6 +164,7 @@ public class ElevatorWristFSM {
 				}
 				//stay in moving in state
 				return FSMState.MOVING_IN;
+			
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -182,6 +180,10 @@ public class ElevatorWristFSM {
 	private void handleIdleState(TeleopInput input) {
 		//PREVIOUS CODE: wristMotor.set(0);
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
+		if (wrist zero is pressed) {
+			currentEncoder = 0;
+			wristMotor.getEncoder().setPosition(0);
+		}
 	}
 	private void handleMovingInState(TeleopInput input) {
 		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS

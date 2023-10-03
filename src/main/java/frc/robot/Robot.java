@@ -24,7 +24,6 @@ public class Robot extends TimedRobot {
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
 	private DriveFSMSystem driveFSMSystem;
-	boolean outtaked;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -49,21 +48,16 @@ public class Robot extends TimedRobot {
 		wristSystem.reset();
 		elevatorArm.reset();
 		driveFSMSystem.resetAutonomus();
-		outtaked = false;
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		//everybotIntake.update(null);
-		//driveFSMSystem.update(null);
-		//PIDS ARM to middle state, moves the wrist out, then runs drive function
-		if (wristSystem.movingInState() && elevatorArm.handleAutonMiddleState()) {
-			if (!outtaked) {
-				outtaked = everybotIntake.handleAutoOuttakingState();
-			} else {
-				//finished depositing, run drive code
-			}
-		}
+		// boolean isWristMoved = wristSystem.movingInState();
+		// boolean isArmMoved = elevatorArm.handleAutonMiddleState();
+
+		// SmartDashboard.putBoolean("Wrist is at position", isWristMoved);
+		// SmartDashboard.putBoolean("Arm is at position", isArmMoved);
+		driveFSMSystem.auto1(null);
 	}
 
 	@Override

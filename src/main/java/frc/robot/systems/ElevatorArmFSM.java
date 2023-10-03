@@ -24,21 +24,18 @@ public class ElevatorArmFSM {
 		ZEROING
 	}
 
-	private static final float UP_POWER = 0.1f;
-	private static final float DOWN_POWER = -0.1f;
 	private static final float ZEROING_POWER = 0.2f;
 	private static final double PID_CONSTANT_ARM_P = 0.01;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
-	private static final float MAX_UP_POWER = 0.35f;
+	private static final float MAX_UP_POWER = 0.4f;
 	private static final float MAX_DOWN_POWER = -0.35f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -145;
 	private static final float MID_ENCODER_ROTATIONS = 15;
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
-	private static final float JOYSTICK_CONSTANT = 4;
-	private static final float ENCODER_OFFSET = 5;
+	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 
 	/* ======================== Private variables ======================== */
