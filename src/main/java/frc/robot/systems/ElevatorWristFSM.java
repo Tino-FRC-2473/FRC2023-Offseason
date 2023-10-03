@@ -164,7 +164,7 @@ public class ElevatorWristFSM {
 				}
 				//stay in moving in state
 				return FSMState.MOVING_IN;
-			
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -178,9 +178,9 @@ public class ElevatorWristFSM {
 	 */
 
 	private void handleIdleState(TeleopInput input) {
-		//PREVIOUS CODE: wristMotor.set(0);
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
-		if (wrist zero is pressed) {
+		//Zeroes the encoder at a given configuration, mainly for testing
+		if (input.isWristZeroButtonPressed()) {
 			currentEncoder = 0;
 			wristMotor.getEncoder().setPosition(0);
 		}
