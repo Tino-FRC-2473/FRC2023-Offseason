@@ -44,7 +44,6 @@ public class DriveFSMSystem {
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
-	private int counter = 0;
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -179,7 +178,6 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		counter++;
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
@@ -187,7 +185,6 @@ public class DriveFSMSystem {
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
 
-		//if (counter % 20 == 0) System.out.println(getPose());
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		switch (currentState) {

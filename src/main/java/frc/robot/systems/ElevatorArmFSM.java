@@ -156,30 +156,6 @@ public class ElevatorArmFSM {
 		currentState = nextState(input);
 	}
 
-	// /**
-	//  * Autonomous update.
-	//  * @param autonState current autonomous state
-	//  * @return status update
-	//  */
-	// public boolean autonomousUpdate(FSMState autonState) {
-	// 	if (limitSwitchLow.isPressed()) {
-	// 		armMotor.getEncoder().setPosition(0);
-	// 	}
-
-	// 	switch (autonState) {
-	// 		case IDLE:
-	// 			return handleAutonIdleState();
-	// 		case HIGH:
-	// 			return handleAutonHighState();
-	// 		case MIDDLE:
-	// 			return handleAutonMiddleState();
-	// 		case LOW:
-	// 			return handleAutonLowState();
-	// 		default:
-	// 			return true;
-	// 	}
-	// }
-
 	/* ======================== Private methods ======================== */
 	/**
 	 * Decide the next state to transition to. This is a function of the inputs
@@ -350,7 +326,7 @@ public class ElevatorArmFSM {
 	}
 
 	/**
-	 * This method is for depositing high in game.
+	 * This method is for depositing mid in game.
 	 *
 	 * @return completion of the deposit
 	 */
