@@ -28,7 +28,6 @@ import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
 
-
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
