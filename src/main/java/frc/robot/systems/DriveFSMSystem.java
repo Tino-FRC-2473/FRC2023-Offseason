@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -183,6 +184,9 @@ public class DriveFSMSystem {
 				frontRight.getPosition(),
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
+
+		SmartDashboard.putNumber("X Pos", getPose().getX());
+		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {

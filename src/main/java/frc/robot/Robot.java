@@ -19,7 +19,6 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private RaspberryPI rpi;
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
@@ -34,7 +33,6 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		rpi = new RaspberryPI();
 		wristSystem = new ElevatorWristFSM();
 		everybotIntake = new EveryBotIntakeFSM();
 		elevatorArm = new ElevatorArmFSM();
@@ -52,8 +50,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		everybotIntake.update(null);
-		driveFSMSystem.update(null);
+		driveFSMSystem.auto1(null);
 	}
 
 	@Override
@@ -61,12 +58,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		everybotIntake.reset();
 		driveFSMSystem.reset();
+		elevatorArm.reset();
+		wristSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		everybotIntake.update(input);
 		driveFSMSystem.update(input);
+		elevatorArm.update(input);
+		wristSystem.update(input);
 	}
 
 	@Override

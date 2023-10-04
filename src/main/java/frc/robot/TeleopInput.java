@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int LEFT_JOYSTICK_PORT = 1;
+	private static final int RIGHT_JOYSTICK_PORT = 2;
 	private static final int ELEVATOR_HIGH_BUTTON = 7;
 	private static final int ELEVATOR_MID_BUTTON = 9;
 	private static final int ELEVATOR_LOW_BUTTON = 11;

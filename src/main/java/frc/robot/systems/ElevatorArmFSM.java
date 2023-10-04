@@ -24,19 +24,19 @@ public class ElevatorArmFSM {
 		ZEROING
 	}
 
-	private static final float UP_POWER = 0.1f;
-	private static final float DOWN_POWER = -0.1f;
-	private static final float ZEROING_POWER = -0.1f;
-	private static final double PID_CONSTANT_ARM_P = 0.005;
+	private static final float ZEROING_POWER = 0.2f;
+	private static final double PID_CONSTANT_ARM_P = 0.01;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
-	private static final float MAX_UP_POWER = 0.2f;
-	private static final float MAX_DOWN_POWER = -0.2f;
-	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.05f;
+	private static final float MAX_UP_POWER = 0.4f;
+	private static final float MAX_DOWN_POWER = -0.35f;
+	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
-	private static final float LOW_ENCODER_ROTATIONS = -5;
-	private static final float MID_ENCODER_ROTATIONS = 50;
-	private static final float HIGH_ENCODER_ROTATIONS = 100;
+	private static final float LOW_ENCODER_ROTATIONS = -145;
+	private static final float MID_ENCODER_ROTATIONS = 15;
+	private static final float HIGH_ENCODER_ROTATIONS = 160;
+	private static final float JOYSTICK_CONSTANT = 3;
+	private static final float STARTING_ER = -135;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -47,8 +47,9 @@ public class ElevatorArmFSM {
 	private SparkMaxPIDController pidControllerArm;
 	private SparkMaxLimitSwitch limitSwitchLow;
 	private double currentEncoder;
-	private boolean zeroed = true;
-	private int three;
+	private boolean zeroed = false;
+	private boolean lastPressed = false;
+
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -59,17 +60,18 @@ public class ElevatorArmFSM {
 	public ElevatorArmFSM() {
 		// Perform hardware init
 		armMotor = new CANSparkMax(HardwareMap.CAN_ID_ARM,
-										CANSparkMax.MotorType.kBrushless);
+				CANSparkMax.MotorType.kBrushless);
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
-		limitSwitchLow.enableLimitSwitch(true);
+		limitSwitchLow.enableLimitSwitch(false);
+		armMotor.setInverted(true);
 		pidControllerArm = armMotor.getPIDController();
 		pidControllerArm.setP(PID_CONSTANT_ARM_P);
 		pidControllerArm.setI(PID_CONSTANT_ARM_I);
 		pidControllerArm.setD(PID_CONSTANT_ARM_D);
 		pidControllerArm.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
-		three = (2 + 1);
-
+		armMotor.getEncoder().setPosition(STARTING_ER);
+		currentEncoder = STARTING_ER;
 		// Reset state machine
 		reset();
 	}
@@ -90,6 +92,7 @@ public class ElevatorArmFSM {
 	public double getEncoderCount() {
 		return armMotor.getEncoder().getPosition();
 	}
+
 	/**
 	 * Reset this system to its start state. This may be called from mode init
 	 * when the robot is enabled.
@@ -100,8 +103,6 @@ public class ElevatorArmFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE;
-		armMotor.getEncoder().setPosition(0);
-		currentEncoder = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -118,10 +119,15 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
-		if (limitSwitchLow.isPressed()) {
-			armMotor.getEncoder().setPosition(0);
-			currentEncoder = 0;
-		}
+		System.out.println(armMotor.getAppliedOutput());
+		System.out.println(currentState);
+		SmartDashboard.putString("Elevator Current State", currentState.toString());
+		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
+		SmartDashboard.putBoolean("Is Limit Switch Pressed", limitSwitchLow.isPressed());
+		SmartDashboard.putBoolean("Last Pressed", lastPressed);
+		SmartDashboard.putBoolean("Is Zero button pressed", input.isArmZeroButtonPressed());
+
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -144,34 +150,9 @@ public class ElevatorArmFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
-		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
+		lastPressed = limitSwitchLow.isPressed();
+
 		currentState = nextState(input);
-	}
-
-	/**
-	 * Autonomous update.
-	 * @param autonState current autonomous state
-	 * @return status update
-	 */
-	public boolean autonomousUpdate(FSMState autonState) {
-		if (limitSwitchLow.isPressed()) {
-			armMotor.getEncoder().setPosition(0);
-		}
-
-		switch (autonState) {
-			case IDLE:
-				return handleAutonIdleState();
-			case HIGH:
-				return handleAutonHighState();
-			case MIDDLE:
-				return handleAutonMiddleState();
-			case LOW:
-				return handleAutonLowState();
-			default:
-				return true;
-		}
 	}
 
 	/* ======================== Private methods ======================== */
@@ -229,8 +210,10 @@ public class ElevatorArmFSM {
 				}
 			case ZEROING:
 				if (!input.isArmZeroButtonPressed()) {
+					System.out.println("Leaving zero state");
 					return FSMState.IDLE;
 				} else {
+					System.out.println("Staying in zero state");
 					return FSMState.ZEROING;
 				}
 			default:
@@ -241,52 +224,111 @@ public class ElevatorArmFSM {
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
 	 * Handle behavior in START_STATE.
+	 *
 	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 *              the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
+		pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
+
 	private void handleHighState(TeleopInput input) {
-		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS));
 	}
+
 	private void handleMiddleState(TeleopInput input) {
-		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 	}
+
 	private void handleLowState(TeleopInput input) {
-		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 	}
+
 	private void handleMovingState(TeleopInput input) {
-		pidControllerArm.setReference(-input.getLeftJoystickY() / three,
-			CANSparkMax.ControlType.kDutyCycle);
+		if (!zeroed) {
+			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+				CANSparkMax.ControlType.kDutyCycle);
+			return;
+		}
+		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
+				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
+			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+
+		} else if (armMotor.getEncoder().getPosition() < LOW_ENCODER_ROTATIONS) {
+
+			if (-input.getLeftJoystickY() > 0) {
+				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+			}
+
+		} else {
+			if (-input.getLeftJoystickY() < 0) {
+				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
+						CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+			}
+		}
 	}
+
 	private void handleZeroingState(TeleopInput input) {
-		pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+
+
+		if (zeroed) {
+			armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
+		} else {
+			if (limitSwitchLow.isPressed() && lastPressed) {
+				pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+			} else if (!limitSwitchLow.isPressed() && !lastPressed) {
+				pidControllerArm.setReference(-ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
+			} else {
+				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+				armMotor.getEncoder().setPosition(0);
+				currentEncoder = 0;
+				zeroed = true;
+			}
+		}
 	}
 
-
-	private boolean handleAutonIdleState() {
-		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
-		return true;
-	}
-
-	private boolean handleAutonHighState() {
-		pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+	/**
+	 * This method is for depositing high in game.
+	 *
+	 * @return completion of the deposit
+	 */
+	public boolean handleAutonHighState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS);
 	}
 
-	private boolean handleAutonMiddleState() {
-		pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+	/**
+	 * This method is for depositing mid in game.
+	 *
+	 * @return completion of the deposit
+	 */
+	public boolean handleAutonMiddleState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
 
-	private boolean handleAutonLowState() {
-		pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
+	/**
+	 * This method is for depositing low in game.
+	 *
+	 * @return completion of the deposit
+	 */
+	public boolean handleAutonLowState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
 
-
 	private boolean inRange(double a, double b) {
 		return Math.abs(a - b) <= 1.0 / 2;
+	}
+
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_ARM_P * (targetEncoder - currentEncoderPID);
+		return Math.min(MAX_UP_POWER, Math.max(MAX_DOWN_POWER, correction));
 	}
 }
