@@ -95,6 +95,8 @@ public class EveryBotIntakeFSM {
 		pidControllerFlip.setI(PID_CONSTANT_ARM_I);
 		pidControllerFlip.setD(PID_CONSTANT_ARM_D);
 		pidControllerFlip.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);
+		flipMotor.getEncoder().setPosition(0);
+
 		//pidControllerFlip.setOutputRange(0, 0);
 		// Reset state machine
 		reset();
@@ -120,7 +122,6 @@ public class EveryBotIntakeFSM {
 		currentState = EveryBotIntakeFSMState.IDLE_STOP;
 		hasTimerStarted = false;
 		needsReset = true;
-		flipMotor.getEncoder().setPosition(0);
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
