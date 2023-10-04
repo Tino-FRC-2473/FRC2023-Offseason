@@ -32,8 +32,9 @@ public class ElevatorWristFSM {
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
 	private static final double ELEVATOR_COLLISION_ER = -0.5;
-	private static final double WRIST_UP_RPM = -7;
-	private static final double WRIST_DOWN_RPM = 7;
+
+	private static final float FALLING_RPM_BACKWARDS = 700;
+	private static final float FALLING_RPM_FORWARDS = -500;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -199,9 +200,14 @@ public class ElevatorWristFSM {
 			//	&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
+			//wristMotor.set(pidVelocity(wristMotor.getEncoder().getVelocity(), WRIST_DOWN_RPM))
+			// //}
+			// if (wristMotor.getEncoder().getVelocity() >= FALLING_RPM_BACKWARDS) {
+			// 	pidControllerWrist.setReference(-0.05 * wristMotor.getEncoder().getVelocity()
+			// 	/ Math.abs(wristMotor.getEncoder().getVelocity()), CANSparkMax.ControlType.kDutyCycle);
+			// } else {
 			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
-			//wristMotor.set(pid_velocity(wristMotor.getEncoder().getVelocity(), WRIST_DOWN_RPM))
-			//}
+			// }
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
@@ -214,9 +220,16 @@ public class ElevatorWristFSM {
 			//		&& wristMotor.getEncoder().getPosition() < PEAK_ENCODER_LOWER) {
 			//	pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 			//} else {
-			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
-			//wristMotor.set(pid_velocity(wristMotor.getEncoder().getVelocity(), WRIST_UP_RPM))
+			//wristMotor.set(pidVelocity(wristMotor.getEncoder().getVelocity(), WRIST_UP_RPM))
 			//}
+			// if (wristMotor.getEncoder().getVelocity() <= FALLING_RPM_FORWARDS) {
+			// 	pidControllerWrist.setReference(-0.05 * wristMotor.getEncoder().getVelocity()
+			// 	/ Math.abs(wristMotor.getEncoder().getVelocity()), CANSparkMax.ControlType.kDutyCycle);
+			// } else {
+			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
+
+			// }
+
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}

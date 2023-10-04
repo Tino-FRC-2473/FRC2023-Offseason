@@ -46,7 +46,7 @@ public class EveryBotIntakeFSM {
 	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_CW_THRESHOLD = -14.0; //16
+	private static final double FLIP_CW_THRESHOLD = -14.5; //16
 	private static final double FLIP_CCW_THRESHOLD = 0.0;
 	private static final double PID_CONSTANT_ARM_P = 0.075; //0.075
 	private static final double PID_CONSTANT_ARM_I = 0.0000000;

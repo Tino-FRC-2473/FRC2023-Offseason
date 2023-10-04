@@ -263,7 +263,6 @@ public class ElevatorArmFSM {
 		}
 		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
 				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
-
 			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
 
