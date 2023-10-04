@@ -37,7 +37,6 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 160;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
-	private static final float BASE_ER = -20; //SUBJECT TO CHANGE AFTER TESTING
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -230,33 +229,23 @@ public class ElevatorArmFSM {
 	 *              the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		// pidControllerArm.setReference(currentEncoder,
-		// CANSparkMax.ControlType.kPosition);
 		pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
 
 	private void handleHighState(TeleopInput input) {
-		//pidControllerArm.setReference(HIGH_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), HIGH_ENCODER_ROTATIONS));
-		System.out.println("In high state");
 	}
 
 	private void handleMiddleState(TeleopInput input) {
-		//pidControllerArm.setReference(MID_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
-		System.out.println("In mid state");
 	}
 
 	private void handleLowState(TeleopInput input) {
-		//pidControllerArm.setReference(LOW_ENCODER_ROTATIONS, CANSparkMax.ControlType.kPosition);
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
-		System.out.println("In low state");
 	}
 
 	private void handleMovingState(TeleopInput input) {
-		System.out.println("Zeroed: " + zeroed);
 		if (!zeroed) {
-			System.out.println("here");
 			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 				CANSparkMax.ControlType.kDutyCycle);
 			return;
@@ -269,7 +258,6 @@ public class ElevatorArmFSM {
 		} else if (armMotor.getEncoder().getPosition() < LOW_ENCODER_ROTATIONS) {
 
 			if (-input.getLeftJoystickY() > 0) {
-				System.out.println("OVER ");
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
 			} else {
@@ -278,7 +266,6 @@ public class ElevatorArmFSM {
 
 		} else {
 			if (-input.getLeftJoystickY() < 0) {
-				System.out.println("UNDER ");
 				pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
 						CANSparkMax.ControlType.kDutyCycle);
 			} else {
@@ -295,23 +282,15 @@ public class ElevatorArmFSM {
 		} else {
 			if (limitSwitchLow.isPressed() && lastPressed) {
 				pidControllerArm.setReference(ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
-				System.out.println("going up to zero");
 			} else if (!limitSwitchLow.isPressed() && !lastPressed) {
 				pidControllerArm.setReference(-ZEROING_POWER, CANSparkMax.ControlType.kDutyCycle);
-				System.out.println("going down to zero");
 			} else {
 				pidControllerArm.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 				armMotor.getEncoder().setPosition(0);
 				currentEncoder = 0;
 				zeroed = true;
-				System.out.println("has zeroed");
 			}
 		}
-	}
-
-	private boolean handleAutonIdleState() {
-		pidControllerArm.setReference(currentEncoder, CANSparkMax.ControlType.kPosition);
-		return true;
 	}
 
 	/**
@@ -349,14 +328,7 @@ public class ElevatorArmFSM {
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
-		double error = targetEncoder - currentEncoderPID;
-		//double errorChange = error - lastError;
-		double correction = PID_CONSTANT_ARM_P * error;
-						//+ PID_CONSTANT_ARM_I * errorSum + PID_CONSTANT_ARM_D * errorChange;
-		//errorSum += error;
-
-
-
+		double correction = PID_CONSTANT_ARM_P * (targetEncoder - currentEncoderPID);
 		return Math.min(MAX_UP_POWER, Math.max(MAX_DOWN_POWER, correction));
 	}
 }

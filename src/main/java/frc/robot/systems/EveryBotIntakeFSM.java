@@ -62,9 +62,6 @@ public class EveryBotIntakeFSM {
 	private boolean forward = true;
 	private boolean prevOuttaking = false;
 	private double[] currLogs = new double[AVERAGE_SIZE];
-	//diy pid
-	private double lastError = 0;
-	private double errorSum = 0;
 
 
 	/* ======================== Private variables ======================== */
@@ -75,7 +72,7 @@ public class EveryBotIntakeFSM {
 	private CANSparkMax flipMotor;
 	private SparkMaxPIDController pidControllerFlip;
 	private Timer timer;
-	//private ElevatorArmFSM arm;
+	private double currentEncoder = 0;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -96,7 +93,7 @@ public class EveryBotIntakeFSM {
 		pidControllerFlip.setD(PID_CONSTANT_ARM_D);
 		pidControllerFlip.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);
 		flipMotor.getEncoder().setPosition(0);
-
+		currentEncoder = 0;
 		//pidControllerFlip.setOutputRange(0, 0);
 		// Reset state machine
 		reset();
@@ -142,6 +139,10 @@ public class EveryBotIntakeFSM {
 			toggleUpdate = !toggleUpdate;
 			SmartDashboard.putBoolean("Is update enabled", toggleUpdate);
 		}*/
+		if (currentState == EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE
+			|| currentState == EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE) {
+			currentEncoder = flipMotor.getEncoder().getPosition();
+		}
 		if (input.isThrottleForward()) {
 			itemType = ItemType.CUBE;
 		} else {
@@ -354,7 +355,7 @@ public class EveryBotIntakeFSM {
 		spinnerMotor.set(KEEP_SPEED);
 		flipMotor.set(0);
 		//flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
-
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 		if (holding) {
 			spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));
 		}
@@ -389,16 +390,8 @@ public class EveryBotIntakeFSM {
 		holding = false;
 	}
 
-	private double pid(double currentEncoder, double targetEncoder) {
-		double error = targetEncoder - currentEncoder;
-		//double errorChange = error - lastError;
-		double correction = PID_CONSTANT_ARM_P * error;
-						//+ PID_CONSTANT_ARM_I * errorSum + PID_CONSTANT_ARM_D * errorChange;
-		lastError = error;
-		//errorSum += error;
-
-
-
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_ARM_P * (targetEncoder - currentEncoder);
 		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 }
