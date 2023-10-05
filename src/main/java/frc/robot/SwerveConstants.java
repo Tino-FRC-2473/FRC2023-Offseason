@@ -61,7 +61,6 @@ public final class SwerveConstants {
 		public static final double ANGLE_MULTIPLIER_1 = 0.45;
 		public static final double ANGLE_MULTIPLIER_2 = 0.85;
 		public static final double BALANCE_SPEED_INVERSE_PROPORTION = 120;
-		public static final double TELEOP_JOYSTICK_POWER_CURVE = 3;
 	}
 
 	public static final class ModuleConstants {
