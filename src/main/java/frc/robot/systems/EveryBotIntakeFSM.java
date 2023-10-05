@@ -153,6 +153,7 @@ public class EveryBotIntakeFSM {
 			SmartDashboard.putNumber("Flip Motor output", flipMotor.getAppliedOutput());
 			SmartDashboard.putString("spinning intake state", currentState.toString());
 			SmartDashboard.putNumber("flip encoder", flipMotor.getEncoder().getPosition());
+			SmartDashboard.putNumber("flip idle encoder", currentEncoder);
 			SmartDashboard.putString("item type", itemType.toString());
 			SmartDashboard.putNumber("spinner power", spinnerMotor.get());
 			SmartDashboard.putBoolean("holding", holding);
@@ -290,7 +291,6 @@ public class EveryBotIntakeFSM {
 				return EveryBotIntakeFSMState.INTAKING;
 			case IDLE_STOP:
 				if (input.isOuttakeButtonPressed()) {
-					// && flipMotor.getEncoder().getPosition() > FLIP_THRESHOLD) {
 					return EveryBotIntakeFSMState.OUTTAKING;
 				} else if (input.isIntakeButtonPressed()) {
 					if (holding) {
@@ -349,11 +349,11 @@ public class EveryBotIntakeFSM {
 		} else {
 			spinnerMotor.set(-INTAKE_SPEED);
 		}
-		flipMotor.set(0);
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 	}
 	private void handleIdleStopState(TeleopInput input) {
 		spinnerMotor.set(KEEP_SPEED);
-		flipMotor.set(0);
+		//flipMotor.set(0);
 		//flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 		if (holding) {
@@ -388,6 +388,7 @@ public class EveryBotIntakeFSM {
 		itemType = ItemType.EMPTY;
 		isMotorAllowed = true;
 		holding = false;
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {

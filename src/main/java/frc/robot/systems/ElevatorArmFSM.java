@@ -32,9 +32,9 @@ public class ElevatorArmFSM {
 	private static final float MAX_DOWN_POWER = -0.35f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
-	private static final float LOW_ENCODER_ROTATIONS = -145;
+	private static final float LOW_ENCODER_ROTATIONS = -148;
 	private static final float MID_ENCODER_ROTATIONS = 15;
-	private static final float HIGH_ENCODER_ROTATIONS = 160;
+	private static final float HIGH_ENCODER_ROTATIONS = 90;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 
@@ -127,7 +127,6 @@ public class ElevatorArmFSM {
 		SmartDashboard.putBoolean("Is Limit Switch Pressed", limitSwitchLow.isPressed());
 		SmartDashboard.putBoolean("Last Pressed", lastPressed);
 		SmartDashboard.putBoolean("Is Zero button pressed", input.isArmZeroButtonPressed());
-
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -245,11 +244,6 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleMovingState(TeleopInput input) {
-		if (!zeroed) {
-			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
-				CANSparkMax.ControlType.kDutyCycle);
-			return;
-		}
 		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
 				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
 			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
