@@ -191,9 +191,11 @@ public class DriveFSMSystem {
 			case TELEOP_STATE:
 				if (input != null) {
 					drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-						* Math.abs(input.getControllerLeftJoystickY())), OIConstants.DRIVE_DEADBAND),
+						* Math.abs(input.getControllerLeftJoystickY())),
+						OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-						* Math.abs(input.getControllerLeftJoystickX())), OIConstants.DRIVE_DEADBAND),
+						* Math.abs(input.getControllerLeftJoystickX())),
+						OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
 						OIConstants.DRIVE_DEADBAND), true, true);
 					if (input.isBackButtonPressed()) {
