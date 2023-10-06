@@ -50,7 +50,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		driveFSMSystem.auto1(null);
+		//driveFSMSystem.auto1(null);
+		// if (elevatorArm.handleAutonMiddleState()) {
+
+		// }
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 
 /**
  * Common class for providing driver inputs during Teleop.
@@ -33,7 +33,7 @@ public class TeleopInput {
 	// Input objects
 	private Joystick leftJoystick;
 	private Joystick rightJoystick;
-	private XboxController driverController;
+	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -44,7 +44,7 @@ public class TeleopInput {
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
-		driverController = new XboxController(DRIVER_CONTROLLER_PORT);
+		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
 
 	}
 
@@ -87,7 +87,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isBackButtonPressed() {
-		return driverController.getBackButtonPressed();
+		return driverController.getShareButton();
 	}
 
 	/* ------------------------ Left Joystick ------------------------ */
