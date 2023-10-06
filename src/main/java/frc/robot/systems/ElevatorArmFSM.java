@@ -34,7 +34,7 @@ public class ElevatorArmFSM {
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -148;
 	private static final float MID_ENCODER_ROTATIONS = 15;
-	private static final float HIGH_ENCODER_ROTATIONS = 130;
+	private static final float HIGH_ENCODER_ROTATIONS = 110;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 
@@ -119,8 +119,6 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
-		System.out.println(armMotor.getAppliedOutput());
-		System.out.println(currentState);
 		SmartDashboard.putString("Elevator Current State", currentState.toString());
 		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());

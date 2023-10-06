@@ -11,7 +11,7 @@
 //  * polling input values. Systems may query TeleopInput via its getter methods
 //  * for inputs by value, but may not access the internal input objects.
 //  */
-// public class TeleopInput {
+// public class TeleopInputPS4 {
 // 	/* ======================== Constants ======================== */
 // 	private static final int LEFT_JOYSTICK_PORT = 1;
 // 	private static final int RIGHT_JOYSTICK_PORT = 2;
@@ -41,7 +41,7 @@
 // 	 * are registered at robot initialization, valid values will not be provided
 // 	 * by WPILib until teleop mode.
 // 	 */
-// 	public TeleopInput() {
+// 	public TeleopInputPS4() {
 // 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
 // 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
 // 		driverController = new XboxController(DRIVER_CONTROLLER_PORT);

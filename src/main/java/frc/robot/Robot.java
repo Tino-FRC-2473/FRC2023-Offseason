@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
@@ -26,6 +27,7 @@ public class Robot extends TimedRobot {
 
 	private boolean autoWristMoved;
 	private boolean autoElevatorMoved;
+	private boolean autoIntakeMoved;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -52,11 +54,12 @@ public class Robot extends TimedRobot {
 
 		autoWristMoved = false;
 		autoElevatorMoved = false;
+		autoIntakeMoved = false;
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		driveFSMSystem.auto1(null);
+		driveFSMSystem.update(null);
 		// if (wristSystem.movingAutoState()) {
 		// 	autoWristMoved = true;
 		// }
@@ -66,8 +69,12 @@ public class Robot extends TimedRobot {
 		// }
 
 		// if (autoElevatorMoved && everybotIntake.handleAutoOuttakingState()) {
-			
+		//	autoIntakeMoved = true;
+		//  driveFSMSystem.auto1(null);
 		// }
+		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
+		SmartDashboard.putBoolean("Elevator auto moved", autoElevatorMoved);
+		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
 	}
 
 	@Override

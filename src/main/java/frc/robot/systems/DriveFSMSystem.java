@@ -347,6 +347,7 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void auto1(TeleopInput input) {
+		System.out.println("here");
 		if (input != null) {
 			return;
 		}
