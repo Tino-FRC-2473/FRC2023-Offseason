@@ -64,6 +64,9 @@ public class EveryBotIntakeFSM {
 	private double[] currLogs = new double[AVERAGE_SIZE];
 
 
+	private double autoOuttakingTimeStart;
+	private boolean autoOuttakingTimerStarted;
+
 	/* ======================== Private variables ======================== */
 	private EveryBotIntakeFSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -97,6 +100,8 @@ public class EveryBotIntakeFSM {
 		//pidControllerFlip.setOutputRange(0, 0);
 		// Reset state machine
 		reset();
+
+		autoOuttakingTimerStarted = false;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -391,8 +396,40 @@ public class EveryBotIntakeFSM {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 	}
 
+	public boolean handleAutoOuttakingState() {
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_CW_THRESHOLD));
+
+		if (inRange(flipMotor.getEncoder().getPosition(), FLIP_CW_THRESHOLD)) {
+			if (!autoOuttakingTimerStarted) {
+				autoOuttakingTimerStarted = true;
+				autoOuttakingTimeStart = timer.get();
+			}
+
+
+			if (autoOuttakingTimerStarted && !timer.hasElapsed(autoOuttakingTimeStart + 2.0)) {
+				spinnerMotor.set(RELEASE_SPEED);
+			} else {
+				spinnerMotor.set(0);
+				return true;
+			}
+
+			itemType = ItemType.EMPTY;
+			isMotorAllowed = true;
+			holding = false;
+
+			return false;
+		}
+
+		return false;
+		
+	}
+
 	private double pid(double currentEncoderPID, double targetEncoder) {
 		double correction = PID_CONSTANT_ARM_P * (targetEncoder - currentEncoder);
 		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
+	}
+
+	private boolean inRange(double a, double b) {
+		return Math.abs(a - b) <= 1.0;
 	}
 }

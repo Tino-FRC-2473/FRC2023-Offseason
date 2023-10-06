@@ -30,6 +30,7 @@ public class ElevatorWristFSM {
 	private static final float MAX_DOWN_POWER = 0.1f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
+	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -10;
 	private static final double IN_RPM = 300;
 	private static final double OUT_RPM = -300;
 	/* ======================== Private variables ======================== */
@@ -222,12 +223,17 @@ public class ElevatorWristFSM {
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS);
 	}
 
+	public boolean movingAutoState() {
+		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS));
+		return inRange(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
+	}
+
 	private double pid(double currentEncoderPID, double targetEncoder) {
 		double correction = PID_CONSTANT_WRIST_P * (targetEncoder - currentEncoderPID);
 		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
 	}
 
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 1.0 / 2;
+		return Math.abs(a - b) <= 1.0;
 	}
 }

@@ -28,13 +28,13 @@ public class ElevatorArmFSM {
 	private static final double PID_CONSTANT_ARM_P = 0.01;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
-	private static final float MAX_UP_POWER = 0.4f;
-	private static final float MAX_DOWN_POWER = -0.35f;
+	private static final float MAX_UP_POWER = 0.55f;
+	private static final float MAX_DOWN_POWER = -0.5f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -148;
 	private static final float MID_ENCODER_ROTATIONS = 15;
-	private static final float HIGH_ENCODER_ROTATIONS = 90;
+	private static final float HIGH_ENCODER_ROTATIONS = 130;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 
@@ -318,7 +318,7 @@ public class ElevatorArmFSM {
 	}
 
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 1.0 / 2;
+		return Math.abs(a - b) <= 1.0;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
