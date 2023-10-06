@@ -347,13 +347,12 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void auto1(TeleopInput input) {
-		System.out.println("here");
 		if (input != null) {
 			return;
 		}
 		System.out.println(getPose());
 		double power;
-		if (getPose().getX() > -1) {
+		if (getPose().getX() > -AutoConstants.AUTO_MOBILITY_DIST) {
 			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else {
 			power = 0;
