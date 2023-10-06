@@ -31,8 +31,6 @@ public class ElevatorWristFSM {
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
 	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -10;
-	private static final double IN_RPM = 300;
-	private static final double OUT_RPM = -300;
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -192,7 +190,6 @@ public class ElevatorWristFSM {
 		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
 			&& input.isWristInButtonPressed()) {
 			pidControllerWrist.setReference(MAX_DOWN_POWER, CANSparkMax.ControlType.kDutyCycle);
-			//pidControllerWrist.setReference(IN_RPM, CANSparkMax.ControlType.kVelocity);
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
@@ -202,7 +199,6 @@ public class ElevatorWristFSM {
 		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
 			&& input.isWristOutButtonPressed()) {
 			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
-			//pidControllerWrist.setReference(OUT_RPM, CANSparkMax.ControlType.kVelocity);
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
@@ -215,6 +211,7 @@ public class ElevatorWristFSM {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS));
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS);
 	}
+
 	/** This method is for intake in game and flipping.
 	 * @return if moving in state is finished
  	*/
@@ -223,6 +220,10 @@ public class ElevatorWristFSM {
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Moves the wrist to the correct encoder position for auto.
+	 * @return whether the wrist finished moving in auto
+	 */
 	public boolean movingAutoState() {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS));
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);

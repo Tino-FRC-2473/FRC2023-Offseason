@@ -63,7 +63,6 @@ public class Robot extends TimedRobot {
 		// if (wristSystem.movingAutoState()) {
 		// 	autoWristMoved = true;
 		// }
-		
 		// if (autoWristMoved && elevatorArm.handleAutonMiddleState()) {
 		// 	autoElevatorMoved = true;
 		// }
