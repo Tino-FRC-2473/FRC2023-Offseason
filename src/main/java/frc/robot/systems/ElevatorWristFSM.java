@@ -163,8 +163,7 @@ public class ElevatorWristFSM {
 				//stay in idle state
 				return FSMState.IDLE;
 			case MOVING_OUT:
-				if (!input.isWristOutButtonPressed()
-					|| wristMotor.getEncoder().getPosition() > OUTER_LIMIT_ENCODER) {
+				if (!input.isWristOutButtonPressed()) {
 					//go to idle state
 					return FSMState.IDLE;
 				}
@@ -227,7 +226,7 @@ public class ElevatorWristFSM {
 
 	private void handleMovingInDoubleState(TeleopInput input) {
 		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
-			&& input.isWristInButtonPressed()) {
+			&& input.isWristInDoubleButtonPressed()) {
 			pidControllerWrist.setReference(MAX_DOWN_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
@@ -236,8 +235,8 @@ public class ElevatorWristFSM {
 
 	private void handleMovingOutDoubleState(TeleopInput input) {
 		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
-			&& input.isWristOutButtonPressed()) {
-				pidControllerWrist.setReference(MAX_UP_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
+			&& input.isWristOutDoubleButtonPressed()) {
+			pidControllerWrist.setReference(MAX_UP_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 		}
