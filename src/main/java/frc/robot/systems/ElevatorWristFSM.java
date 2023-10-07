@@ -8,6 +8,10 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -40,6 +44,9 @@ public class ElevatorWristFSM {
 	private CANSparkMax wristMotor;
 	private SparkMaxPIDController pidControllerWrist;
 	private double currentEncoder = 0;
+	private CameraServer cam;
+	private CvSink cvSink;
+	private CvSource outputStrem;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -58,6 +65,14 @@ public class ElevatorWristFSM {
 		pidControllerWrist.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
 		wristMotor.getEncoder().setPosition(0);
 		currentEncoder = 0;
+
+		UsbCamera usb = CameraServer.startAutomaticCapture();
+		usb.setResolution(1920, 1080);
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("Intake view camera",
+		1920, 1080);
 		// Reset state machine
 		reset();
 	}
