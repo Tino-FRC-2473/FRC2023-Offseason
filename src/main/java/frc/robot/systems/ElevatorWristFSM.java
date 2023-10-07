@@ -28,7 +28,7 @@ public class ElevatorWristFSM {
 		FREE_MOVING,
 		IDLE,
 	}
-	private static final double PID_CONSTANT_WRIST_P = 0.005;
+	private static final double PID_CONSTANT_WRIST_P = 0.04;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
@@ -36,7 +36,7 @@ public class ElevatorWristFSM {
 	private static final float MAX_DOWN_POWER = 0.15f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
-	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -5;
+	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -8;
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -277,8 +277,11 @@ public class ElevatorWristFSM {
 	 * @return whether the wrist finished moving in auto
 	 */
 	public boolean movingAutoState() {
-		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS));
-		System.out.println(wristMotor.getEncoder().getPosition());
+		double power = pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
+		wristMotor.set(power);
+		SmartDashboard.putNumber("wrist encoder auto", wristMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("wrist applied power auto", wristMotor.getAppliedOutput());
+		SmartDashboard.putNumber("wrist pid power auto", power);
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
 	}
 

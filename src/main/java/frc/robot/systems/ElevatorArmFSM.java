@@ -37,6 +37,7 @@ public class ElevatorArmFSM {
 	private static final float HIGH_ENCODER_ROTATIONS = 110;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
+	private static final float AUTO_ENCODER = 30;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -304,7 +305,6 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
-
 	/**
 	 * This method is for depositing low in game.
 	 *
@@ -314,9 +314,16 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
-
+	public boolean handleAutonExtendState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), AUTO_ENCODER));
+		return inRange(armMotor.getEncoder().getPosition(), AUTO_ENCODER);
+	}
+	public boolean handleAutonRetractState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
+		return inRange(armMotor.getEncoder().getPosition(), STARTING_ER);
+	}
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 1.0;
+		return Math.abs(a - b) <= 3.0;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
