@@ -20,11 +20,13 @@ public class TeleopInput {
 	private static final int ELEVATOR_LOW_BUTTON = 11;
 	private static final int WRIST_IN_BUTTON = 6;
 	private static final int WRIST_OUT_BUTTON = 4;
-	private static final int ABORT_FLIP_BUTTON = 5;
+	private static final int WRIST_IN_BUTTON_DOUBLE = 5;
+	private static final int WRIST_OUT_BUTTON_DOUBLE = 3;
+	private static final int ABORT_FLIP_BUTTON = 12;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int FLIP_BUTTON = 10;
 	private static final int ARM_ZERO_BUTTON = 8;
-	private static final int WRIST_ZERO_BUTTON = 12;
+	//private static final int WRIST_ZERO_BUTTON = -1;
 
 	public static final int DRIVER_CONTROLLER_PORT = 0;
 
@@ -185,6 +187,22 @@ public class TeleopInput {
 		return leftJoystick.getRawButton(WRIST_IN_BUTTON);
 	}
 
+		/**
+	 * Get the value of the wrist down button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristOutDoubleButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_OUT_BUTTON_DOUBLE);
+	}
+
+	/**
+	 * Get the value of the wrist up button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristInDoubleButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_IN_BUTTON_DOUBLE);
+	}
+
 	/**
 	 * Get the value of the flip abort button.
 	 * @return True if button is pressed
@@ -213,9 +231,9 @@ public class TeleopInput {
 	 * Get the value of the wrist zero button.
 	 * @return True if button is pressed
 	 */
-	public boolean isWristZeroButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_ZERO_BUTTON);
-	}
+	// public boolean isWristZeroButtonPressed() {
+	// 	return leftJoystick.getRawButton(WRIST_ZERO_BUTTON);
+	// }
 
 	/**
 	 * Get the value of the throttle.

@@ -59,7 +59,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		driveFSMSystem.update(null);
+		//wristSystem.movingAutoState();
+		driveFSMSystem.update(
+			null);
+
 		// if (wristSystem.movingAutoState()) {
 		// 	autoWristMoved = true;
 		// }

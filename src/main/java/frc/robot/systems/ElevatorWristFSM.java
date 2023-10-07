@@ -19,6 +19,8 @@ public class ElevatorWristFSM {
 	private enum FSMState {
 		MOVING_IN,
 		MOVING_OUT,
+		MOVING_IN_DOUBLE,
+		MOVING_OUT_DOUBLE,
 		FREE_MOVING,
 		IDLE,
 	}
@@ -30,7 +32,7 @@ public class ElevatorWristFSM {
 	private static final float MAX_DOWN_POWER = 0.15f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
-	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -10;
+	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -5;
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -107,6 +109,12 @@ public class ElevatorWristFSM {
 			case MOVING_OUT:
 				handleMovingOutState(input);
 				break;
+			case MOVING_IN_DOUBLE:
+				handleMovingInDoubleState(input);
+				break;
+			case MOVING_OUT_DOUBLE:
+				handleMovingOutDoubleState(input);
+				break;
 			case IDLE:
 				handleIdleState(input);
 				break;
@@ -141,12 +149,16 @@ public class ElevatorWristFSM {
 		}
 		switch (currentState) {
 			case IDLE:
-				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()) {
+				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed() && !input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()) {
+				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && !input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
 					//go to moving in state
 					return FSMState.MOVING_IN;
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
+					return FSMState.MOVING_IN_DOUBLE;
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && !input.isWristInDoubleButtonPressed() && input.isWristOutDoubleButtonPressed()) {
+					return FSMState.MOVING_OUT_DOUBLE;
 				}
 				//stay in idle state
 				return FSMState.IDLE;
@@ -164,7 +176,16 @@ public class ElevatorWristFSM {
 				}
 				//stay in moving in state
 				return FSMState.MOVING_IN;
-
+			case MOVING_IN_DOUBLE:
+				if (!input.isWristInDoubleButtonPressed()) {
+					return FSMState.IDLE;
+				}
+				return FSMState.MOVING_IN_DOUBLE;
+			case MOVING_OUT_DOUBLE:
+				if (!input.isWristOutDoubleButtonPressed()) {
+					return FSMState.IDLE;
+				}
+				return FSMState.MOVING_OUT_DOUBLE;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -180,10 +201,10 @@ public class ElevatorWristFSM {
 	private void handleIdleState(TeleopInput input) {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
 		//Zeroes the encoder at a given configuration, mainly for testing
-		if (input.isWristZeroButtonPressed()) {
-			currentEncoder = 0;
-			wristMotor.getEncoder().setPosition(0);
-		}
+		// if (input.isWristZeroButtonPressed()) {
+		// 	currentEncoder = 0;
+		// 	wristMotor.getEncoder().setPosition(0);
+		// }
 	}
 
 	private void handleMovingInState(TeleopInput input) {
@@ -204,6 +225,23 @@ public class ElevatorWristFSM {
 		}
 	}
 
+	private void handleMovingInDoubleState(TeleopInput input) {
+		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
+			&& input.isWristInButtonPressed()) {
+			pidControllerWrist.setReference(MAX_DOWN_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
+	}
+
+	private void handleMovingOutDoubleState(TeleopInput input) {
+		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
+			&& input.isWristOutButtonPressed()) {
+				pidControllerWrist.setReference(MAX_UP_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
+	}
 	/** This method is for intake in game and flipping.
 	* @return completion of moving out
  	*/
