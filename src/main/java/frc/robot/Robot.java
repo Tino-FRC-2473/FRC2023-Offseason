@@ -6,6 +6,7 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
@@ -18,6 +19,8 @@ import frc.robot.systems.DriveFSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
+
+	Thread vThread;
 
 	// Systems
 	private ElevatorWristFSM wristSystem;
@@ -43,6 +46,7 @@ public class Robot extends TimedRobot {
 		elevatorArm = new ElevatorArmFSM();
 		driveFSMSystem = new DriveFSMSystem();
 	}
+	
 
 	@Override
 	public void autonomousInit() {
@@ -59,7 +63,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//wristSystem.movingAutoState();
+		wristSystem.movingAutoState();
 		driveFSMSystem.update(
 			null);
 

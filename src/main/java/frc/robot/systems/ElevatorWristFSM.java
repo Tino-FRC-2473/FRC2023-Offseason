@@ -278,6 +278,7 @@ public class ElevatorWristFSM {
 	 */
 	public boolean movingAutoState() {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS));
+		System.out.println(wristMotor.getEncoder().getPosition());
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
 	}
 
