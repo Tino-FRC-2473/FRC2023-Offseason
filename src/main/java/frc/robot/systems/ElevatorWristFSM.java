@@ -26,8 +26,8 @@ public class ElevatorWristFSM {
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
-	private static final float MAX_UP_POWER = -0.1f;
-	private static final float MAX_DOWN_POWER = 0.1f;
+	private static final float MAX_UP_POWER = -0.15f;
+	private static final float MAX_DOWN_POWER = 0.15f;
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
 	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -10;

@@ -125,8 +125,8 @@ public final class SwerveConstants {
 	}
 
 	public static final class AutoConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //3
-		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1; //3
+		public static final double MAX_SPEED_METERS_PER_SECOND = 2; //3
+		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2; //3
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 2; // pi
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2; // pi
 
@@ -134,7 +134,7 @@ public final class SwerveConstants {
 		public static final double PY_CONTROLLER = 1;
 		public static final double P_THETA_CONTROLLER = 1;
 
-		public static final double AUTO_MOBILITY_DIST = 1.7; //meters
+		public static final double AUTO_MOBILITY_DIST = 1.5; //meters
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS
