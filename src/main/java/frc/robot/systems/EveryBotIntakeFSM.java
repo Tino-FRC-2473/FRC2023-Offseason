@@ -46,7 +46,7 @@ public class EveryBotIntakeFSM {
 	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double FLIP_SPEED = 0.2;
 	private static final double OVERRUN_THRESHOLD = 0.01;
-	private static final double FLIP_CW_THRESHOLD = -16; //-14.5
+	private static final double FLIP_CW_THRESHOLD = -14.5;
 	private static final double FLIP_CCW_THRESHOLD = 0.0;
 	private static final double PID_CONSTANT_ARM_P = 0.075; //0.075
 	private static final double PID_CONSTANT_ARM_I = 0.0000000;
@@ -305,7 +305,7 @@ public class EveryBotIntakeFSM {
 					}
 				} else if (input.isFlipButtonPressed()) {
 					//&& arm.getEncoderCount() > BASE_THRESHOLD) {
-					if (flipMotor.getEncoder().getPosition() >= FLIP_CW_THRESHOLD) {
+					if (flipMotor.getEncoder().getPosition() >= (FLIP_CW_THRESHOLD + 1)) {
 						return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 					} else {
 						return EveryBotIntakeFSMState.IDLE_FLIPCOUNTERCLOCKWISE;
@@ -323,9 +323,9 @@ public class EveryBotIntakeFSM {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				}
 			case IDLE_FLIPCOUNTERCLOCKWISE:
-				if (flipMotor.getEncoder().getPosition() > -1
+				if (flipMotor.getEncoder().getPosition() > (FLIP_CCW_THRESHOLD - 1)
 					|| input.isFlipAbortButtonPressed()) {
-					return EveryBotIntakeFSMState.IDLE_STOP; 
+					return EveryBotIntakeFSMState.IDLE_STOP;
 				} else if (input.isFlipButtonPressed()) {
 					return EveryBotIntakeFSMState.IDLE_FLIPCLOCKWISE;
 				} else {
@@ -358,8 +358,6 @@ public class EveryBotIntakeFSM {
 	}
 	private void handleIdleStopState(TeleopInput input) {
 		spinnerMotor.set(KEEP_SPEED);
-		//flipMotor.set(0);
-		//flipMotor.set(pid(flipMotor.getEncoder().getPosition(), 0));
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 		if (holding) {
 			spinnerMotor.set(HOLDING_SPEED * ((input.isThrottleForward()) ? 1 : -1));
@@ -396,6 +394,10 @@ public class EveryBotIntakeFSM {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), currentEncoder));
 	}
 
+	/**
+	 * Runs the intake behavior for auto deposit.
+	 * @return whether the intake has finished running for auto
+	 */
 	public boolean handleAutoOuttakingState() {
 		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_CW_THRESHOLD));
 
@@ -421,7 +423,6 @@ public class EveryBotIntakeFSM {
 		}
 
 		return false;
-		
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
