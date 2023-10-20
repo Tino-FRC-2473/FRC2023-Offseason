@@ -34,8 +34,8 @@ public class ElevatorWristFSM {
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
 	private static final float MAX_UP_POWER = -0.15f;
 	private static final float MAX_DOWN_POWER = 0.15f;
-	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
-	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
+	private static final double WRIST_IN_ENCODER_ROTATIONS = 200;
+	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200;
 	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -8;
 	private static final int WEBCAM_WIDTH_PIXELS = 1920;
 	private static final int WEBCAM_HEIGHT_PIXELS = 1080;
