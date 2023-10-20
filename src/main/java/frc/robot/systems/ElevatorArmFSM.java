@@ -306,6 +306,7 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
+  
 	/**
 	 * This method is for depositing low in game.
 	 *
@@ -333,8 +334,14 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
 		return inRange(armMotor.getEncoder().getPosition(), STARTING_ER);
 	}
+
 	private boolean inRange(double a, double b) {
 		return Math.abs(a - b) <= AUTO_ENCODER_MARGIN;
+	}
+
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_ARM_P * (targetEncoder - currentEncoderPID);
+		return Math.min(MAX_UP_POWER, Math.max(MAX_DOWN_POWER, correction));
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {

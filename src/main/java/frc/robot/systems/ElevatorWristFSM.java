@@ -39,6 +39,7 @@ public class ElevatorWristFSM {
 	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -8;
 	private static final int WEBCAM_WIDTH_PIXELS = 1920;
 	private static final int WEBCAM_HEIGHT_PIXELS = 1080;
+
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -224,11 +225,6 @@ public class ElevatorWristFSM {
 
 	private void handleIdleState(TeleopInput input) {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
-		//Zeroes the encoder at a given configuration, mainly for testing
-		// if (input.isWristZeroButtonPressed()) {
-		// 	currentEncoder = 0;
-		// 	wristMotor.getEncoder().setPosition(0);
-		// }
 	}
 
 	private void handleMovingInState(TeleopInput input) {

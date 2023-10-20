@@ -80,7 +80,6 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
 		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
 		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
-
 	}
 
 	@Override
