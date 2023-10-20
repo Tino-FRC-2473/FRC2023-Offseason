@@ -18,9 +18,6 @@ import frc.robot.systems.DriveFSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
-	Thread vThread;
-
 	// Systems
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
@@ -46,7 +43,6 @@ public class Robot extends TimedRobot {
 		elevatorArm = new ElevatorArmFSM();
 		driveFSMSystem = new DriveFSMSystem();
 	}
-
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
@@ -63,7 +59,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//driveFSMSystem.update(null);
 		if (wristSystem.movingAutoState()) {
 			autoWristMoved = true;
 		}
@@ -78,8 +73,9 @@ public class Robot extends TimedRobot {
 			autoElevatorRetracted = true;
 		}
 		if (autoElevatorRetracted) {
-
+			driveFSMSystem.update(null);
 		}
+
 		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
 		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
 		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
