@@ -228,14 +228,6 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the wrist zero button.
-	 * @return True if button is pressed
-	 */
-	// public boolean isWristZeroButtonPressed() {
-	// 	return leftJoystick.getRawButton(WRIST_ZERO_BUTTON);
-	// }
-
-	/**
 	 * Get the value of the throttle.
 	 * @return True throttle is forward
 	 */

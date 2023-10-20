@@ -38,6 +38,7 @@ public class ElevatorArmFSM {
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 	private static final float AUTO_ENCODER = 30;
+	private static final double AUTO_ENCODER_MARGIN = 3.0;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -314,16 +315,26 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
+	/**
+	 * This method is for moving the elevator to the autonomous extension.
+	 *
+	 * @return completion of the extension
+	 */
 	public boolean handleAutonExtendState() {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), AUTO_ENCODER));
 		return inRange(armMotor.getEncoder().getPosition(), AUTO_ENCODER);
 	}
+	/**
+	 * This method is for moving the elevator to the starting config in auto.
+	 *
+	 * @return completion of the retraction
+	 */
 	public boolean handleAutonRetractState() {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
 		return inRange(armMotor.getEncoder().getPosition(), STARTING_ER);
 	}
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 3.0;
+		return Math.abs(a - b) <= AUTO_ENCODER_MARGIN;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {

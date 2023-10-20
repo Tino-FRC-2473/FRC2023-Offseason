@@ -37,6 +37,8 @@ public class ElevatorWristFSM {
 	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
 	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
 	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -8;
+	private static final int WEBCAM_WIDTH_PIXELS = 1920;
+	private static final int WEBCAM_HEIGHT_PIXELS = 1080;
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
@@ -67,12 +69,12 @@ public class ElevatorWristFSM {
 		currentEncoder = 0;
 
 		UsbCamera usb = CameraServer.startAutomaticCapture();
-		usb.setResolution(1920, 1080);
+		usb.setResolution(WEBCAM_WIDTH_PIXELS, WEBCAM_HEIGHT_PIXELS);
 		// Creates the CvSink and connects it to the UsbCamera
 		cvSink = CameraServer.getVideo();
 		// Creates the CvSource and MjpegServer [2] and connects them
 		outputStrem = CameraServer.putVideo("Intake view camera",
-		1920, 1080);
+		WEBCAM_WIDTH_PIXELS, WEBCAM_HEIGHT_PIXELS);
 		// Reset state machine
 		reset();
 	}
@@ -164,15 +166,23 @@ public class ElevatorWristFSM {
 		}
 		switch (currentState) {
 			case IDLE:
-				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed() && !input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
+				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && !input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
+				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
 					//go to moving in state
 					return FSMState.MOVING_IN;
-				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && input.isWristInDoubleButtonPressed() && !input.isWristOutDoubleButtonPressed()) {
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
 					return FSMState.MOVING_IN_DOUBLE;
-				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed() && !input.isWristInDoubleButtonPressed() && input.isWristOutDoubleButtonPressed()) {
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& input.isWristOutDoubleButtonPressed()) {
 					return FSMState.MOVING_OUT_DOUBLE;
 				}
 				//stay in idle state
