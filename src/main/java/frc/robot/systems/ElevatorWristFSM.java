@@ -8,6 +8,10 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -19,17 +23,22 @@ public class ElevatorWristFSM {
 	private enum FSMState {
 		MOVING_IN,
 		MOVING_OUT,
+		MOVING_IN_DOUBLE,
+		MOVING_OUT_DOUBLE,
 		FREE_MOVING,
 		IDLE,
 	}
-	private static final double PID_CONSTANT_WRIST_P = 0.005;
+	private static final double PID_CONSTANT_WRIST_P = 0.04;
 	private static final double PID_CONSTANT_WRIST_I = 0.00000001;
 	private static final double PID_CONSTANT_WRIST_D = 0.00000001;
 	private static final double OUTER_LIMIT_ENCODER = 100.0; //subject to change based on testing
-	private static final float MAX_UP_POWER = -0.1f;
-	private static final float MAX_DOWN_POWER = 0.1f;
-	private static final double WRIST_IN_ENCODER_ROTATIONS = 200; //16
-	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200; //-40
+	private static final float MAX_UP_POWER = -0.15f;
+	private static final float MAX_DOWN_POWER = 0.15f;
+	private static final double WRIST_IN_ENCODER_ROTATIONS = 200;
+	private static final double WRIST_OUT_ENCODER_ROTATIONS = -200;
+	private static final double WRIST_AUTO_ENCODER_ROTATIONS = -8;
+	private static final int WEBCAM_WIDTH_PIXELS = 1920;
+	private static final int WEBCAM_HEIGHT_PIXELS = 1080;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -38,6 +47,9 @@ public class ElevatorWristFSM {
 	private CANSparkMax wristMotor;
 	private SparkMaxPIDController pidControllerWrist;
 	private double currentEncoder = 0;
+	private CameraServer cam;
+	private CvSink cvSink;
+	private CvSource outputStrem;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -56,6 +68,14 @@ public class ElevatorWristFSM {
 		pidControllerWrist.setOutputRange(MAX_DOWN_POWER, MAX_UP_POWER);
 		wristMotor.getEncoder().setPosition(0);
 		currentEncoder = 0;
+
+		UsbCamera usb = CameraServer.startAutomaticCapture();
+		usb.setResolution(WEBCAM_WIDTH_PIXELS, WEBCAM_HEIGHT_PIXELS);
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("Intake view camera",
+		WEBCAM_WIDTH_PIXELS, WEBCAM_HEIGHT_PIXELS);
 		// Reset state machine
 		reset();
 	}
@@ -107,6 +127,12 @@ public class ElevatorWristFSM {
 			case MOVING_OUT:
 				handleMovingOutState(input);
 				break;
+			case MOVING_IN_DOUBLE:
+				handleMovingInDoubleState(input);
+				break;
+			case MOVING_OUT_DOUBLE:
+				handleMovingOutDoubleState(input);
+				break;
 			case IDLE:
 				handleIdleState(input);
 				break;
@@ -141,18 +167,29 @@ public class ElevatorWristFSM {
 		}
 		switch (currentState) {
 			case IDLE:
-				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()) {
+				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
 					//go to moving out state
 					return FSMState.MOVING_OUT;
-				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()) {
+				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
 					//go to moving in state
 					return FSMState.MOVING_IN;
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& input.isWristInDoubleButtonPressed()
+					&& !input.isWristOutDoubleButtonPressed()) {
+					return FSMState.MOVING_IN_DOUBLE;
+				} else if (!input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
+					&& !input.isWristInDoubleButtonPressed()
+					&& input.isWristOutDoubleButtonPressed()) {
+					return FSMState.MOVING_OUT_DOUBLE;
 				}
 				//stay in idle state
 				return FSMState.IDLE;
 			case MOVING_OUT:
-				if (!input.isWristOutButtonPressed()
-					|| wristMotor.getEncoder().getPosition() > OUTER_LIMIT_ENCODER) {
+				if (!input.isWristOutButtonPressed()) {
 					//go to idle state
 					return FSMState.IDLE;
 				}
@@ -164,7 +201,16 @@ public class ElevatorWristFSM {
 				}
 				//stay in moving in state
 				return FSMState.MOVING_IN;
-
+			case MOVING_IN_DOUBLE:
+				if (!input.isWristInDoubleButtonPressed()) {
+					return FSMState.IDLE;
+				}
+				return FSMState.MOVING_IN_DOUBLE;
+			case MOVING_OUT_DOUBLE:
+				if (!input.isWristOutDoubleButtonPressed()) {
+					return FSMState.IDLE;
+				}
+				return FSMState.MOVING_OUT_DOUBLE;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -179,11 +225,6 @@ public class ElevatorWristFSM {
 
 	private void handleIdleState(TeleopInput input) {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
-		//Zeroes the encoder at a given configuration, mainly for testing
-		if (input.isWristZeroButtonPressed()) {
-			currentEncoder = 0;
-			wristMotor.getEncoder().setPosition(0);
-		}
 	}
 
 	private void handleMovingInState(TeleopInput input) {
@@ -204,6 +245,23 @@ public class ElevatorWristFSM {
 		}
 	}
 
+	private void handleMovingInDoubleState(TeleopInput input) {
+		if (wristMotor.getEncoder().getPosition() < WRIST_IN_ENCODER_ROTATIONS
+			&& input.isWristInDoubleButtonPressed()) {
+			pidControllerWrist.setReference(MAX_DOWN_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
+	}
+
+	private void handleMovingOutDoubleState(TeleopInput input) {
+		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
+			&& input.isWristOutDoubleButtonPressed()) {
+			pidControllerWrist.setReference(MAX_UP_POWER * 2, CANSparkMax.ControlType.kDutyCycle);
+		} else {
+			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		}
+	}
 	/** This method is for intake in game and flipping.
 	* @return completion of moving out
  	*/
@@ -211,6 +269,7 @@ public class ElevatorWristFSM {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS));
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS);
 	}
+
 	/** This method is for intake in game and flipping.
 	 * @return if moving in state is finished
  	*/
@@ -219,12 +278,25 @@ public class ElevatorWristFSM {
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Moves the wrist to the correct encoder position for auto.
+	 * @return whether the wrist finished moving in auto
+	 */
+	public boolean movingAutoState() {
+		double power = pid(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
+		wristMotor.set(power);
+		SmartDashboard.putNumber("wrist encoder auto", wristMotor.getEncoder().getPosition());
+		SmartDashboard.putNumber("wrist applied power auto", wristMotor.getAppliedOutput());
+		SmartDashboard.putNumber("wrist pid power auto", power);
+		return inRange(wristMotor.getEncoder().getPosition(), WRIST_AUTO_ENCODER_ROTATIONS);
+	}
+
 	private double pid(double currentEncoderPID, double targetEncoder) {
 		double correction = PID_CONSTANT_WRIST_P * (targetEncoder - currentEncoderPID);
 		return Math.min(MAX_DOWN_POWER, Math.max(MAX_UP_POWER, correction));
 	}
 
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 1.0 / 2;
+		return Math.abs(a - b) <= 1.0;
 	}
 }

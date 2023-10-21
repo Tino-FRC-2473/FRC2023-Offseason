@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
@@ -17,12 +18,16 @@ import frc.robot.systems.DriveFSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
 	// Systems
 	private ElevatorWristFSM wristSystem;
 	private ElevatorArmFSM elevatorArm;
 	private EveryBotIntakeFSM everybotIntake;
 	private DriveFSMSystem driveFSMSystem;
+
+	private boolean autoWristMoved;
+	private boolean autoElevatorExtended;
+	private boolean autoElevatorRetracted;
+	private boolean autoIntakeMoved;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -38,7 +43,6 @@ public class Robot extends TimedRobot {
 		elevatorArm = new ElevatorArmFSM();
 		driveFSMSystem = new DriveFSMSystem();
 	}
-
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
@@ -46,11 +50,36 @@ public class Robot extends TimedRobot {
 		wristSystem.reset();
 		elevatorArm.reset();
 		driveFSMSystem.resetAutonomus();
+
+		autoWristMoved = false;
+		autoElevatorExtended = false;
+		autoElevatorRetracted = false;
+		autoIntakeMoved = false;
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		driveFSMSystem.auto1(null);
+		if (wristSystem.movingAutoState()) {
+			autoWristMoved = true;
+		}
+		if (autoWristMoved && elevatorArm.handleAutonExtendState()) {
+			autoElevatorExtended = true;
+		}
+
+		if (autoElevatorExtended && everybotIntake.handleAutoOuttakingState()) {
+			autoIntakeMoved = true;
+		}
+		if (autoIntakeMoved && elevatorArm.handleAutonRetractState()) {
+			autoElevatorRetracted = true;
+		}
+		if (autoElevatorRetracted) {
+			driveFSMSystem.update(null);
+		}
+
+		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
+		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
+		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
+		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
 	}
 
 	@Override

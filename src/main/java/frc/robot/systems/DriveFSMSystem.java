@@ -190,10 +190,12 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
-					drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
-						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
-						-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
-						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+					drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
+						* Math.abs(input.getControllerLeftJoystickY())),
+						OIConstants.DRIVE_DEADBAND),
+						-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
+						* Math.abs(input.getControllerLeftJoystickX())),
+						OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
 						OIConstants.DRIVE_DEADBAND), true, true);
 					if (input.isBackButtonPressed()) {
@@ -350,7 +352,7 @@ public class DriveFSMSystem {
 		}
 		System.out.println(getPose());
 		double power;
-		if (getPose().getX() > -1) {
+		if (getPose().getX() > -AutoConstants.AUTO_MOBILITY_DIST) {
 			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else {
 			power = 0;

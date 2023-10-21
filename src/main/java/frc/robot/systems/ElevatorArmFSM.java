@@ -28,15 +28,17 @@ public class ElevatorArmFSM {
 	private static final double PID_CONSTANT_ARM_P = 0.01;
 	private static final double PID_CONSTANT_ARM_I = 0.00000001;
 	private static final double PID_CONSTANT_ARM_D = 0.00000001;
-	private static final float MAX_UP_POWER = 0.4f;
-	private static final float MAX_DOWN_POWER = -0.35f;
+	private static final float MAX_UP_POWER = 0.55f;
+	private static final float MAX_DOWN_POWER = -0.5f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
 	// arbitrary encoder amounts
-	private static final float LOW_ENCODER_ROTATIONS = -145;
+	private static final float LOW_ENCODER_ROTATIONS = -148;
 	private static final float MID_ENCODER_ROTATIONS = 15;
-	private static final float HIGH_ENCODER_ROTATIONS = 160;
+	private static final float HIGH_ENCODER_ROTATIONS = 110;
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
+	private static final float AUTO_ENCODER = 30;
+	private static final double AUTO_ENCODER_MARGIN = 3.0;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -119,15 +121,12 @@ public class ElevatorArmFSM {
 		if (currentState != FSMState.IDLE) {
 			currentEncoder = armMotor.getEncoder().getPosition();
 		}
-		System.out.println(armMotor.getAppliedOutput());
-		System.out.println(currentState);
 		SmartDashboard.putString("Elevator Current State", currentState.toString());
 		SmartDashboard.putNumber("Elevator Encoder", armMotor.getEncoder().getPosition());
 		SmartDashboard.putNumber("Elevator Power", armMotor.getAppliedOutput());
 		SmartDashboard.putBoolean("Is Limit Switch Pressed", limitSwitchLow.isPressed());
 		SmartDashboard.putBoolean("Last Pressed", lastPressed);
 		SmartDashboard.putBoolean("Is Zero button pressed", input.isArmZeroButtonPressed());
-
 		switch (currentState) {
 			case IDLE:
 				handleIdleState(input);
@@ -245,11 +244,6 @@ public class ElevatorArmFSM {
 	}
 
 	private void handleMovingState(TeleopInput input) {
-		if (!zeroed) {
-			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
-				CANSparkMax.ControlType.kDutyCycle);
-			return;
-		}
 		if ((armMotor.getEncoder().getPosition() >= LOW_ENCODER_ROTATIONS
 				&& armMotor.getEncoder().getPosition() <= HIGH_ENCODER_ROTATIONS)) {
 			pidControllerArm.setReference(-input.getLeftJoystickY() / JOYSTICK_CONSTANT,
@@ -322,9 +316,27 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
+	/**
+	 * This method is for moving the elevator to the autonomous extension.
+	 *
+	 * @return completion of the extension
+	 */
+	public boolean handleAutonExtendState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), AUTO_ENCODER));
+		return inRange(armMotor.getEncoder().getPosition(), AUTO_ENCODER);
+	}
+	/**
+	 * This method is for moving the elevator to the starting config in auto.
+	 *
+	 * @return completion of the retraction
+	 */
+	public boolean handleAutonRetractState() {
+		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
+		return inRange(armMotor.getEncoder().getPosition(), STARTING_ER);
+	}
 
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= 1.0 / 2;
+		return Math.abs(a - b) <= AUTO_ENCODER_MARGIN;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
