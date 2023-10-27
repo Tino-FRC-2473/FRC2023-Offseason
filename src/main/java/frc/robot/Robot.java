@@ -6,9 +6,6 @@ package frc.robot;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
-import frc.robot.systems.ElevatorWristFSM;
-import frc.robot.systems.ElevatorArmFSM;
-import frc.robot.systems.EveryBotIntakeFSM;
 import frc.robot.systems.DriveFSMSystem;
 
 /**
@@ -20,9 +17,6 @@ public class Robot extends TimedRobot {
 
 	// Systems
 	private RaspberryPI rpi;
-	private ElevatorWristFSM wristSystem;
-	private ElevatorArmFSM elevatorArm;
-	private EveryBotIntakeFSM everybotIntake;
 	private DriveFSMSystem driveFSMSystem;
 
 	/**
@@ -35,37 +29,28 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		// Instantiate all systems here
 		rpi = new RaspberryPI();
-		wristSystem = new ElevatorWristFSM();
-		everybotIntake = new EveryBotIntakeFSM();
-		elevatorArm = new ElevatorArmFSM();
 		driveFSMSystem = new DriveFSMSystem();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		everybotIntake.reset();
-		wristSystem.reset();
-		elevatorArm.reset();
 		driveFSMSystem.resetAutonomus();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		everybotIntake.update(null);
 		driveFSMSystem.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		everybotIntake.reset();
 		driveFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		everybotIntake.update(input);
 		driveFSMSystem.update(input);
 	}
 
