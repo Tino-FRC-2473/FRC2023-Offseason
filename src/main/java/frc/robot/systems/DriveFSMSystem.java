@@ -233,6 +233,14 @@ public class DriveFSMSystem {
 	/* ------------------------ FSM state handlers ------------------------ */
 
 	/**
+	 * Drives the robot to a final odometry state.
+	 * @param x final x position of center
+	 * @param y final y position of center
+	 * @param angle final angle
+	 */
+	public void driveToPositionAngle(double x, double y, double angle) {	}
+
+	/**
 	 * Method to drive the robot using joystick info.
 	 *
 	 * @param xSpeed        Speed of the robot in the x direction (forward).
