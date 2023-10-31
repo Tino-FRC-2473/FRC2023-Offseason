@@ -237,8 +237,36 @@ public class DriveFSMSystem {
 	 * @param x final x position of center
 	 * @param y final y position of center
 	 * @param angle final angle
+	 * @param swerveModuleStates final SwerveModuleState for each swerve
 	 */
-	public void driveToPositionAngle(double x, double y, double angle) {	}
+	public void driveToPositionAngle(double x, double y, double angle,
+		SwerveModuleState[] swerveModuleStates) {
+		double xDiff = Math.abs(getPose().getX() - x);
+		double yDiff = Math.abs(getPose().getY() - y);
+		while (xDiff - x > 0.001 || yDiff > 0.001) {
+			double angleDiff = angle - getPose().getRotation().getRadians();
+			double travelAngle = Math.atan2(yDiff, xDiff);
+			if (angleDiff > 0) {
+				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+						-DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			} else if (angleDiff < 0) {
+				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+						DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			} else {
+				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+					0, false, false);
+			}
+			xDiff = Math.abs(getPose().getX() - x);
+			yDiff = Math.abs(getPose().getY() - y);
+		}
+		frontLeft.setDesiredState(swerveModuleStates[0]);
+		frontRight.setDesiredState(swerveModuleStates[1]);
+		rearLeft.setDesiredState(swerveModuleStates[2]);
+		rearRight.setDesiredState(swerveModuleStates[3]);
+	}
 
 	/**
 	 * Method to drive the robot using joystick info.
