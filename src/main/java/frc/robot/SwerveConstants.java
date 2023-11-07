@@ -135,6 +135,8 @@ public final class SwerveConstants {
 		public static final double P_THETA_CONTROLLER = 1;
 
 		public static final double AUTO_MOBILITY_DIST = 2.5; //meters
+		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 3; //meters
+		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 3;
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS

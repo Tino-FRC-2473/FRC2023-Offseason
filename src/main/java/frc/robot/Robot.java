@@ -7,9 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
-import frc.robot.systems.ElevatorWristFSM;
-import frc.robot.systems.ElevatorArmFSM;
-import frc.robot.systems.EveryBotIntakeFSM;
 import frc.robot.systems.DriveFSMSystem;
 
 /**
@@ -19,15 +16,7 @@ import frc.robot.systems.DriveFSMSystem;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private ElevatorWristFSM wristSystem;
-	private ElevatorArmFSM elevatorArm;
-	private EveryBotIntakeFSM everybotIntake;
 	private DriveFSMSystem driveFSMSystem;
-
-	private boolean autoWristMoved;
-	private boolean autoElevatorExtended;
-	private boolean autoElevatorRetracted;
-	private boolean autoIntakeMoved;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -38,65 +27,28 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		wristSystem = new ElevatorWristFSM();
-		everybotIntake = new EveryBotIntakeFSM();
-		elevatorArm = new ElevatorArmFSM();
 		driveFSMSystem = new DriveFSMSystem();
 	}
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		everybotIntake.reset();
-		wristSystem.reset();
-		elevatorArm.reset();
 		driveFSMSystem.resetAutonomus();
-
-		autoWristMoved = false;
-		autoElevatorExtended = false;
-		autoElevatorRetracted = false;
-		autoIntakeMoved = false;
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		if (wristSystem.movingAutoState()) {
-			autoWristMoved = true;
-		}
-		if (autoWristMoved && elevatorArm.handleAutonExtendState()) {
-			autoElevatorExtended = true;
-		}
-
-		if (autoElevatorExtended && everybotIntake.handleAutoOuttakingState()) {
-			autoIntakeMoved = true;
-		}
-		if (autoIntakeMoved && elevatorArm.handleAutonRetractState()) {
-			autoElevatorRetracted = true;
-		}
-		if (autoElevatorRetracted) {
-			driveFSMSystem.update(null);
-		}
-
-		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
-		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
-		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
-		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		everybotIntake.reset();
 		driveFSMSystem.reset();
-		elevatorArm.reset();
-		wristSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		everybotIntake.update(input);
 		driveFSMSystem.update(input);
-		elevatorArm.update(input);
-		wristSystem.update(input);
+
 	}
 
 	@Override

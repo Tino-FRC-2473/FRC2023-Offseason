@@ -33,7 +33,8 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		AUTO_STATE
+		AUTO_STATE,
+		TO_POS_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -146,7 +147,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.AUTO_STATE;
+		currentState = FSMState.TO_POS_STATE;
 
 		resetEncoders();
 		resetOdometry(getPose());
@@ -208,6 +209,13 @@ public class DriveFSMSystem {
 					auto1(input);
 				}
 				break;
+
+			case TO_POS_STATE:
+				if (input == null) {
+					driveToPos(input, 1.5, 1.5, 90);
+				}
+				break;
+
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -323,12 +331,39 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
+	public void driveToPos(TeleopInput input, double xFinal, double yFinal, double rotFinal) {
+		if (input != null) {
+			System.out.println("Teleop");
+			return;
+		}
+	
+		double xDist = xFinal - getPose().getX();
+		double yDist = yFinal - getPose().getY();
+		double rotAmount = rotFinal - (getHeading() % 360);
+
+		driveUntilPoint(xDist, yDist, rotAmount);
+	}
+
+	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
+		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
+			drive (0, 0, 0, false, false);
+		} else {
+			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+			double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+
+			drive(xSpeed, ySpeed, rotSpeed, false, true);
+		}
+
+	}
+
 	/**
 	 * Balances gyro.
 	 */
 	public void balance() {
 		double power;
 		if (Math.abs(gyro.getRoll()) < 2) {
+
 			power = 0;
 		} else {
 			power = gyro.getRoll()
