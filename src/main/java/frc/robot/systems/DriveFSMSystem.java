@@ -33,8 +33,7 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		AUTO_STATE,
-		TO_POS_STATE
+		AUTO_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -87,6 +86,7 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
+	public static final double THREE_SIXTY_DEGREES = 360;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -147,7 +147,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.TO_POS_STATE;
+		currentState = FSMState.AUTO_STATE;
 
 		resetEncoders();
 		resetOdometry(getPose());
@@ -209,13 +209,6 @@ public class DriveFSMSystem {
 					auto1(input);
 				}
 				break;
-
-			case TO_POS_STATE:
-				if (input == null) {
-					driveToPos(input, 1.5, 1.5, 90);
-				}
-				break;
-
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -331,20 +324,23 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
+	/**
+	 * Drives robot to specific position and orientation.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 * @param xFinal desired x position in meters
+	 * @param yFinal desired y position in meters
+	 * @param rotFinal desired rotation in degrees
+	 *
+	 */
 	public void driveToPos(TeleopInput input, double xFinal, double yFinal, double rotFinal) {
-		if (input != null) {
-			System.out.println("Teleop");
-			return;
-		}
 		double xDist = xFinal - getPose().getX();
 		double yDist = yFinal - getPose().getY();
-		double rotAmount = rotFinal - (getHeading() % 360);
+		double rotAmount = rotFinal - (getHeading() % THREE_SIXTY_DEGREES);
 
-		driveUntilPoint(xDist, yDist, rotAmount);
-	}
-
-	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
-		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
+		if (Math.abs(xDist) < AutoConstants.METERS_MARGIN_OF_ERROR
+			&& Math.abs(yDist) < AutoConstants.METERS_MARGIN_OF_ERROR
+			&& Math.abs(rotAmount) < AutoConstants.DEGREES_MARGIN_OF_ERROR) {
 			drive(0, 0, 0, false, false);
 		} else {
 			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
@@ -353,8 +349,8 @@ public class DriveFSMSystem {
 
 			drive(xSpeed, ySpeed, rotSpeed, false, true);
 		}
-
 	}
+
 
 	/**
 	 * Balances gyro.
