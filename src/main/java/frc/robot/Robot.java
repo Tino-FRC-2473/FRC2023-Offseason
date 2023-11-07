@@ -18,6 +18,11 @@ public class Robot extends TimedRobot {
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
 
+	private boolean autoWristMoved;
+	private boolean autoElevatorExtended;
+	private boolean autoElevatorRetracted;
+	private boolean autoIntakeMoved;
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -33,10 +38,36 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		driveFSMSystem.resetAutonomus();
+
+		autoWristMoved = false;
+		autoElevatorExtended = false;
+		autoElevatorRetracted = false;
+		autoIntakeMoved = false;
 	}
 
 	@Override
 	public void autonomousPeriodic() {
+		if (wristSystem.movingAutoState()) {
+			autoWristMoved = true;
+		}
+		if (autoWristMoved && elevatorArm.handleAutonExtendState()) {
+			autoElevatorExtended = true;
+		}
+
+		if (autoElevatorExtended && everybotIntake.handleAutoOuttakingState()) {
+			autoIntakeMoved = true;
+		}
+		if (autoIntakeMoved && elevatorArm.handleAutonRetractState()) {
+			autoElevatorRetracted = true;
+		}
+		if (autoElevatorRetracted) {
+			driveFSMSystem.update(null);
+		}
+
+		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
+		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
+		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
+		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
 	}
 
 	@Override
