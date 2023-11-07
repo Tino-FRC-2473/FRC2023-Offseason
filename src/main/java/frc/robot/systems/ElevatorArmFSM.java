@@ -39,6 +39,7 @@ public class ElevatorArmFSM {
 	private static final float JOYSTICK_CONSTANT = 3;
 	private static final float STARTING_ER = -135;
 	private static final float AUTO_ENCODER = 30;
+	private static final double AUTO_ENCODER_MARGIN = 3.0;
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -306,6 +307,7 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS));
 		return inRange(armMotor.getEncoder().getPosition(), MID_ENCODER_ROTATIONS);
 	}
+
 	/**
 	 * This method is for depositing low in game.
 	 *
@@ -316,18 +318,18 @@ public class ElevatorArmFSM {
 		return inRange(armMotor.getEncoder().getPosition(), LOW_ENCODER_ROTATIONS);
 	}
 	/**
-	 * This method is for the auton encoder.
+	 * This method is for moving the elevator to the autonomous extension.
 	 *
-	 * @return reached auton encoder
+	 * @return completion of the extension
 	 */
 	public boolean handleAutonExtendState() {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), AUTO_ENCODER));
 		return inRange(armMotor.getEncoder().getPosition(), AUTO_ENCODER);
 	}
 	/**
-	 * This method is for reaching starting position.
+	 * This method is for moving the elevator to the starting config in auto.
 	 *
-	 * @return at starting position
+	 * @return completion of the retraction
 	 */
 	public boolean handleAutonRetractState() {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));

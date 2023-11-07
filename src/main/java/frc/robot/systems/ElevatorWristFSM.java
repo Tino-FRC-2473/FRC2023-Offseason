@@ -177,7 +177,7 @@ public class ElevatorWristFSM {
 				if (input.isWristOutButtonPressed() && !input.isWristInButtonPressed()
 					&& !input.isWristInDoubleButtonPressed()
 					&& !input.isWristOutDoubleButtonPressed()) {
-					// go to moving out state
+					//go to moving out state
 					return FSMState.MOVING_OUT;
 				} else if (input.isWristInButtonPressed() && !input.isWristOutButtonPressed()
 					&& !input.isWristInDoubleButtonPressed()
@@ -233,11 +233,6 @@ public class ElevatorWristFSM {
 
 	private void handleIdleState(TeleopInput input) {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), currentEncoder));
-		// Zeroes the encoder at a given configuration, mainly for testing
-		// if (input.isWristZeroButtonPressed()) {
-		// currentEncoder = 0;
-		// wristMotor.getEncoder().setPosition(0);
-		// }
 	}
 
 	private void handleMovingInState(TeleopInput input) {
@@ -252,6 +247,7 @@ public class ElevatorWristFSM {
 	private void handleMovingOutState(TeleopInput input) {
 		if (wristMotor.getEncoder().getPosition() > WRIST_OUT_ENCODER_ROTATIONS
 				&& input.isWristOutButtonPressed()) {
+
 			pidControllerWrist.setReference(MAX_UP_POWER, CANSparkMax.ControlType.kDutyCycle);
 		} else {
 			pidControllerWrist.setReference(0, CANSparkMax.ControlType.kDutyCycle);
@@ -276,21 +272,17 @@ public class ElevatorWristFSM {
 		}
 	}
 
-	/**
-	 * This method is for intake in game and flipping.
-	 *
-	 * @return completion of moving out
-	 */
+	/** This method is for intake in game and flipping.
+	* @return completion of moving out
+ 	*/
 	public boolean movingOutState() {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS));
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_OUT_ENCODER_ROTATIONS);
 	}
 
-	/**
-	 * This method is for intake in game and flipping.
-	 *
+	/** This method is for intake in game and flipping.
 	 * @return if moving in state is finished
-	 */
+ 	*/
 	public boolean movingInState() {
 		wristMotor.set(pid(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS));
 		return inRange(wristMotor.getEncoder().getPosition(), WRIST_IN_ENCODER_ROTATIONS);
@@ -298,7 +290,6 @@ public class ElevatorWristFSM {
 
 	/**
 	 * Moves the wrist to the correct encoder position for auto.
-	 *
 	 * @return whether the wrist finished moving in auto
 	 */
 	public boolean movingAutoState() {
