@@ -18,8 +18,7 @@ import frc.robot.systems.DriveFSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
-	Thread vThread;
+	private Thread vThread;
 
 	// Systems
 	private ElevatorWristFSM wristSystem;
@@ -78,13 +77,11 @@ public class Robot extends TimedRobot {
 			autoElevatorRetracted = true;
 		}
 		if (autoElevatorRetracted) {
-
+			SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
+			SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
+			SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
+			SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
 		}
-		SmartDashboard.putBoolean("Wrist auto moved", autoWristMoved);
-		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
-		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
-		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
-
 	}
 
 	@Override

@@ -227,7 +227,7 @@ public class TeleopInput {
 		return leftJoystick.getRawButton(ARM_ZERO_BUTTON);
 	}
 
-	/**
+	/*
 	 * Get the value of the wrist zero button.
 	 * @return True if button is pressed
 	 */
