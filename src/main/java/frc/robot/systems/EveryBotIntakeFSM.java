@@ -399,19 +399,19 @@ public class EveryBotIntakeFSM {
 	 * @return whether the intake has finished running for auto
 	 */
 	public boolean handleAutoOuttakingState() {
-			flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_CCW_THRESHOLD));
-			if (!autoOuttakingTimerStarted) {
-				autoOuttakingTimerStarted = true;
-				autoOuttakingTimeStart = timer.get();
-			}
+		flipMotor.set(pid(flipMotor.getEncoder().getPosition(), FLIP_CCW_THRESHOLD));
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			autoOuttakingTimeStart = timer.get();
+		}
 
-			if (autoOuttakingTimerStarted && !timer.hasElapsed(autoOuttakingTimeStart + 2.0)) {
-				spinnerMotor.set(RELEASE_SPEED);
-			} else {
-				spinnerMotor.set(0);
-				return true;
-			}
-			return false;
+		if (autoOuttakingTimerStarted && !timer.hasElapsed(autoOuttakingTimeStart + 2.0)) {
+			spinnerMotor.set(RELEASE_SPEED);
+		} else {
+			spinnerMotor.set(0);
+			return true;
+		}
+		return false;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
