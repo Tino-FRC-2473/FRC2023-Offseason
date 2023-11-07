@@ -336,7 +336,6 @@ public class DriveFSMSystem {
 			System.out.println("Teleop");
 			return;
 		}
-	
 		double xDist = xFinal - getPose().getX();
 		double yDist = yFinal - getPose().getY();
 		double rotAmount = rotFinal - (getHeading() % 360);
@@ -346,7 +345,7 @@ public class DriveFSMSystem {
 
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
-			drive (0, 0, 0, false, false);
+			drive(0, 0, 0, false, false);
 		} else {
 			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
