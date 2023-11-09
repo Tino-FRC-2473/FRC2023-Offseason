@@ -95,7 +95,6 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
 		everybotIntake.update(input);
-		driveFSMSystem.update(input);
 		elevatorArm.update(input);
 		wristSystem.update(input);
 
