@@ -62,8 +62,8 @@ public class ElevatorArmFSM {
 	 */
 	public ElevatorArmFSM() {
 		// Perform hardware init
-		armMotor = new CANSparkMax(HardwareMap.CAN_ID_ARM,
-				CANSparkMax.MotorType.kBrushless);
+		/*armMotor = new CANSparkMax(HardwareMap.CAN_ID_ARM,
+				CANSparkMax.MotorType.kBrushless);*/
 		armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		limitSwitchLow = armMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);
 		limitSwitchLow.enableLimitSwitch(false);

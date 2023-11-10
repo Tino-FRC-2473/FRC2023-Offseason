@@ -56,8 +56,8 @@ public class ElevatorWristFSM {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public ElevatorWristFSM() {
-		wristMotor = new CANSparkMax(HardwareMap.CAN_ID_WRIST_MOTOR,
-				CANSparkMax.MotorType.kBrushless);
+		/*wristMotor = new CANSparkMax(HardwareMap.CAN_ID_WRIST_MOTOR,
+				CANSparkMax.MotorType.kBrushless);*/
 		wristMotor.setIdleMode(IdleMode.kBrake);
 		pidControllerWrist = wristMotor.getPIDController();
 		wristMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);

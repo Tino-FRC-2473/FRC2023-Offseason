@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
-public class AnyBotIntake {
+public class AnyBotIntakeFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum EveryBotIntakeFSMState {
+	public enum AnyBotIntakeFSMState {
 		INTAKING,
 		IDLE_STOP,
 		OUTTAKING,
@@ -32,8 +32,8 @@ public class AnyBotIntake {
 	// HAVE TO CHANGE BASED ON TEST
 	private static final double KEEP_SPEED = 0;
 	private static final double HOLDING_SPEED = 0.05;
-	private static final double INTAKE_SPEED = 0.3; // 0.3
-	private static final double RELEASE_SPEED = -0.2; // DONT FORGET THE NEGATIVE SIGN (-)
+	private static final double INTAKE_SPEED = 0.1; // 0.3
+	private static final double RELEASE_SPEED = -0.1; // DONT FORGET THE NEGATIVE SIGN (-)
 	private static final double RELEASE_SPEED_LOW = -0.3;
 	private static final double CURRENT_THRESHOLD = 15;
 	private static final double BASE_THRESHOLD = 100;
@@ -62,7 +62,7 @@ public class AnyBotIntake {
 	private boolean autoOuttakingTimerStarted;
 
 	/* ======================== Private variables ======================== */
-	private EveryBotIntakeFSMState currentState;
+	private AnyBotIntakeFSMState currentState;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax spinnerMotor;
@@ -75,7 +75,7 @@ public class AnyBotIntake {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public AnyBotIntake() {
+	public AnyBotIntakeFSM() {
 		// arm = new ElevatorArmFSM();
 		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
@@ -93,7 +93,7 @@ public class AnyBotIntake {
 	 *
 	 * @return Current FSM state
 	 */
-	public EveryBotIntakeFSMState getCurrentState() {
+	public AnyBotIntakeFSMState getCurrentState() {
 		return currentState;
 	}
 
@@ -106,7 +106,7 @@ public class AnyBotIntake {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = EveryBotIntakeFSMState.IDLE_STOP;
+		currentState = AnyBotIntakeFSMState.IDLE_STOP;
 		hasTimerStarted = false;
 		needsReset = true;
 		// Call one tick of update to ensure outputs reflect start state
@@ -159,7 +159,7 @@ public class AnyBotIntake {
 				default:
 					throw new IllegalStateException("Invalid state: " + currentState.toString());
 			}
-			EveryBotIntakeFSMState previousState = currentState;
+			AnyBotIntakeFSMState previousState = currentState;
 
 			double currentTime = Timer.getFPGATimestamp();
 			double timeTaken = currentTime - begin;
@@ -192,7 +192,7 @@ public class AnyBotIntake {
 	 * @param currState
 	 * @return completion of the updateautonomous
 	 */
-	public boolean updateAutonomous(EveryBotIntakeFSMState currState) {
+	public boolean updateAutonomous(AnyBotIntakeFSMState currState) {
 		switch (currState) {
 			case INTAKING:
 				handleIntakingState(null);
@@ -234,9 +234,9 @@ public class AnyBotIntake {
 	 *              the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private EveryBotIntakeFSMState nextState(TeleopInput input) {
+	private AnyBotIntakeFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return EveryBotIntakeFSMState.IDLE_STOP;
+			return AnyBotIntakeFSMState.IDLE_STOP;
 		}
 		switch (currentState) {
 			case INTAKING:
@@ -246,6 +246,7 @@ public class AnyBotIntake {
 					needsReset = false;
 					prevOuttaking = false;
 				}
+
 				if (timer.hasElapsed(TIME_RESET_CURRENT)) {
 					currLogs[tick % AVERAGE_SIZE] = spinnerMotor.getOutputCurrent();
 					tick++;
@@ -257,34 +258,40 @@ public class AnyBotIntake {
 					avgcone /= AVERAGE_SIZE;
 					if (avgcone > CURRENT_THRESHOLD) {
 						holding = true;
-						return EveryBotIntakeFSMState.IDLE_STOP;
+						return AnyBotIntakeFSMState.IDLE_STOP;
 					} else {
 						holding = false;
 					}
 				}
 				forward = input.isThrottleForward();
-				if (!input.isIntakeButtonPressed()) {
-					return EveryBotIntakeFSMState.IDLE_STOP;
+				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()) {
+					return AnyBotIntakeFSMState.INTAKING;
+				} else {
+					return AnyBotIntakeFSMState.IDLE_STOP;
 				}
-				return EveryBotIntakeFSMState.INTAKING;
 			case IDLE_STOP:
-				if (input.isOuttakeButtonPressed()) {
-					return EveryBotIntakeFSMState.OUTTAKING;
+
+				if (input.isOuttakeButtonPressed() && input.isIntakeButtonPressed()) {
+					return AnyBotIntakeFSMState.IDLE_STOP;
+				}
+
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return AnyBotIntakeFSMState.OUTTAKING;
 				} else if (input.isIntakeButtonPressed()) {
 					if (holding) {
-						return EveryBotIntakeFSMState.IDLE_STOP;
+						return AnyBotIntakeFSMState.IDLE_STOP;
 					} else {
-						return EveryBotIntakeFSMState.INTAKING;
+						return AnyBotIntakeFSMState.INTAKING;
 					}
 				} else {
-					return EveryBotIntakeFSMState.IDLE_STOP;
+					return AnyBotIntakeFSMState.IDLE_STOP;
 				}
 			case OUTTAKING:
-				if (input.isOuttakeButtonPressed()) {
-					return EveryBotIntakeFSMState.OUTTAKING;
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return AnyBotIntakeFSMState.OUTTAKING;
 				} else {
 					prevOuttaking = true;
-					return EveryBotIntakeFSMState.IDLE_STOP;
+					return AnyBotIntakeFSMState.IDLE_STOP;
 				}
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
