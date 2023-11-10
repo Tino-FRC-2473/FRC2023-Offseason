@@ -87,8 +87,8 @@ public class EveryBotIntakeFSM {
 		timer = new Timer();
 		spinnerMotor = new CANSparkMax(HardwareMap.CAN_ID_SPINNER_MOTOR,
 				CANSparkMax.MotorType.kBrushless);
-		/*flipMotor = new CANSparkMax(HardwareMap.CAN_ID_FLIP_MOTOR,
-				CANSparkMax.MotorType.kBrushless);*/
+		flipMotor = new CANSparkMax(HardwareMap.CAN_ID_FLIP_MOTOR,
+				CANSparkMax.MotorType.kBrushless);
 
 		pidControllerFlip = flipMotor.getPIDController();
 		pidControllerFlip.setP(PID_CONSTANT_ARM_P);

@@ -7,12 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
-import frc.robot.systems.AnyBotIntakeFSM;
-
-/*import frc.robot.systems.ElevatorWristFSM;
+import frc.robot.systems.ElevatorWristFSM;
 import frc.robot.systems.ElevatorArmFSM;
 import frc.robot.systems.EveryBotIntakeFSM;
-import frc.robot.systems.DriveFSMSystem;*/
+import frc.robot.systems.DriveFSMSystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,11 +19,10 @@ import frc.robot.systems.DriveFSMSystem;*/
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private AnyBotIntakeFSM anybotIntake;
-	//private ElevatorWristFSM wristSystem;
-	//private ElevatorArmFSM elevatorArm;
-	//private EveryBotIntakeFSM everybotIntake;
-	//private DriveFSMSystem driveFSMSystem;
+	private ElevatorWristFSM wristSystem;
+	private ElevatorArmFSM elevatorArm;
+	private EveryBotIntakeFSM everybotIntake;
+	private DriveFSMSystem driveFSMSystem;
 
 	private boolean autoWristMoved;
 	private boolean autoElevatorExtended;
@@ -41,19 +38,18 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		//wristSystem = new ElevatorWristFSM();
-		//everybotIntake = new EveryBotIntakeFSM();
-		//elevatorArm = new ElevatorArmFSM();
-		//driveFSMSystem = new DriveFSMSystem();
-		anybotIntake = new AnyBotIntakeFSM();
+		wristSystem = new ElevatorWristFSM();
+		everybotIntake = new EveryBotIntakeFSM();
+		elevatorArm = new ElevatorArmFSM();
+		driveFSMSystem = new DriveFSMSystem();
 	}
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		//everybotIntake.reset();
-		//wristSystem.reset();
-		//elevatorArm.reset();
-		//driveFSMSystem.resetAutonomus();
+		everybotIntake.reset();
+		wristSystem.reset();
+		elevatorArm.reset();
+		driveFSMSystem.resetAutonomus();
 
 		autoWristMoved = false;
 		autoElevatorExtended = false;
@@ -63,7 +59,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		/*if (wristSystem.movingAutoState()) {
+		if (wristSystem.movingAutoState()) {
 			autoWristMoved = true;
 		}
 		if (autoWristMoved && elevatorArm.handleAutonExtendState()) {
@@ -84,26 +80,23 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBoolean("Elevator auto extended", autoElevatorExtended);
 		SmartDashboard.putBoolean("Intake auto moved", autoIntakeMoved);
 		SmartDashboard.putBoolean("Elevator auto retracted", autoElevatorRetracted);
-		*/
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		//everybotIntake.reset();
-		//driveFSMSystem.reset();
-		//elevatorArm.reset();
-		//wristSystem.reset();
-
+		everybotIntake.reset();
+		driveFSMSystem.reset();
+		elevatorArm.reset();
+		wristSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		/*everybotIntake.update(input);
+		everybotIntake.update(input);
 		driveFSMSystem.update(input);
 		elevatorArm.update(input);
-		wristSystem.update(input);*/
-		anybotIntake.update(input);
+		wristSystem.update(input);
 	}
 
 	@Override
