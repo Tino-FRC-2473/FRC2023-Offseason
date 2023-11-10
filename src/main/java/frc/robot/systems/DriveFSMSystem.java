@@ -1,5 +1,8 @@
 package frc.robot.systems;
 
+import java.util.ArrayList;
+import java.awt.Point;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
@@ -32,7 +35,10 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		AUTO_STATE
+		AUTO_STATE,
+		AUTO_DRIVING,
+		AUTO_ROTATING,
+		AUTO_STATIC
 	}
 
 	/* ======================== Private variables ======================== */
@@ -222,8 +228,12 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				return FSMState.TELEOP_STATE;
-			case AUTO_STATE:
-				return FSMState.AUTO_STATE;
+			case AUTO_DRIVING:
+				return FSMState.AUTO_DRIVING;
+			case AUTO_ROTATING:
+				return FSMState.AUTO_ROTATING;
+			case AUTO_STATIC:
+				return FSMState.AUTO_STATIC;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -237,35 +247,38 @@ public class DriveFSMSystem {
 	 * @param x final x position of center
 	 * @param y final y position of center
 	 * @param angle final angle
-	 * @param swerveModuleStates final SwerveModuleState for each swerve
 	 */
-	public void driveToPositionAngle(double x, double y, double angle,
-		SwerveModuleState[] swerveModuleStates) {
-		double xDiff = Math.abs(getPose().getX() - x);
-		double yDiff = Math.abs(getPose().getY() - y);
-		while (xDiff - x > 0.001 || yDiff > 0.001) {
-			double angleDiff = angle - getPose().getRotation().getRadians();
-			double travelAngle = Math.atan2(yDiff, xDiff);
-			if (angleDiff > 0) {
-				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
-						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
-						-DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			} else if (angleDiff < 0) {
-				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
-						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
-						DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			} else {
-				drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
-						DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
-					0, false, false);
-			}
+	public void driveToState(double x, double y, double angle) {
+		double xDiff = x - getPose().getX();
+		double yDiff = y - getPose().getY();
+		double aDiff = angle - getPose().getRotation().getRadians();
+		double travelAngle = Math.atan2(yDiff, xDiff);
+		while (Math.abs(xDiff) > 0.001 || Math.abs(yDiff) > 0.001) {
+			drive(DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+		 		DriveConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+		 		DriveConstants.MAX_ANGULAR_SPEED, false, false);
 			xDiff = Math.abs(getPose().getX() - x);
 			yDiff = Math.abs(getPose().getY() - y);
 		}
-		frontLeft.setDesiredState(swerveModuleStates[0]);
-		frontRight.setDesiredState(swerveModuleStates[1]);
-		rearLeft.setDesiredState(swerveModuleStates[2]);
-		rearRight.setDesiredState(swerveModuleStates[3]);
+		while (Math.abs(aDiff) > 0.1) {
+			if (aDiff < 0) {
+				drive(0, 0, DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			} else {
+				drive(0, 0, -DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			}
+			aDiff = angle - getPose().getRotation().getRadians();
+		}
+	}
+
+	/**
+	 * Auto-specific method for generalization of paths.
+	 * @param autoPoints ArrayList of all desired points to be traveled through
+	 * @param autoAngles ArrayList of all desired angular positions for each point
+	 */
+	public void driveToStates(ArrayList<Point> autoPoints, ArrayList<Double> autoAngles) {
+		for (int i = 0; i < autoPoints.size(); i++) {
+			driveToState(autoPoints.get(i).getX(), autoPoints.get(i).getY(), autoAngles.get(i));
+		}
 	}
 
 	/**
