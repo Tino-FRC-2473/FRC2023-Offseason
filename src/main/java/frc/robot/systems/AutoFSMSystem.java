@@ -1,53 +1,38 @@
 package frc.robot.systems;
 
-import java.util.ArrayList;
-
-// WPILib Imports
-
-// Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
-
-// Robot Imports
-import frc.robot.TeleopInput;
-import frc.robot.HardwareMap;
 
 public class AutoFSMSystem {
 	/* ======================== Constants ======================== */
-	// FSM state definitions
-	public enum FSMState {
+	// Auto FSM state definitions
+	public enum AutoFSMState {
 		CUBE_LOW,
-        CUBE_MID,
-        CUBE_HIGH,
-        CONE_LOW,
-        CONE_MID,
-        CONE_HIGH,
-        BALANCE,
-        MOVE_BACK_TWO_METERS
+		CUBE_MID,
+		CUBE_HIGH,
+		CONE_LOW,
+		CONE_MID,
+		CONE_HIGH,
+		BALANCE,
+		MOVE_BACK_TWO_METERS
 	}
 
-	private static final float MOTOR_RUN_POWER = 0.1f;
 
 	/* ======================== Private variables ======================== */
-	private FSMState currentState;
-    private FSMState[] currentStateList;
-    private static final FSMState[] PATH1 = new FSMState[]{
-        FSMState.CUBE_MID, FSMState.MOVE_BACK_TWO_METERS, FSMState.BALANCE};
-
-	// Hardware devices should be owned by one and only one system. They must
-	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax exampleMotor;
-
+	//Contains the sequential list of states in the current auto path that must be executed
+	private AutoFSMState[] currentStateList;
+	//Predefined auto path consisting of doing mid cube, then moving back two meters, then balancing
+	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
+		AutoFSMState.CUBE_MID, AutoFSMState.MOVE_BACK_TWO_METERS, AutoFSMState.BALANCE};
+	//The index in the currentStateList where the currentState is at
+	private int currentStateIndex;
+	//Stores if the current state has finished executing or not
+	private boolean isCurrentStateFinished;
 	/* ======================== Constructor ======================== */
 	/**
-	 * Create FSMSystem and initialize to starting state. Also perform any
-	 * one-time initialization or configuration of hardware required. Note
-	 * the constructor is called only once when the robot boots.
+	 * Create FSMSystem and initialize to starting state.
+	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 */
-	public AutoFSMSystem(int pathNumber) {
-        if (pathNumber == 1) {
-            currentStateList = PATH1;
-        }
-		reset();
+	public AutoFSMSystem() {
+
 	}
 
 	/* ======================== Public methods ======================== */
@@ -55,8 +40,8 @@ public class AutoFSMSystem {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public FSMState getCurrentState() {
-		return currentState;
+	public AutoFSMState getCurrentState() {
+		return currentStateList[currentStateIndex];
 	}
 	/**
 	 * Reset this system to its start state. This may be called from mode init
@@ -65,77 +50,73 @@ public class AutoFSMSystem {
 	 * Note this is distinct from the one-time initialization in the constructor
 	 * as it may be called multiple times in a boot cycle,
 	 * Ex. if the robot is enabled, disabled, then reenabled.
+	 * @param pathNumber the auto path that we want to execute
 	 */
-	public void reset() {
-		currentState = FSMState.START_STATE;
-
+	public void reset(int pathNumber) {
+		currentStateIndex = 0;
+		isCurrentStateFinished = false;
+		if (pathNumber == 1) {
+			currentStateList = PATH1;
+		}
 		// Call one tick of update to ensure outputs reflect start state
-		update(null);
+		//update();
+		//^ is this practical to when in auto
 	}
 	/**
-	 * Update FSM based on new inputs. This function only calls the FSM state
-	 * specific handlers.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 * This function only calls the FSM state specific handlers.
 	 */
-	public void update(TeleopInput input) {
-		switch (currentState) {
-			case START_STATE:
-				handleStartState(input);
+	public void update() {
+		switch (getCurrentState()) {
+			case CUBE_MID:
+				isCurrentStateFinished = handleCubeMid();
 				break;
 
-			case OTHER_STATE:
-				handleOtherState(input);
+			case MOVE_BACK_TWO_METERS:
+				isCurrentStateFinished = handleMoveBackTwoMeters();
+				break;
+
+			case BALANCE:
+				isCurrentStateFinished = handleBalance();
 				break;
 
 			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
+				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
 		}
-		currentState = nextState(input);
+		nextState();
 	}
 
 	/* ======================== Private methods ======================== */
 	/**
-	 * Decide the next state to transition to. This is a function of the inputs
-	 * and the current state of this FSM. This method should not have any side
-	 * effects on outputs. In other words, this method should only read or get
-	 * values to decide what state to go to.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 * @return FSM state for the next iteration
+	 * Checks if the current auto state is finished and if so, transitions to the
+	 * next state to be executed.
 	 */
-	private FSMState nextState(TeleopInput input) {
-		switch (currentState) {
-			case START_STATE:
-				if (input != null) {
-					return FSMState.OTHER_STATE;
-				} else {
-					return FSMState.START_STATE;
-				}
-
-			case OTHER_STATE:
-				return FSMState.OTHER_STATE;
-
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
+	private void nextState() {
+		if (isCurrentStateFinished) {
+			currentStateIndex++;
+			isCurrentStateFinished = false;
 		}
 	}
 
-	/* ------------------------ FSM state handlers ------------------------ */
 	/**
-	 * Handle behavior in START_STATE.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 * Moves the arm to the mid encoder and moves the wrist out, then deposits the cube.
+	 * @return returns true if the cube is successfully deposited to mid, and false if not
 	 */
-	private void handleStartState(TeleopInput input) {
-		exampleMotor.set(0);
+	private boolean handleCubeMid() {
+		return false;
+	}
+
+	/**
+	 * Moves the chassis two meters back from its current position.
+	 * @return returns true if the chassis is at its desired position, and false if not
+	 */
+	private boolean handleMoveBackTwoMeters() {
+		return false;
 	}
 	/**
-	 * Handle behavior in OTHER_STATE.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
+	 * Uses gyro to balance the chassis on the charging station.
+	 * @return returns true if the chassis is balanced, and false if not
 	 */
-	private void handleOtherState(TeleopInput input) {
-		exampleMotor.set(MOTOR_RUN_POWER);
+	private boolean handleBalance() {
+		return false;
 	}
 }
