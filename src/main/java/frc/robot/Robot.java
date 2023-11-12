@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.AutoFSMSystem;
 
@@ -14,7 +15,18 @@ import frc.robot.systems.AutoFSMSystem;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
+	// Systems
 	private AutoFSMSystem autoFSMSystem;
+	private ElevatorWristFSM wristSystem;
+	private ElevatorArmFSM elevatorArm;
+	private EveryBotIntakeFSM everybotIntake;
+	private DriveFSMSystem driveFSMSystem;
+
+	private boolean autoWristMoved;
+	private boolean autoElevatorExtended;
+	private boolean autoElevatorRetracted;
+	private boolean autoIntakeMoved;
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -23,9 +35,13 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
+		// Instantiate all systems here
 		autoFSMSystem = new AutoFSMSystem();
+		wristSystem = new ElevatorWristFSM();
+		everybotIntake = new EveryBotIntakeFSM();
+		elevatorArm = new ElevatorArmFSM();
+		driveFSMSystem = new DriveFSMSystem();
 	}
-
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
@@ -40,10 +56,18 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		everybotIntake.reset();
+		driveFSMSystem.reset();
+		elevatorArm.reset();
+		wristSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
+		everybotIntake.update(input);
+		driveFSMSystem.update(input);
+		elevatorArm.update(input);
+		wristSystem.update(input);
 	}
 
 	@Override
