@@ -204,6 +204,22 @@ public class TeleopInput {
 	}
 
 	/**
+	 * Get the value of the wrist down button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristOutDoubleButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_OUT_BUTTON_DOUBLE);
+	}
+
+	/**
+	 * Get the value of the wrist up button.
+	 * @return True if button is pressed
+	 */
+	public boolean isWristInDoubleButtonPressed() {
+		return leftJoystick.getRawButton(WRIST_IN_BUTTON_DOUBLE);
+	}
+
+	/**
 	 * Get the value of the flip abort button.
 	 * @return True if button is pressed
 	 */
@@ -234,6 +250,4 @@ public class TeleopInput {
 	public boolean isThrottleForward() {
 		return leftJoystick.getThrottle() <= 0;
 	}
-	/* ======================== Private methods ======================== */
-
 }
