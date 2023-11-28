@@ -31,6 +31,7 @@ public class ElevatorArmFSM {
 	private static final float MAX_UP_POWER = 0.55f;
 	private static final float MAX_DOWN_POWER = -0.5f;
 	private static final float JOYSTICK_DRIFT_THRESHOLD = 0.15f;
+	private static final double AUTON_INRANGE_MATH = 3.0;
 	// arbitrary encoder amounts
 	private static final float LOW_ENCODER_ROTATIONS = -148;
 	private static final float MID_ENCODER_ROTATIONS = 15;
@@ -334,9 +335,8 @@ public class ElevatorArmFSM {
 		armMotor.set(pid(armMotor.getEncoder().getPosition(), STARTING_ER));
 		return inRange(armMotor.getEncoder().getPosition(), STARTING_ER);
 	}
-
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) <= AUTO_ENCODER_MARGIN;
+		return Math.abs(a - b) <= AUTON_INRANGE_MATH;
 	}
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
