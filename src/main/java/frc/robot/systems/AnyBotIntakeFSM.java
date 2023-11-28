@@ -57,6 +57,7 @@ public class AnyBotIntakeFSM {
 	private boolean forward = true;
 	private boolean prevOuttaking = false;
 	private double[] currLogs = new double[AVERAGE_SIZE];
+	private boolean stopping = false; 
 
 	private double autoOuttakingTimeStart;
 	private boolean autoOuttakingTimerStarted;
@@ -272,12 +273,17 @@ public class AnyBotIntakeFSM {
 			case IDLE_STOP:
 
 				if (input.isOuttakeButtonPressed() && input.isIntakeButtonPressed()) {
+					stopping = true; 
 					return AnyBotIntakeFSMState.IDLE_STOP;
 				}
+				else if(!input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()){
+                        stopping = false; 
+					    return AnyBotIntakeFSMState.IDLE_STOP;
+				}
 
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed() && stopping == false) {
 					return AnyBotIntakeFSMState.OUTTAKING;
-				} else if (input.isIntakeButtonPressed()) {
+				} else if (input.isIntakeButtonPressed() && stopping == false) {
 					if (holding) {
 						return AnyBotIntakeFSMState.IDLE_STOP;
 					} else {
