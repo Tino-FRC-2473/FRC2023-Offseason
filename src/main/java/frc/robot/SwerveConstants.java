@@ -27,8 +27,8 @@ public final class SwerveConstants {
 	public static final class DriveConstants {
 		// Driving Parameters - Note that these are not the maximum capable speeds of
 		// the robot, rather the allowed maximum speeds
-		public static final double MAX_SPEED_METERS_PER_SECOND = 4.8; //4.8
-		public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second //2
+		public static final double MAX_SPEED_METERS_PER_SECOND = 2; //4.8
+		public static final double MAX_ANGULAR_SPEED = 0.5 * Math.PI; // radians per second //2
 
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
@@ -53,6 +53,8 @@ public final class SwerveConstants {
 		public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
 		public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
 
+		public static final double TELEOP_JOYSTICK_POWER_CURVE = 3;
+
 
 		public static final boolean GYRO_REVERSED = false;
 		public static final double TIME_CONSTANT = 1e-6;
@@ -67,7 +69,7 @@ public final class SwerveConstants {
 		// The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
 		// This changes the drive speed of the module (a pinion gear with more teeth will result in
 		// a robot that drives faster).
-		public static final int DRIVING_MOTOR_PINON_TEETH = 14;
+		public static final int DRIVING_MOTOR_PINON_TEETH = 13;
 
 		// Invert the turning encoder, since the output shaft rotates in the opposite direction of
 		// the steering motor in the MAXSwerve Module.
@@ -125,9 +127,9 @@ public final class SwerveConstants {
 	}
 
 	public static final class AutoConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 2;
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.5;
 		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 2;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 4;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 
 		public static final double PX_CONTROLLER = 1;

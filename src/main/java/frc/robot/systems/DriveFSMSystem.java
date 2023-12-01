@@ -1,5 +1,11 @@
 package frc.robot.systems;
 
+import java.util.ArrayList;
+
+import org.ejml.dense.row.linsol.qr.SolvePseudoInverseQrp_DDRM;
+
+import java.awt.Point;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
@@ -18,7 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -86,7 +91,9 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
-	public static final double THREE_SIXTY_DEGREES = 360;
+	private int autoIndex = 0;
+	private boolean pointReached = false;
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -148,9 +155,10 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentState = FSMState.AUTO_STATE;
-
+		gyro.reset();
 		resetEncoders();
-		resetOdometry(getPose());
+		resetOdometry(new Pose2d());
+		System.out.print(getPose());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -185,28 +193,23 @@ public class DriveFSMSystem {
 				frontRight.getPosition(),
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
-
-		SmartDashboard.putNumber("X Pos", getPose().getX());
-		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
-					drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-						* Math.abs(input.getControllerLeftJoystickY())),
-						OIConstants.DRIVE_DEADBAND),
-						-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-						* Math.abs(input.getControllerLeftJoystickX())),
-						OIConstants.DRIVE_DEADBAND),
+					drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+						-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
 						OIConstants.DRIVE_DEADBAND), true, true);
-					if (input.isBackButtonPressed()) {
+					if (input.isBackButtonPressed()) { 
 						gyro.reset();
 					}
 				}
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					auto1(input);
+					driveToState(2, 0, 0);
 				}
 				break;
 			default:
@@ -238,6 +241,64 @@ public class DriveFSMSystem {
 	}
 
 	/* ------------------------ FSM state handlers ------------------------ */
+
+	/**
+	 * Drives the robot to a final odometry state.
+	 * @param x final x position of center
+	 * @param y final y position of center
+	 * @param angle final angle
+	 */
+	public void driveToState(double x, double y, double angle) {
+		boolean positionReaced = false;
+		// System.out.println("\nX: " + getPose().getX());
+		// System.out.println("Y: " + getPose().getY());
+		double xDiff = x - getPose().getX();
+		double yDiff = y - getPose().getY();
+		double aDiff = angle - getPose().getRotation().getRadians();
+		double travelAngle = Math.atan2(yDiff, xDiff);
+		if (Math.abs(xDiff) > 0.05 || Math.abs(yDiff) > 0.05) {
+			drive(AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+					AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+					0, false, false);
+		} else {
+			positionReaced = true;
+			System.out.print(getPose());
+		}
+		if (Math.abs(aDiff) > 1) {
+			if (aDiff < 0) {
+				drive(0, 0, DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			} else {
+				drive(0, 0, -DriveConstants.MAX_ANGULAR_SPEED, false, false);
+			}
+		} else {
+			if (positionReaced) {
+				drive(0, 0, 0, false, false);
+				pointReached = true;
+				System.out.print(getPose());
+			}
+		}
+	}
+
+	/**
+	 * Auto-specific method for generalization of paths.
+	 * @param autoPoints ArrayList of all desired points to be traveled through
+	 * @param autoAngles ArrayList of all desired angular positions for each point
+	 * @return true if the route was completed and false otherwise
+	 */
+	public boolean driveToStates(ArrayList<Point> autoPoints, ArrayList<Double> autoAngles) {
+		if (!pointReached) {
+			driveToState(autoPoints.get(autoIndex).getX(), autoPoints.get(autoIndex).getY(),
+				autoAngles.get(autoIndex));
+		} else {
+			autoIndex++;
+			pointReached = false;
+			if (autoIndex >= autoPoints.size()) {
+				autoIndex = 0;
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Method to drive the robot using joystick info.
@@ -325,40 +386,11 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Drives robot to specific position and orientation.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 * @param xFinal desired x position in meters
-	 * @param yFinal desired y position in meters
-	 * @param rotFinal desired rotation in degrees
-	 *
-	 */
-	public void driveToPos(TeleopInput input, double xFinal, double yFinal, double rotFinal) {
-		double xDist = xFinal - getPose().getX();
-		double yDist = yFinal - getPose().getY();
-		double rotAmount = rotFinal - (getHeading() % THREE_SIXTY_DEGREES);
-
-		if (Math.abs(xDist) < AutoConstants.METERS_MARGIN_OF_ERROR
-			&& Math.abs(yDist) < AutoConstants.METERS_MARGIN_OF_ERROR
-			&& Math.abs(rotAmount) < AutoConstants.DEGREES_MARGIN_OF_ERROR) {
-			drive(0, 0, 0, false, false);
-		} else {
-			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-			double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
-
-			drive(xSpeed, ySpeed, rotSpeed, false, true);
-		}
-	}
-
-
-	/**
 	 * Balances gyro.
 	 */
 	public void balance() {
 		double power;
 		if (Math.abs(gyro.getRoll()) < 2) {
-
 			power = 0;
 		} else {
 			power = gyro.getRoll()
@@ -380,9 +412,8 @@ public class DriveFSMSystem {
 		if (input != null) {
 			return;
 		}
-		System.out.println(getPose());
 		double power;
-		if (getPose().getX() > -AutoConstants.AUTO_MOBILITY_DIST) {
+		if (getPose().getX() > -1) {
 			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else {
 			power = 0;
