@@ -246,38 +246,26 @@ public class DriveFSMSystem {
 	 * Drives the robot to a final odometry state.
 	 * @param x final x position of center
 	 * @param y final y position of center
-	 * @param angle final angle
+	 * @param angle final angle in degrees
 	 */
 	public void driveToState(double x, double y, double angle) {
-		boolean positionReaced = false;
-		// System.out.println("\nX: " + getPose().getX());
-		// System.out.println("Y: " + getPose().getY());
+		System.out.println("\nX: " + getPose().getX());
+		System.out.println("Y: " + getPose().getY());
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
-		double aDiff = angle - getPose().getRotation().getRadians();
+		double aDiff = ((getPose().getRotation().getDegrees() % 360) - angle);
 		double travelAngle = Math.atan2(yDiff, xDiff);
-		if (Math.abs(xDiff) > 0.05 || Math.abs(yDiff) > 0.05) {
-			drive(AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
-					AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
-					0, false, false);
-		} else {
-			positionReaced = true;
-			System.out.print(getPose());
-		}
-		if (Math.abs(aDiff) > 1) {
-			if (aDiff < 0) {
-				drive(0, 0, DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			} else {
-				drive(0, 0, -DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			}
-		} else {
-			if (positionReaced) {
-				drive(0, 0, 0, false, false);
-				pointReached = true;
-				System.out.print(getPose());
-			}
+
+		double xPower = (Math.abs(xDiff) >= 0.05) ?  AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+		double yPower = (Math.abs(yDiff) >= 0.05) ?  AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle) : 0;
+		double aPower = (Math.abs(aDiff) >= 5) ? ((aDiff > 0 ) ? -DriveConstants.MAX_ANGULAR_SPEED : DriveConstants.MAX_ANGULAR_SPEED) : 0;
+		drive(xPower, yPower, aPower, true, false);
+		System.out.print(getPose());
+		if (xPower == 0 && yPower == 0 && aPower == 0) {
+			pointReached = true;
 		}
 	}
+
 
 	/**
 	 * Auto-specific method for generalization of paths.
