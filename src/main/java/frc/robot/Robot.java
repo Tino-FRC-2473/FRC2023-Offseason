@@ -66,10 +66,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		led.rainbow();
+		//led.rainbow();
 		///hueVal++;
 		//led.setHSVVals(hueVal, 100, 100);
-		//led.setRGBVals(250, 0, 0);
+		led.cr();
 		//led.set
 		// if (wristSystem.movingAutoState()) {
 		// 	autoWristMoved = true;
