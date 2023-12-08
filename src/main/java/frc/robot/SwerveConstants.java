@@ -129,7 +129,7 @@ public final class SwerveConstants {
 	public static final class AutoConstants {
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.5;
 		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 4;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 2;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 
 		public static final double PX_CONTROLLER = 1;

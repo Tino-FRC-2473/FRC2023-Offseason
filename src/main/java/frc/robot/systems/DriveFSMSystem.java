@@ -3,6 +3,7 @@ package frc.robot.systems;
 import java.util.ArrayList;
 
 import org.ejml.dense.row.linsol.qr.SolvePseudoInverseQrp_DDRM;
+import frc.robot.utils.SwerveUtils;
 
 import java.awt.Point;
 
@@ -93,6 +94,7 @@ public class DriveFSMSystem {
 
 	private int autoIndex = 0;
 	private boolean pointReached = false;
+	int n = 0;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -193,8 +195,9 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-
-		System.out.println(frontLeft.getPosition());
+		if (n % 20 == 0) {
+			System.out.println(getPose().getRotation().getDegrees());
+		}
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
@@ -202,7 +205,6 @@ public class DriveFSMSystem {
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
 
-		System.out.println("HERE");
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
@@ -212,14 +214,14 @@ public class DriveFSMSystem {
 						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
 						OIConstants.DRIVE_DEADBAND), true, true);
-					if (input.isBackButtonPressed()) { 
+					if (input.isBackButtonPressed()) {
 						gyro.reset();
 					}
 				}
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					driveToState(1, 0, 0);
+					driveToState(1, 1, -179);
 					System.out.println(getPose());
 				}
 				break;
@@ -227,6 +229,7 @@ public class DriveFSMSystem {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		n++;
 	}
 
 	/* ======================== Private methods ======================== */
@@ -263,27 +266,34 @@ public class DriveFSMSystem {
 		boolean positionReaced = false;
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
-		double aDiff = angle - getPose().getRotation().getRadians();
+		double aDiff = angle - getPose().getRotation().getDegrees();
 		double travelAngle = Math.atan2(yDiff, xDiff);
-		if (Math.abs(xDiff) > 0.05 || Math.abs(yDiff) > 0.05) {
-			drive(AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
-					AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
-					0, false, false);
-		} else {
-			positionReaced = true;
-		}
-		if (Math.abs(aDiff) > 1) {
-			if (aDiff < 0) {
-				drive(0, 0, DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			} else {
-				drive(0, 0, -DriveConstants.MAX_ANGULAR_SPEED, false, false);
-			}
-		} else {
-			if (positionReaced) {
-				drive(0, 0, 0, false, false);
-				pointReached = true;
-			}
-		}
+
+		System.out.println("ADIFF: " + aDiff);
+		double xSpeed = Math.abs(xDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+		double ySpeed = Math.abs(yDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND  * Math.sin(travelAngle) : 0;
+		double aSpeed = Math.abs(aDiff) > 5 ? (aDiff > 0 ? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60) : Math.max(-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60)): 0;
+		drive(xSpeed, ySpeed, aSpeed, true, false);
+		// if (Math.abs(xDiff) > 0.05 || Math.abs(yDiff) > 0.05 || Math.abs(aDiff) > 5) {
+		// 	drive(AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle),
+		// 			AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle),
+		// 			-Math.abs(aDiff) * DriveConstants.MAX_ANGULAR_SPEED / aDiff , false, false);
+		// } else {
+		// 	drive(0, 0, 0, false, false);
+		// 	pointReached = true;
+		// }
+		// if (Math.abs(aDiff) > 5) {
+		// 	if (aDiff < 0) {
+		// 		drive(0, 0, DriveConstants.MAX_ANGULAR_SPEED, false, false);
+		// 	} else {
+		// 		drive(0, 0, -DriveConstants.MAX_ANGULAR_SPEED, false, false);
+		// 	}
+		// } else {
+		// 	if (positionReaced) {
+		// 		drive(0, 0, 0, false, false);
+		// 		pointReached = true;
+		// 	}
+		// }
 	}
 
 	/**
