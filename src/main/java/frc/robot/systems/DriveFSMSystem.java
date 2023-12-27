@@ -1,7 +1,5 @@
 package frc.robot.systems;
 
-import java.util.ArrayList;
-
 import frc.robot.utils.SwerveUtils;
 
 import com.kauailabs.navx.frc.AHRS;
