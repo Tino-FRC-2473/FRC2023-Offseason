@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.TeleopInput;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
+import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -32,7 +33,7 @@ public class DriveFSMSystem {
 	public enum FSMState {
 		TELEOP_STATE,
 		AUTO_STATE,
-		TO_POS_STATE
+		CV_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -43,6 +44,8 @@ public class DriveFSMSystem {
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	
+	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -145,7 +148,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.TO_POS_STATE;
+		currentState = FSMState.CV_STATE;
 
 		resetEncoders();
 		resetOdometry(getPose());
@@ -204,13 +207,13 @@ public class DriveFSMSystem {
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					auto1(input);
+					driveToPos(input, 1.5, 1.5, 90);
 				}
 				break;
 
-			case TO_POS_STATE:
+			case CV_STATE:
 				if (input == null) {
-					driveToPos(input, 1.5, 1.5, 90);
+					driveUntilObject(input, rpi.getConeDistance(), rpi.getConeYaw());
 				}
 				break;
 
@@ -354,21 +357,16 @@ public class DriveFSMSystem {
 			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 			double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
 
-			drive(xSpeed, ySpeed, rotSpeed, false, true);
+			drive(xSpeed, ySpeed, rotSpeed, true, true);
 		}
-	
 	}
 
-	public void driveUntilPointD(double dist, double rotFinal) {
-		// if (xDist < 1 && yDist < 1 && rotFinal < 1) {
-		// 	drive (0, 0, 0, false, false);
-		// } else {
-		// 	double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-		// 	double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-		// 	double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+	public void driveUntilObject(TeleopInput input, double dist, double rotFinal) {
 
-		// 	drive(xSpeed, ySpeed, rotSpeed, false, true);
-		// }
+		if (input != null) {
+			System.out.println("Teleop");
+			return;
+		}
 		
 		double power = dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
@@ -380,61 +378,6 @@ public class DriveFSMSystem {
 		} else {
 			drive (power, 0, 0, false, false);
 		}
-	}
-
-	/**
-	 * Balances gyro.
-	 */
-	public void balance() {
-		double power;
-		if (Math.abs(gyro.getRoll()) < 2) {
-
-			power = 0;
-		} else {
-			power = gyro.getRoll()
-				/ DriveConstants.BALANCE_SPEED_INVERSE_PROPORTION;
-		}
-		// set to power field reletive so facing charge station
-		frontLeft.setDesiredState(new SwerveModuleState(power, frontLeft.getState().angle));
-		frontRight.setDesiredState(new SwerveModuleState(power, frontRight.getState().angle));
-		rearLeft.setDesiredState(new SwerveModuleState(power, rearLeft.getState().angle));
-		rearRight.setDesiredState(new SwerveModuleState(power, rearRight.getState().angle));
-	}
-
-	/**
-	 * auto method.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	public void auto1(TeleopInput input) {
-		if (input != null) {
-			return;
-		}
-		System.out.println(getPose());
-		double power;
-		if (getPose().getX() > -AutoConstants.AUTO_MOBILITY_DIST) {
-			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-		} else {
-			power = 0;
-		}
-		frontLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
-		frontRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
-		rearLeft.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
-		rearRight.setDesiredState(new SwerveModuleState(power, new Rotation2d(Math.PI)));
-	}
-
-	/**
-	 * Sets the wheels into an X formation to prevent movement.
-	 */
-	public void setX() {
-		frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
-			Math.toDegrees(Math.PI / 2))));
-		frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
-			-Math.toDegrees(Math.PI / 2))));
-		rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
-			-Math.toDegrees(Math.PI / 2))));
-		rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(
-			Math.toDegrees(Math.PI / 2))));
 	}
 
 	/**
