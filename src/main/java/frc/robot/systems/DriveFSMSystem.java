@@ -1,7 +1,5 @@
 package frc.robot.systems;
-
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.math.MathUtil;
 
 // WPILib Imports
@@ -358,7 +356,30 @@ public class DriveFSMSystem {
 
 			drive(xSpeed, ySpeed, rotSpeed, false, true);
 		}
+	
+	}
 
+	public void driveUntilPointD(double dist, double rotFinal) {
+		// if (xDist < 1 && yDist < 1 && rotFinal < 1) {
+		// 	drive (0, 0, 0, false, false);
+		// } else {
+		// 	double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		// 	double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		// 	double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+
+		// 	drive(xSpeed, ySpeed, rotSpeed, false, true);
+		// }
+		
+		double power = dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+	
+		if (dist < 1 && rotFinal < 1) {
+			drive (0, 0, 0, false, false);
+		} else if (rotFinal > 1) {
+			drive (0, 0, rotSpeed, false, false);
+		} else {
+			drive (power, 0, 0, false, false);
+		}
 	}
 
 	/**
