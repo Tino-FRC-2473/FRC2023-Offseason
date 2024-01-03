@@ -342,6 +342,10 @@ public class DriveFSMSystem {
 		double rotAmount = rotFinal - (getHeading() % 360);
 
 		driveUntilPoint(xDist, yDist, rotAmount);
+
+		// double xSpeed = Math.abs(xDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+		// double ySpeed = Math.abs(yDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND  * Math.sin(travelAngle) : 0;
+		// double aSpeed = Math.abs(aDiff) > 5 ? (aDiff > 0 ? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60) : Math.max(-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60)): 0;
 	}
 
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
