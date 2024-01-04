@@ -1,5 +1,9 @@
 package frc.robot.systems;
 
+import frc.robot.utils.SwerveUtils;
+
+import java.util.ArrayList;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
@@ -18,11 +22,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Robot Imports
 import frc.robot.TeleopInput;
-import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
@@ -38,6 +40,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
+	private int currentPointInPath;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -86,6 +89,9 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
+	private int autoIndex = 0;
+	private boolean pointReached = false;
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -130,8 +136,9 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 
-		resetEncoders();
-		resetOdometry(getPose());
+		//resetEncoders();
+		//resetOdometry(getPose());
+		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -147,9 +154,13 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentState = FSMState.AUTO_STATE;
-
-		resetEncoders();
-		resetOdometry(getPose());
+		// resetEncoders();
+		// resetOdometry(getPose());
+		// gyro.reset();
+		resetOdometry(new Pose2d());
+		System.out.println("---------------------RESET POSE");
+		System.out.println(getPose());
+		currentPointInPath = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -185,17 +196,13 @@ public class DriveFSMSystem {
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
 
-		SmartDashboard.putNumber("X Pos", getPose().getX());
-		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
-					drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-						* Math.abs(input.getControllerLeftJoystickY())),
-						OIConstants.DRIVE_DEADBAND),
-						-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-						* Math.abs(input.getControllerLeftJoystickX())),
-						OIConstants.DRIVE_DEADBAND),
+					drive(-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickY(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
+						-MathUtil.applyDeadband(Math.pow(input.getControllerLeftJoystickX(),
+						DriveConstants.TELEOP_JOYSTICK_POWER_CURVE), OIConstants.DRIVE_DEADBAND),
 						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
 						OIConstants.DRIVE_DEADBAND), true, true);
 					if (input.isBackButtonPressed()) {
@@ -205,7 +212,11 @@ public class DriveFSMSystem {
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					auto1(input);
+					driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// ArrayList<Pose2d> points = new ArrayList<Pose2d>();
+					// points.add(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					// driveAlongPath(points);
 				}
 				break;
 			default:
@@ -237,6 +248,71 @@ public class DriveFSMSystem {
 	}
 
 	/* ------------------------ FSM state handlers ------------------------ */
+
+	/**
+	 * Drives the robot to a final odometry state.
+	 * @param x final x position of center in meters
+	 * @param y final y position of center in meters
+	 * @param angle final angle in degrees
+	 * @return if the robot has driven to the current position
+	 */
+	public boolean driveToPose(Pose2d pose) {
+		double x = pose.getX();
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+
+		double xDiff = x - getPose().getX();
+		double yDiff = y - getPose().getY();
+		double aDiff = angle - getPose().getRotation().getDegrees();
+		double travelAngle = Math.atan2(yDiff, xDiff);
+
+		double xSpeed = Math.abs(xDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
+			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+		double ySpeed = Math.abs(yDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
+			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle) : 0;
+		double aSpeed = Math.abs(aDiff) > AutoConstants.DEGREES_MARGIN_OF_ERROR ? (aDiff > 0
+			? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
+			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
+
+		drive(xSpeed, ySpeed, aSpeed, true, false);
+		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean driveAlongPath(ArrayList<Pose2d> points) {
+		if (currentPointInPath >= points.size()) {
+			return true;
+		}
+		if (driveToPose(points.get(currentPointInPath))) {
+			currentPointInPath++;
+		}
+		return false;
+	}
+
+	// /**
+	//  * Auto-specific method for generalization of paths.
+	//  * @param autoPoses ArrayList of all desired poses to be traveled through
+	//  * @return true if the route was completed and false otherwise
+	//  */
+	// public boolean driveToPoses(ArrayList<Pose2d> autoPoses) {
+	// 	if (!pointReached) {
+	// 		pointReached = driveToPose(autoPoints.get(autoIndex).getX()
+	//			, autoPoints.get(autoIndex).getY(),
+	// 			autoAngles.get(autoIndex));
+	// 	} else {
+	// 		autoIndex++;
+	// 		pointReached = false;
+	// 		if (autoIndex >= autoPoints.size()) {
+	// 			autoIndex = 0;
+	// 			return true;
+	// 		}
+	// 	}
+	// 	return false;
+	// }
 
 	/**
 	 * Method to drive the robot using joystick info.
@@ -350,9 +426,8 @@ public class DriveFSMSystem {
 		if (input != null) {
 			return;
 		}
-		System.out.println(getPose());
 		double power;
-		if (getPose().getX() > -AutoConstants.AUTO_MOBILITY_DIST) {
+		if (getPose().getX() > -1) {
 			power = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 		} else {
 			power = 0;
