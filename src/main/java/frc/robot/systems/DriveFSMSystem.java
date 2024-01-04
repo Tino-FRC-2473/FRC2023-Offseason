@@ -38,7 +38,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
-
+	int n = 0;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
@@ -189,6 +189,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
+		n++;
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input != null) {
@@ -213,6 +214,14 @@ public class DriveFSMSystem {
 
 			case CV_STATE:
 				if (input == null) {
+					if (n % 40 == 0) {
+						System.out.println("dist: " + rpi.getConeDistance());
+						System.out.println("ang: " + rpi.getConeYaw());
+
+						if (rpi.getConeDistance() == -1 || rpi.getConeYaw() == -1) {
+							System.out.println("CANT SEE");
+						}
+					}
 					driveUntilObject(input, rpi.getConeDistance(), rpi.getConeYaw());
 				}
 				break;
@@ -239,6 +248,8 @@ public class DriveFSMSystem {
 				return FSMState.TELEOP_STATE;
 			case AUTO_STATE:
 				return FSMState.AUTO_STATE;
+			case CV_STATE:
+				return FSMState.CV_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -367,13 +378,18 @@ public class DriveFSMSystem {
 			System.out.println("Teleop");
 			return;
 		}
-		
+
 		double power = dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+		double rotSpeed = -rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+
+		System.out.println(dist);
+		System.out.println("power: " + power);
+		System.out.println("rotSpeed: " + rotSpeed);
 	
-		if (dist < 1 && rotFinal < 1) {
+	
+		if ((dist < 1 && Math.abs(rotFinal) <= 5)) {
 			drive (0, 0, 0, false, false);
-		} else if (rotFinal > 1) {
+		} else if (Math.abs(rotFinal) > 5) {
 			drive (0, 0, rotSpeed, false, false);
 		} else {
 			drive (power, 0, 0, false, false);
