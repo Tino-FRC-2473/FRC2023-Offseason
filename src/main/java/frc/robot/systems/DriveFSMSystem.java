@@ -2,6 +2,8 @@ package frc.robot.systems;
 
 import frc.robot.utils.SwerveUtils;
 
+import java.util.ArrayList;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
@@ -38,6 +40,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
+	private int currentPointInPath;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -157,6 +160,7 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		System.out.println("---------------------RESET POSE");
 		System.out.println(getPose());
+		currentPointInPath = 0;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -208,7 +212,11 @@ public class DriveFSMSystem {
 				break;
 			case AUTO_STATE:
 				if (input == null) {
-					driveToPose(1, 1, 0);
+					driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// ArrayList<Pose2d> points = new ArrayList<Pose2d>();
+					// points.add(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					// driveAlongPath(points);
 				}
 				break;
 			default:
@@ -248,7 +256,11 @@ public class DriveFSMSystem {
 	 * @param angle final angle in degrees
 	 * @return if the robot has driven to the current position
 	 */
-	public boolean driveToPose(double x, double y, double angle) {
+	public boolean driveToPose(Pose2d pose) {
+		double x = pose.getX();
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
@@ -267,6 +279,16 @@ public class DriveFSMSystem {
 		drive(xSpeed, ySpeed, aSpeed, true, false);
 		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
 			return true;
+		}
+		return false;
+	}
+
+	public boolean driveAlongPath(ArrayList<Pose2d> points) {
+		if (currentPointInPath >= points.size()) {
+			return true;
+		}
+		if (driveToPose(points.get(currentPointInPath))) {
+			currentPointInPath++;
 		}
 		return false;
 	}
