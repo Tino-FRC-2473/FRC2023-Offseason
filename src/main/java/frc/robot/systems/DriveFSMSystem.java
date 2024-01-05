@@ -1,11 +1,11 @@
 package frc.robot.systems;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.math.MathUtil;
-
-// WPILib Imports
 
 // Third party Hardware Imports
+import com.kauailabs.navx.frc.AHRS;
+import java.util.ArrayList;
 //import com.revrobotics.CANSparkMax;
+
+// WPILib Imports
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 
 // Robot Imports
 import frc.robot.TeleopInput;

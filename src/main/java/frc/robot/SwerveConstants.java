@@ -139,6 +139,8 @@ public final class SwerveConstants {
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
 		public static final double METERS_MARGIN_OF_ERROR = 0.05;
 		public static final double DEGREES_MARGIN_OF_ERROR = 5;
+		public static final double ANGULAR_SPEED_ACCEL_CONSTANT = 60;
+
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS
