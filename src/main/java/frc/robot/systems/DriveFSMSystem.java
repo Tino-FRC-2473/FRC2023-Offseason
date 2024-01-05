@@ -340,6 +340,50 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
+	
+	/**
+	 * Drives the robot to a final odometry state.
+	 * @param x final x position of center in meters
+	 * @param y final y position of center in meters
+	 * @param angle final angle in degrees
+	 * @return if the robot has driven to the current position
+	 */
+	public boolean driveToPose(Pose2d pose) {
+		double x = pose.getX();
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+
+		double xDiff = x - getPose().getX();
+		double yDiff = y - getPose().getY();
+		double aDiff = angle - getPose().getRotation().getDegrees();
+		double travelAngle = Math.atan2(yDiff, xDiff);
+
+		double xSpeed = Math.abs(xDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
+			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+		double ySpeed = Math.abs(yDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
+			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle) : 0;
+		double aSpeed = Math.abs(aDiff) > AutoConstants.DEGREES_MARGIN_OF_ERROR ? (aDiff > 0
+			? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
+			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
+
+		drive(xSpeed, ySpeed, aSpeed, true, false);
+		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean driveAlongPath(ArrayList<Pose2d> points) {
+		if (currentPointInPath >= points.size()) {
+			return true;
+		}
+		if (driveToPose(points.get(currentPointInPath))) {
+			currentPointInPath++;
+		}
+		return false;
+	}
 
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
