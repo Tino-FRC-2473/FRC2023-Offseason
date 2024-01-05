@@ -207,23 +207,20 @@ public class DriveFSMSystem {
 				}
 				break;
 			case AUTO_STATE:
-				if (input == null) {
-					driveToPos(input, 1.5, 1.5, 90);
-				}
 				break;
 
 			case CV_STATE:
-				if (input == null) {
-					if (n % 40 == 0) {
-						System.out.println("dist: " + rpi.getConeDistance());
-						System.out.println("ang: " + rpi.getConeYaw());
+				double dist = rpi.getConeDistance();
+				double angle = rpi.getConeYaw();
+				if (n % 40 == 0) {
+					System.out.println("dist: " + dist);
+					System.out.println("ang: " + angle);
 
-						if (rpi.getConeDistance() == -1 || rpi.getConeYaw() == -1) {
-							System.out.println("CANT SEE");
-						}
+					if (dist == -1 || angle == -1) {
+						System.out.println("CANT SEE");
 					}
-					driveUntilObject(input, rpi.getConeDistance(), rpi.getConeYaw());
 				}
+				driveUntilObject(dist, angle);
 				break;
 
 			default:
@@ -343,22 +340,6 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
-	public void driveToPos(TeleopInput input, double xFinal, double yFinal, double rotFinal) {
-		if (input != null) {
-			System.out.println("Teleop");
-			return;
-		}
-	
-		double xDist = xFinal - getPose().getX();
-		double yDist = yFinal - getPose().getY();
-		double rotAmount = rotFinal - (getHeading() % 360);
-
-		driveUntilPoint(xDist, yDist, rotAmount);
-
-		// double xSpeed = Math.abs(xDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
-		// double ySpeed = Math.abs(yDiff) > 0.05 ? AutoConstants.MAX_SPEED_METERS_PER_SECOND  * Math.sin(travelAngle) : 0;
-		// double aSpeed = Math.abs(aDiff) > 5 ? (aDiff > 0 ? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60) : Math.max(-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff / 60)): 0;
-	}
 
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
@@ -372,27 +353,22 @@ public class DriveFSMSystem {
 		}
 	}
 
-	public void driveUntilObject(TeleopInput input, double dist, double rotFinal) {
+	public void driveUntilObject(double dist, double rotFinal) {
+		double power = clamp(dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (input != null) {
-			System.out.println("Teleop");
-			return;
-		}
-
-		double power = dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-		double rotSpeed = -rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
-
-		System.out.println(dist);
 		System.out.println("power: " + power);
 		System.out.println("rotSpeed: " + rotSpeed);
-	
-	
+
 		if ((dist < 1 && Math.abs(rotFinal) <= 5)) {
-			drive (0, 0, 0, false, false);
+			drive(0, 0, 0, false, false);
 		} else if (Math.abs(rotFinal) > 5) {
-			drive (0, 0, rotSpeed, false, false);
+			drive(0, 0, rotSpeed, false, false);
 		} else {
-			drive (power, 0, 0, false, false);
+			drive(power, 0, 0, false, false);
 		}
 	}
 
@@ -431,5 +407,9 @@ public class DriveFSMSystem {
 	 */
 	public double getHeading() {
 		return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
+	}
+
+	public static double clamp(double value, double lowerBound, double upperBound) {
+		return Math.min(Math.max(value, lowerBound), upperBound);
 	}
 }
