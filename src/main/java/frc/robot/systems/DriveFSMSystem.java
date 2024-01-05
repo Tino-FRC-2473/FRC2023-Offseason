@@ -212,7 +212,7 @@ public class DriveFSMSystem {
 			case CV_STATE:
 				double dist = rpi.getConeDistance();
 				double angle = rpi.getConeYaw();
-				if (n % 40 == 0) {
+				if (n % 100 == 0) {
 					System.out.println("dist: " + dist);
 					System.out.println("ang: " + angle);
 
@@ -354,21 +354,21 @@ public class DriveFSMSystem {
 	}
 
 	public void driveUntilObject(double dist, double rotFinal) {
-		double power = clamp(dist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double power = clamp((dist - 0.58) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		System.out.println("power: " + power);
-		System.out.println("rotSpeed: " + rotSpeed);
+		// System.out.println("power: " + power);
+		// System.out.println("rotSpeed: " + rotSpeed);
 
-		if ((dist < 1 && Math.abs(rotFinal) <= 5)) {
+		if ((dist < 0.58 && Math.abs(rotFinal) <= 5) || (dist == -1 || rotFinal == -1)) {
 			drive(0, 0, 0, false, false);
-		} else if (Math.abs(rotFinal) > 5) {
-			drive(0, 0, rotSpeed, false, false);
+		// } else if (Math.abs(rotFinal) > 5) {
+		// 	drive(0, 0, rotSpeed, false, false);
 		} else {
-			drive(power, 0, 0, false, false);
+			drive(power, 0, rotSpeed, false, false);
 		}
 	}
 
