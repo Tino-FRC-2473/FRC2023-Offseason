@@ -85,11 +85,25 @@ public class TeleopInput {
 		return driverController.getRightX();
 	}
 	/**
-	 * Get the value of the A button.
+	 * Get the value of the Share button.
 	 * @return True if button is pressed
 	 */
 	public boolean isBackButtonPressed() {
 		return driverController.getShareButton();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isCircleButtonPressed() {
+		return driverController.getCircleButtonPressed();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isCircleButtonReleased() {
+		return driverController.getCircleButtonReleased();
 	}
 
 	/* ------------------------ Left Joystick ------------------------ */

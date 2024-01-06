@@ -35,7 +35,7 @@ public class DriveFSMSystem {
 	public enum FSMState {
 		TELEOP_STATE,
 		AUTO_STATE,
-		CV_STATE
+		DRIVE_TO_CONE_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -151,7 +151,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.CV_STATE;
+		currentState = FSMState.DRIVE_TO_CONE_STATE;
 		currentPointInPath = 0;
 
 		//resetEncoders();
@@ -210,6 +210,7 @@ public class DriveFSMSystem {
 					}
 				}
 				break;
+
 			case AUTO_STATE:
 				if (input == null) {
 					driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
@@ -220,14 +221,17 @@ public class DriveFSMSystem {
 				}
 				break;
 
-			case CV_STATE:
+			case DRIVE_TO_CONE_STATE:
 				double dist = rpi.getConeDistance();
 				double angle = rpi.getConeYaw();
+				boolean canSee = (dist == -1 || angle == -1);
+				SmartDashboard.putBoolean("Can See Cone", canSee);
+				SmartDashboard.putNumber("Distance to Cone", dist);
 				if (n % Constants.PRINTING_MOD_CONSTANT == 0) {
 					System.out.println("dist: " + dist);
 					System.out.println("ang: " + angle);
 
-					if (dist == -1 || angle == -1) {
+					if (!canSee) {
 						System.out.println("CANT SEE");
 					}
 				}
@@ -253,11 +257,17 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
+				if (input.isCircleButtonPressed()) {
+					return FSMState.DRIVE_TO_CONE_STATE;
+				}
 				return FSMState.TELEOP_STATE;
 			case AUTO_STATE:
 				return FSMState.AUTO_STATE;
-			case CV_STATE:
-				return FSMState.CV_STATE;
+			case DRIVE_TO_CONE_STATE:
+				if (input.isCircleButtonReleased()) {
+					return FSMState.TELEOP_STATE;
+				}
+				return FSMState.DRIVE_TO_CONE_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -351,7 +361,6 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
-
 	/**
 	 * Drives the robot to a final odometry state.
 	 * @param pose final odometry position for the robot
@@ -406,13 +415,13 @@ public class DriveFSMSystem {
 	 * @param rotFinal constantly updating angular difference to the point
 	 */
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
+		double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
 			drive(0, 0, 0, false, false);
 		} else {
-			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-			double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
-
 			drive(xSpeed, ySpeed, rotSpeed, true, true);
 		}
 	}
