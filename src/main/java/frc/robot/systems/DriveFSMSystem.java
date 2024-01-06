@@ -210,6 +210,13 @@ public class DriveFSMSystem {
 				}
 				break;
 			case AUTO_STATE:
+				if (input == null) {
+					driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// ArrayList<Pose2d> points = new ArrayList<Pose2d>();
+					// points.add(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+					// points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					// driveAlongPath(points);
+				}
 				break;
 
 			case CV_STATE:
