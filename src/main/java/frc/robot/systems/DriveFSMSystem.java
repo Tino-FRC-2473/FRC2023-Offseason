@@ -385,6 +385,11 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot through a series of points.
+	 * @param points arraylist of points to drive to
+	 * @return if the robot has driven to the next position
+	 */
 	public boolean driveAlongPath(ArrayList<Pose2d> points) {
 		if (currentPointInPath >= points.size()) {
 			return true;
@@ -395,6 +400,12 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot until it reaches a given point.
+	 * @param xDist constantly updating x distance to the point
+	 * @param yDist constantly updating y distance to the point
+	 * @param rotFinal constantly updating angular difference to the point
+	 */
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
 			drive (0, 0, 0, false, false);
@@ -407,6 +418,11 @@ public class DriveFSMSystem {
 		}
 	}
 
+	/**
+	 * Drives the robot until it reaches a given object.
+	 * @param dist constantly updating distance to the object
+	 * @param rotFinal constantly updating angular difference to the point
+	 */
 	public void driveUntilObject(double dist, double rotFinal) {
 		double power = clamp((dist - 0.58) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
