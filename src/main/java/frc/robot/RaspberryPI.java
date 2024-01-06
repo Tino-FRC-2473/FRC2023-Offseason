@@ -9,7 +9,7 @@ import frc.robot.Constants.NetworkTablesConstants;
 public class RaspberryPI {
 	private double fps = 0;
 	private NetworkTable table;
-	int n = 0;
+
 	//FPS Calculation
 	private DoubleSubscriber fpsCounter;
 	private DoubleSubscriber cubeYawSubscriber;
@@ -90,7 +90,8 @@ public class RaspberryPI {
 	}
 
 	/**
-	 * returns the FPS
+	 * returns the FPS.
+	 * @return frames per second
 	 */
 	public double getFPS() {
 		return fps;

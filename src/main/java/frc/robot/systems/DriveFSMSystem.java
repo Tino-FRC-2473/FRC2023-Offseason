@@ -27,6 +27,7 @@ import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
+import frc.robot.Constants;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
@@ -40,13 +41,13 @@ public class DriveFSMSystem {
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
-	int n = 0;
+	private int n = 0;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
-	
+
 	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
@@ -222,7 +223,7 @@ public class DriveFSMSystem {
 			case CV_STATE:
 				double dist = rpi.getConeDistance();
 				double angle = rpi.getConeYaw();
-				if (n % 100 == 0) {
+				if (n % Constants.PRINTING_MOD_CONSTANT == 0) {
 					System.out.println("dist: " + dist);
 					System.out.println("ang: " + angle);
 
@@ -350,12 +351,10 @@ public class DriveFSMSystem {
 		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
 	}
 
-	
+
 	/**
 	 * Drives the robot to a final odometry state.
-	 * @param x final x position of center in meters
-	 * @param y final y position of center in meters
-	 * @param angle final angle in degrees
+	 * @param pose final odometry position for the robot
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
@@ -408,7 +407,7 @@ public class DriveFSMSystem {
 	 */
 	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
 		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
-			drive (0, 0, 0, false, false);
+			drive(0, 0, 0, false, false);
 		} else {
 			double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 			double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
@@ -424,7 +423,8 @@ public class DriveFSMSystem {
 	 * @param rotFinal constantly updating angular difference to the point
 	 */
 	public void driveUntilObject(double dist, double rotFinal) {
-		double power = clamp((dist - 0.58) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double power = clamp((dist - AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_TAG)
+			/ AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
@@ -433,7 +433,8 @@ public class DriveFSMSystem {
 		// System.out.println("power: " + power);
 		// System.out.println("rotSpeed: " + rotSpeed);
 
-		if ((dist < 0.58 && Math.abs(rotFinal) <= 5) || (dist == -1 || rotFinal == -1)) {
+		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_TAG && Math.abs(rotFinal)
+			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_TAG) || (dist == -1 || rotFinal == -1)) {
 			drive(0, 0, 0, false, false);
 		// } else if (Math.abs(rotFinal) > 5) {
 		// 	drive(0, 0, rotSpeed, false, false);
@@ -479,6 +480,13 @@ public class DriveFSMSystem {
 		return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
 	}
 
+	/**
+	 * Clamps a double between two values.
+	 * @param value the value wished to be bounded
+	 * @param lowerBound the lower limit for the value
+	 * @param upperBound the upper limit for the value
+	 * @return the clamped value of the double
+	 */
 	public static double clamp(double value, double lowerBound, double upperBound) {
 		return Math.min(Math.max(value, lowerBound), upperBound);
 	}
