@@ -153,7 +153,7 @@ public class DriveFSMSystem {
 		currentState = FSMState.CV_STATE;
 		currentPointInPath = 0;
 
-		resetEncoders();
+		//resetEncoders();
 		resetOdometry(getPose());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
