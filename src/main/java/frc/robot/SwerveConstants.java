@@ -67,7 +67,7 @@ public final class SwerveConstants {
 		// The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
 		// This changes the drive speed of the module (a pinion gear with more teeth will result in
 		// a robot that drives faster).
-		public static final int DRIVING_MOTOR_PINON_TEETH = 14;
+		public static final int DRIVING_MOTOR_PINON_TEETH = 13;
 
 		// Invert the turning encoder, since the output shaft rotates in the opposite direction of
 		// the steering motor in the MAXSwerve Module.
@@ -116,8 +116,8 @@ public final class SwerveConstants {
 		public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
 		public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
 
-		public static final int DRIVING_MOTOR_CUTTENT_LIMIT = 20; // amps //50
-		public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
+		public static final int DRIVING_MOTOR_CUTTENT_LIMIT = 40; // amps
+		public static final int TURNING_MOTOR_CURRENT_LIMIT = 30; // amps
 	}
 
 	public static final class OIConstants {
@@ -134,7 +134,6 @@ public final class SwerveConstants {
 		public static final double PY_CONTROLLER = 1;
 		public static final double P_THETA_CONTROLLER = 1;
 
-		public static final double AUTO_MOBILITY_DIST = 2.5; //meters
 		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 0.5; //meters
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
 		public static final double METERS_MARGIN_OF_ERROR = 0.05;
