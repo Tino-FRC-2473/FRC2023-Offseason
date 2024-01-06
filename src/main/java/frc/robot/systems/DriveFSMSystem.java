@@ -39,6 +39,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
+	private int currentPointInPath;
 	int n = 0;
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -150,6 +151,7 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentState = FSMState.CV_STATE;
+		currentPointInPath = 0;
 
 		resetEncoders();
 		resetOdometry(getPose());
