@@ -46,7 +46,7 @@ public class DriveFSMSystem {
 	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
-	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	private AHRS gyro;
 
 	private RaspberryPI rpi = new RaspberryPI();
 
