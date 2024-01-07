@@ -135,7 +135,7 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 
-		resetEncoders();
+		//resetEncoders();
 		resetOdometry(getPose());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
