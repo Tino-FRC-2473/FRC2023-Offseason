@@ -18,6 +18,13 @@ public class LED extends TimedRobot{
 		  led.start();
     }
 
+    public void greenLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 135, 255, 8);
+      }
+      led.setData(ledBuffer);
+    }
+
     public void cr() {
       for (var i = 0; i < ledBuffer.getLength(); i++) {
         ledBuffer.setRGB(i, 199, greenVal, 0);

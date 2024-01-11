@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 		//led.rainbow();
 		///hueVal++;
 		//led.setHSVVals(hueVal, 100, 100);
-		led.cr();
+		led.greenLight();
 		//led.set
 		// if (wristSystem.movingAutoState()) {
 		// 	autoWristMoved = true;
